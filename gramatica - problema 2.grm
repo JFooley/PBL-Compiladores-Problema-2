@@ -1,0 +1,87 @@
+﻿"Start Symbol" = <start>
+
+boolean::= "true" | "false"
+number::= {Digit}+("."{Digit}+)?
+<symbol>::= {AlphaNumeric} !-------So adicionei pq estava sem nada, mas precisa corrigir
+string::= '"'({AlphaNumeric} | <symbol>)*'"'
+character::= "'" ({AlphaNumeric} | <symbol>) "'"
+identifier::= {letter}({letter}| {digit} | "_")*
+
+<start>::= <registers> <constants> <variables> <functions><main> | <registers> <constants> <variables> <main> | <registers> <constants> <variables> <functions> <main>
+
+<registers>::= <register> | <register> <registers>
+<functions>::= <function> | <function> <functions>
+
+<constants>::= "constants" "{" <constants declarations> "}" | "constants" "{" "}"
+<constants declarations>::= <attribute declaration> | <attribute declaration> <constants declarations>
+<assignment declaration>::= <primitive type> identifier "=" <value> ";"
+
+<value>::= number | string | character | boolean 
+<type>::= <primitive type> | identifier
+<primitive type>::= "integer" | "float" | "boolean" | "string"
+
+<variables>::= "variables" "{" <expression variables> "}" | "variables" "{" "}"
+<declaration>::= <type> identifier ";"
+
+<vector declaration>::= <type> <vector position> ";"
+<vector position>::= identifier <vector index>
+<vector index>::= "[" number "]" | "[" number "]" <vector index> | "[" identifier "]" | "[" identifier "]" <vector index> | "[" <arithmetic expression>"]" | "[" <arithmetic expression>"]" <vector index>
+
+<expression variables>::= <declaration> <expression variables> | <assignment declaration> <expression variables> | <declaration> | <assignment declaration> | <vector declaration> | <vector declaration> <expression variables>
+      
+<register>::= "register" identifier "{" <register body> "}" ";"
+<register body>::= <declaration> | <declaration> <register body>
+<register position>::= identifier <register access>
+<register access>::= "." identifier | "." identifier <register access> | "." <vector position>
+
+<function>::= "function" <type> identifier "(" <parameter> ")" "{" <statements> "}"
+<parameter>::= <type> identifier | <type> identifier "," <parameter> 
+
+<main>:: = "main()" "{" <statements> "}"
+<statements> ::= <variables> <body>
+
+<body>::= <commands> | <assignment> | <commands> <body>| <assignment> <body>
+<assignment>::= <attribute> "=" <expression> ";"| <attribute> <increment terminal> ";"
+<attribute>::= identifier | <register position> | <vector position>
+
+<expression>::= <attribute> | <logic expression> | <relational expression> | <arithmetic expression> | <function call> | <value>
+
+<commands>::= <for> | <while> | <if> | <write> | <read> | <return>
+            
+! Comandos:
+<function call>::= identifier "(" <arguments> ")" ";"
+<arguments>::= <expression> | <expression> "," <arguments>
+<return>::= "return" ";" | "return" <expression> ";"
+
+<if>::= <fixed if>  | <fixed if> "else" "{" <body> "}"
+<fixed if>::= "if (" <conditional expression> ")" "then" "{" <body> "}" 
+
+<for>::= "for" "(" <initialization> ";" <relational expression> ";" identifier <increment terminal> ")" "{" <body> "}"
+<initialization>::= "integer" identifier "=" <initialization options> | identifier "=" <initialization options> 
+<initialization options> ::= <attribute> | <arithmetic expression> | <functions> | number
+
+<while>::= "while" "(" <conditional expression> ")" "{" <body> "}"
+<conditional expression> ::= <relational expression> | <logic expression>
+
+<write>::= "write" "(" <write list> ")" ";"
+<write list> ::= <expression> "," <write list> | <expression>
+
+<read>::= "read" "(" <read list> ")" ";"
+<read_list>::= <attribute>  "," <read list> | <attribute>
+
+! Expressões:
+<increment terminal>::= "++" | "--"
+
+<logic expression>::= <logic value> <logic terminal> <logic expression> | <logic value> <logic terminal> <logic value> | "(" <logic expression> ")" | "(" <logic expression> ")" <logic terminal> <logic expression> | "(" <logic expression> ")" <logic terminal> <logic value>
+<logic value>::= boolean | <function call> | <attribute> | <relational expression>
+<logic terminal>::= "&&" | "||" | "=="
+
+
+<relational expression>::= <relational value> <relational terminal> <relational expression> | <relational value> <relational terminal> <relational value> | "(" <relational expression> ")" |  “(”<relational expression>")" <relational terminal> <relational expression> | "(" <relational expression> ")" <relational terminal> <relational value>
+<relational value>::= number | <arithmetic expression> | <function call> | <attribute>
+<relational terminal>::= ">" | "<" | "!=" | ">=" | "<=" | "=="
+
+<arithmetic expression>::= <arithmetic value> <arithmetic terminal> <arithmetic expression> | <arithmetic value> <terminal arithmetic> <arithmetic value> | "(" <arithmetic expression> ")" | "("<arithmetic expression>")" <arithmetic terminal> <arithmetic expression> | "(" <arithmetic expression> ")" <arithmetic terminal> <arithmetic value>
+<arithmetic value>::= number | <function call> | <attribute>
+<arithmetic terminal>::= "+" | "-" | "*" | "/" 
+
