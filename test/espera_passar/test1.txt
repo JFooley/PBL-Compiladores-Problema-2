@@ -67,10 +67,10 @@ main() {
     }
   }
 
+  write(4+5,num,my_array[0],array[0][0],a||b, a<=b);
+  read(num, my_array[0],array[0][0]);
+  
   while(esseTipoNaopodeEDeveAcusarErro + 5){
     a = b+c;
   }
-
-  write(4+5,num,my_array[0],array[0][0],a||b, a<=b,);
-  read(num, my_array[0],array[0][0]);
 }
