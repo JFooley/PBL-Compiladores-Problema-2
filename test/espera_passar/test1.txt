@@ -29,7 +29,7 @@ function integer compute_sum(int x, int y) {
   return x + y;
 }
 
-function empty functionEmpty(){
+function empty functionEmpty(int a){
   temperature = my_array[0];
   num--;
   flag = A_teste && my_register.reg2 || a <= b;
