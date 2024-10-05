@@ -30,6 +30,7 @@ function integer compute_sum(int x, int y) {
 }
 
 function empty functionEmpty(int a){
+  variables {}
   temperature = my_array[0];
   num--;
   flag = A_teste && my_register.reg2 || a <= b;
