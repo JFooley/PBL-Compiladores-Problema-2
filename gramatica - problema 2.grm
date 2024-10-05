@@ -1,12 +1,13 @@
 ﻿"Start Symbol" = <start>
 "Case Sensitive" = True
 
-boolean = 'true' | 'false'
+booleanDeclarate = 'true' | 'false'
 number = {Number}+('.'{Number}+)?
-symbol = {&20 .. &21} + {&23 .. &26} + {&28 .. &7E}
-string = {&22} symbol* {&22}
-character = {&27} symbol {&27}
+{Symbol} = {&20 .. &21} + {&23 .. &26} + {&28 .. &7E} 
+stringDeclarate = '"'{Symbol}*'"' 
+character = ['']{Symbol}[''] 
 identifier = {Letter}({Letter}| {Number} | ['_'])*
+
 
 <start>::= <registers> <constants> <variables> <functions> <main> | <registers> <constants> <variables> <main> | <constants> <variables> <functions> <main> | <constants> <variables> <main>
         
@@ -17,7 +18,7 @@ identifier = {Letter}({Letter}| {Number} | ['_'])*
 <constants declarations>::= <assignment declaration> | <assignment declaration> <constants declarations>
 <assignment declaration>::= <primitive type> identifier '=' <value> ';'
 
-<value>::= string | character | <logic expression>
+<value>::= stringDeclarate | character | <logic expression>
 <type>::= <primitive type> | identifier
 <primitive type>::= 'integer' | 'float' | 'boolean' | 'string'
 
@@ -70,7 +71,7 @@ identifier = {Letter}({Letter}| {Number} | ['_'])*
 <increment terminal>::= '++' | '--'
 
 <logic expression>::= <logic value> <logic terminal> <logic expression> | '(' <logic expression> ')' | '(' <logic expression> ')' <logic terminal> <logic expression> | <logic value>
-<logic value>::= boolean | <relational expression>
+<logic value>::= booleanDeclarate | <relational expression>
 <logic terminal>::= '&&' | '||'   !retiramos o "=="
 
 <relational expression>::= <arithmetic expression> <relational terminal> <relational expression> | '(' <relational expression> ')' |  '('<relational expression>')' <relational terminal> <relational expression> | <arithmetic expression>
