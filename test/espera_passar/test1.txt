@@ -1,0 +1,40 @@
+register my_register {
+  integer reg1;
+  boolean reg2;
+}
+
+constants {
+  integer min = 10;
+  float max = 100.0;
+  string text = "Hello, World";
+}
+
+variables {
+  string message = "test";
+  float temperature = 2.5;
+  integer num = 1;
+  boolean flag = true;
+  integer my_array[3];
+}
+
+function integer compute_sum(int x, int y) {
+  variables {
+    integer x = 1;
+    integer y = 2;  
+  }
+  return x + y;
+}
+
+main() {
+  variables {
+    integer num = 1;
+    integer result;
+  }
+  num = 2;
+
+  num++;
+
+  result = num * 3 + 1;
+
+  result = compute_sum(1, 2);
+}
