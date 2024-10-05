@@ -1,0 +1,27 @@
+constants {
+    integer min = 10;
+    float max = 100.0;
+    string text = "Hello, World";
+}
+
+variables {
+    string message = "test";
+    float temperature = 2.5;
+    integer num = 1;
+    boolean flag = true;
+}
+
+function integer compute_sum(int x, int y) {
+  variables {
+    integer x = 1;
+    integer y = 2;  
+  }
+  return x + y;
+}
+
+main() {
+  variables {
+    integer num;
+  }
+  num = 2;
+}

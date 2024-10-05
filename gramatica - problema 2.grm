@@ -23,7 +23,7 @@ identifier = {Letter}({Letter}| {Number} | ['_'])*
 <primitive type>::= 'integer' | 'float' | 'boolean' | 'string'
 
 <variables>::= 'variables' '{' <expression variables> '}' | 'variables' '{' '}'
-<declaration>::= <type> identifier ';'
+<declaration>::= <primitive type> identifier ';'
 
 <vector declaration>::= <type> <vector position> ';'
 <vector position>::= identifier <vector index>
