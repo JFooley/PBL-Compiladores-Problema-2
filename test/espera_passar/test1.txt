@@ -1,6 +1,8 @@
+// Código fonte de teste
+
 register my_register {
-  integer reg1;
-  boolean reg2;
+  integer reg1; // reg1
+  boolean reg2; /** reg2 **/
 }
 
 constants {
@@ -14,7 +16,7 @@ variables {
   float temperature = 2.5;
   integer num = 1;
   boolean flag = true;
-  integer my_array[3];
+  integer my_array[3]; 
 }
 
 function integer compute_sum(int x, int y) {
@@ -25,8 +27,13 @@ function integer compute_sum(int x, int y) {
   return x + y;
 }
 
+/** 
+
+Essa é a nossa função main 
+
+**/
 main() {
-  variables {
+  variables { 
     integer num = 1;
     integer result;
   }
