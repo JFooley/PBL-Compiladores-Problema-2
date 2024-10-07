@@ -1,6 +1,8 @@
+// Código fonte de teste
+
 register my_register {
-  integer reg1;
-  boolean reg2;
+  integer reg1; // reg1
+  boolean reg2; /** reg2 **/
 }
 
 constants {
@@ -38,6 +40,9 @@ function empty functionEmpty(int a){
   num = c >=b;
 }
 
+/** 
+Essa é a nossa função main 
+**/
 main() {
   variables {
     integer num = 1;
