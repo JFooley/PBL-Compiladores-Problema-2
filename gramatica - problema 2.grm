@@ -32,7 +32,8 @@ Comment Line  = '//'
 <vector position>::= identifier <vector index>
 <vector index>::= '[' number ']' | '[' number ']' <vector index> | '[' identifier ']' | '[' identifier ']' <vector index> | '[' <arithmetic expression>']' | '[' <arithmetic expression>']' <vector index>
 
-<expression variables>::= <declaration> <expression variables> | <assignment declaration> <expression variables> | <declaration> | <assignment declaration> | <vector declaration> | <vector declaration> <expression variables>
+<expression declaration>::= <primitive type> identifier ';' | identifier identifier ';' | <primitive type> identifier '=' <value> ';' | <primitive type> <vector position> ';'
+<expression variables>::= <expression declaration> <expression variables> | <expression declaration> <declaration> <expression variables> | <assignment declaration> <expression variables> | <declaration> | <assignment declaration> | <vector declaration> | <vector declaration> <expression variables>
       
 <register>::= 'register' identifier '{' <register body> '}'
 <register body>::= <declaration> | <declaration> <register body>
@@ -57,7 +58,7 @@ Comment Line  = '//'
 <return>::= 'return' ';' | 'return' <value> ';'
 
 <if>::= <fixed if>  | <fixed if> 'else' '{' <body> '}'
-<fixed if>::= 'if (' <logic expression> ')' 'then' '{' <body> '}' 
+<fixed if>::= 'if' '(' <logic expression> ')' 'then' '{' <body> '}' 
 
 <for>::= 'for' '(' <initialization> ';' <relational expression> ';' identifier <increment terminal> ')' '{' <body> '}'
 <initialization>::= 'integer' identifier '=' <arithmetic expression> | identifier '=' <arithmetic expression> 
