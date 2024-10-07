@@ -16,7 +16,11 @@ variables {
   float temperature = 2.5;
   integer num = 1;
   boolean flag = true;
-  integer my_array[3]; 
+  integer my_array[3];
+  integer array[4+3][5-1];
+  boolean A_teste;
+  integer a = 5;
+  integer b = 4;
 }
 
 function integer compute_sum(int x, int y) {
@@ -27,13 +31,20 @@ function integer compute_sum(int x, int y) {
   return x + y;
 }
 
+function empty functionEmpty(int a){
+  variables {}
+  temperature = my_array[0];
+  num--;
+  flag = A_teste && my_register.reg2 || a <= b;
+  num = a == b;
+  num = c >=b;
+}
+
 /** 
-
 Essa é a nossa função main 
-
 **/
 main() {
-  variables { 
+  variables {
     integer num = 1;
     integer result;
   }
@@ -44,4 +55,27 @@ main() {
   result = num * 3 + 1;
 
   result = compute_sum(1, 2);
+
+  for(a = 1; a <= 10; a++) {
+    num--;
+  }
+
+  for (integer n = 10; n>0; n--){
+    num = n * 8 + 4;
+  }
+
+  while ((num && b) || num != c){
+    if (c && b) then {
+      num++;
+    } else {
+      num--;
+    }
+  }
+
+  write(4+5,num,my_array[0],array[0][0],a||b, a<=b);
+  read(num, my_array[0],array[0][0]);
+  
+  while(esseTipoNaopodeEDeveAcusarErro + 5){
+    a = b+c;
+  }
 }
