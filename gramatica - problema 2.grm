@@ -1,4 +1,4 @@
-﻿"Start Symbol" = <start>
+"Start Symbol" = <start>
 "Case Sensitive" = True
 
 booleanDeclarate = 'true' | 'false'
@@ -7,6 +7,7 @@ number = {Number}+('.'{Number}+)?
 stringDeclarate = '"'{Symbol}*'"' 
 character = ['']{Symbol}[''] 
 identifier = {Letter}({Letter}| {Number} | ['_'])*
+
            
 Comment Start = '/*'
 Comment End   = '*/'
@@ -28,19 +29,20 @@ Comment Line  = '//'
 <variables>::= 'variables' '{' <expression variables> '}' | 'variables' '{' '}'
 <declaration>::= <type> identifier ';'
 
-<vector declaration>::= <type> <vector position> ';'
 <vector position>::= identifier <vector index>
 <vector index>::= '[' number ']' | '[' number ']' <vector index> | '[' identifier ']' | '[' identifier ']' <vector index> | '[' <arithmetic expression>']' | '[' <arithmetic expression>']' <vector index>
 
 <expression declaration>::= <primitive type> identifier ';' | identifier identifier ';' | <primitive type> identifier '=' <value> ';' | <primitive type> <vector position> ';'
-<expression variables>::= <expression declaration> <expression variables> | <expression declaration> <declaration> <expression variables> | <assignment declaration> <expression variables> | <declaration> | <assignment declaration> | <vector declaration> | <vector declaration> <expression variables>
+<expression variables>::= <expression declaration> <expression variables> | <expression declaration>
+                       
       
 <register>::= 'register' identifier '{' <register body> '}'
 <register body>::= <declaration> | <declaration> <register body>
 <register position>::= identifier <register access>
 <register access>::= '.' identifier | '.' identifier <register access> | '.' <vector position>
 
-<function>::= 'function' <type> identifier '(' <parameter> ')' '{' <statements> '}'
+<function>::= 'function' <type> identifier <parameters> '{' <statements> '}' 
+<parameters>::= '(' <parameter> ')' | '(' ')'
 <parameter>::= <type> identifier | <type> identifier ',' <parameter> 
 
 <main>::= 'main' '(' ')' '{' <statements> '}'
@@ -50,10 +52,12 @@ Comment Line  = '//'
 <assignment>::= <attribute> '=' <value> ';'| <attribute> <increment terminal> ';'
 <attribute>::= identifier | <register position> | <vector position>
 
-<commands>::= <for> | <while> | <if> | <write> | <read> | <return>
+<commands>::= <for> | <while> | <if> | <write> | <read> | <return> | <function call> ';'
+           
           
 ! Comandos:
-<function call>::= identifier '(' <arguments> ')' ';'
+<function call>::= identifier <argument>
+<argument>::= '(' <arguments> ')' | '(' ')'
 <arguments>::= <value> | <value> ',' <arguments>
 <return>::= 'return' ';' | 'return' <value> ';'
 
@@ -87,8 +91,5 @@ Comment Line  = '//'
 <arithmetic operating>::= <arithmetic value> <arithmetic multiplication> | <arithmetic value>
 <arithmetic multiplication>::= '*' <arithmetic value> <arithmetic multiplication> | '/' <arithmetic value> <arithmetic multiplication> | '*' <arithmetic value> | '/' <arithmetic value>
 
-<arithmetic value>::= number | <function call> | <attribute> | '(' <arithmetic expression> ')'
+<arithmetic value>::= number | <function call> | <attribute> | '(' <arithmetic expression> ')' 
                    
-
-
-
