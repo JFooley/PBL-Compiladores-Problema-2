@@ -40,6 +40,11 @@ function empty functionEmpty(int a){
   num = c >=b;
 }
 
+function string example(){
+  variables {}
+  return "Hello World";
+}
+
 /** 
 Essa é a nossa função main 
 **/
@@ -53,8 +58,29 @@ main() {
   num++;
 
   result = num * 3 + 1;
+  
+  a = (idade[0] + pessoa.idade) - 1;
 
-  result = compute_sum(1, 2);
+  helloWorld = example();
+  altName(name);
+  result = compute_sum(1,2);
+  
+  if(isEmpty(True)) then {
+    if(isInteger(True)) then {a++;}  
+  } else {
+    while(isString(True) && (a || b)) {
+        for(i = 1; i <= size(name); i++) {
+            count++;
+            isRich = (((a + b)*(d/e)) >= (salario + f*g)) && ((h*i/j - k) != 1500);
+        }
+        a = (isTrue || isFalse) && True;
+        if(isRich) then {return (1+3-a);}
+    }
+  }
+  
+  while(eternalTrue()) {
+    write("Eternamente");
+  }
 
   for(a = 1; a <= 10; a++) {
     num--;
