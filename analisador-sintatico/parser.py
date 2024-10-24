@@ -26,7 +26,7 @@ class Parser():
     def lookahead(self, K = 0):
         if self.index + K < len(self.token_list):
             return self.token_list[self.index + K]
-        return None
+        return {"lexeme": None,"category": None,"line": None}
     
     # Executa o algorítimo
     def run(self):
