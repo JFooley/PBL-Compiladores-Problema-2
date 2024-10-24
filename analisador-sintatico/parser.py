@@ -45,28 +45,17 @@ class Parser():
     # Executa o algorítimo
     def run(self):
         self.start()
-        return len(self.error_list) == 0
+        print(self.error_list)
+        return len(self.error_list) > 0
     
     ### Produções ###
     def start(self):
-        # <start>::= <registers> <constants> <variables> <functions> <main> 
-        #           | <registers> <constants> <variables> <main> 
-        #           | <constants> <variables> <functions> <main>
-        #           | <constants> <variables> <main>
-        
-        #if self.lookahead()["lexeme"] == "register": # TODO Ainda não implementado
-        #    self.registers()
-
-        #self.constants() # TODO Ainda não implementado
-        #self.variables() # TODO Ainda não implementado
-        
-        if self.lookahead()["lexeme"] == "function":
-            self.functions() 
-
-        #self.main() TODO Ainda não implementado
+        self.arithmetic_expression()
     
-    def registers(self):
-        self.match_lexeme("register")
+    def arithmetic_expression(self):
+        self.arithmetic_operating()
+        if self.lookahead()["lexeme"] in ['+', '-']:
+            self.arithmetic_sum()
     
     def arithmetic_operating(self):
         self.arithmetic_value()
@@ -100,89 +89,20 @@ class Parser():
         if self.lookahead()["lexeme"] in ['*', '/']:
             self.arithmetic_multiplication()
 
-    def logic_expression(self):
-        current_token = self.lookahead()
-        # Caso: '(' <logic expression> ')' ou '(' <logic expression> ')' <logic terminal> <logic expression>
-        if current_token["lexeme"] == "(":
-            self.match_lexeme(["("]) 
-            self.logic_expression() 
-            self.match_lexeme([")"]) 
-            # Check for the optional <logic terminal> and further <logic expression>
-            if self.lookahead()["lexeme"] in ['&&', '||']:
-                self.logic_terminal() 
-                self.logic_expression()
-        # Caso: <logic value> ou <logic value> <logic terminal> <logic expression>
-        else:
-            self.logic_value()
-            if self.lookahead()["lexeme"] in ['&&', '||']:
-                self.logic_terminal()
-                self.logic_expression()
-                            
-    def logic_value(self):
-        current_token = self.lookahead()
-        if current_token["lexeme"] in ['true', 'false']: 
-            self.match_lexeme(['true', 'false'])
-        else:
-            self.relational_expression()  
 
-    def logic_terminal(self):
-        self.match_lexeme(['&&', '||']) 
+# Testando a classe
+token_list = []
+token_list.append({"lexeme": "(","category": "OPEN_PARENTHESIS", "line": 1})
+token_list.append({"lexeme": "1","category": "number","line": 1})
+token_list.append({"lexeme": "+","category": "operator","line": 1})
+token_list.append({"lexeme": "3","category": "number","line": 1})
+token_list.append({"lexeme": ")","category": "CLOSE_PARENTHESIS", "line": 1})
+token_list.append({"lexeme": "*","category": "operator","line": 1})
+token_list.append({"lexeme": "3","category": "number","line": 1})
 
-    def relational_expression(self):
-        current_token = self.lookahead()
-        # Caso: '(' <relational expression> ')' ou '(' <relational expression> ')' <relational terminal> <relational expression>
-        if current_token["lexeme"] == "(":
-            self.match_lexeme(["("])
-            self.relational_expression()
-            self.match_lexeme([")"]) 
-            # Verify <relational terminal> and further <relational expression>
-            if self.lookahead()["lexeme"] in ['>', '<', '!=', '>=', '<=', '==']:
-                self.relational_terminal()
-                self.relational_expression()
-        # Caso: <arithmetic expression> ou <arithmetic expression> <relational terminal> <relational expression>
-        else:
-            self.arithmetic_expression()
-            if self.lookahead()["lexeme"] in ['>', '<', '!=', '>=', '<=', '==']:
-                self.relational_terminal()
-                self.relational_expression()
+for item in token_list:
+    print(item["lexeme"], end=" ")
 
-    def relational_terminal(self):
-        self.match_lexeme(['>', '<', '!=', '>=', '<=', '=='])
+p = Parser(token_list)
 
-    def function(self):
-        if self.lookahead()['lexeme'] == "function":
-            self.match_lexeme("function")
-            self.match_category("KEYWORD")
-            self.match_category("IDENTIFIER")
-            self.parameters()
-            self.match_lexeme("{")
-            #self.parse_statements() # TODO
-            self.match_lexeme("}")
-        else:
-            self._log_error('function')
-
-    def parameters(self):
-        if self.lookahead()['lexeme'] == "(":
-            self.match_lexeme("(")
-            self.parameter()
-        else:
-            self._log_error('(')
-
-    def parameter(self):
-        if self.lookahead()['category'] == "KEYWORD":
-            self.match_category("KEYWORD")
-            self.match_category("IDENTIFIER")
-            self.parameter_list()
-        elif self.lookahead()['lexeme'] == ")":
-            self.match_lexeme(")")
-        else:
-            self._log_error(')')  
-
-    def parameter_list(self):
-        if self.lookahead()['lexeme'] == ",":
-            self.match_lexeme(",")
-            self.parameter()
-        elif self.lookahead()['lexeme'] == ")":
-            self.match_lexeme(")")
-        else:
-            self._log_error("',' or ')'")
+p.run()
