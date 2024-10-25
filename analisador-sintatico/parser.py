@@ -101,7 +101,7 @@ class Parser():
 #<read list>::= <attribute>  ',' <read list> | <attribute>
 #--------------------- Read ---------------------
     def read(self):
-        self.match_lexeme("write")
+        self.match_lexeme("read")
         self.match_lexeme("(")
         
         #self.attribute()  
