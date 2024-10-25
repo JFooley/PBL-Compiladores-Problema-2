@@ -32,7 +32,7 @@ function integer compute_sum(int x, int y) {
   return x + y;
 }
 
-function empty functionEmpty(int a){
+function empty functionEmpty(integer a){
   variables {}
   temperature = my_array[0];
   num--;
@@ -41,7 +41,7 @@ function empty functionEmpty(int a){
   num = c >=b;
 }
 
-function integer fact(int number){
+function integer fact(inter number){
     variables {}
     if(number < 0) then {
     return 1;
