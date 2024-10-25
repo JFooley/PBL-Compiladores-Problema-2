@@ -31,6 +31,10 @@ class Parser():
     # Executa o algorítimo
     def run(self):
         self.start()
+
+        if self.index < len(self.token_list):
+            self.error_list.append({"position":"Parsing Erro", "expected":"No tokens", "received":"Remaining tokens"})
+
         return len(self.error_list) == 0
     
     ### Produções ###
@@ -116,16 +120,26 @@ class Parser():
     def relational_terminal(self):
         self.match_lexeme(['>', '<', '!=', '>=', '<=', '=='])
 
+    def arithmetic_expression(self):
+        ## SUBSTITUIR PELA CERTA DEPOIS ##
+        if self.lookahead()["lexeme"] in ['0', '1', '2', '3', '4', '5']:
+            self.match_lexeme(['0', '1', '2', '3', '4', '5'])
+        else:
+            self.match_category(["identifer"])
+        ## SUBSTITUIR PELA CERTA DEPOIS ##
+
 
 # Testando a classe
 token_list = []
 token_list.append({"lexeme": "(", "category": "OPEN_PARENTHESIS", "line": 1})
-token_list.append({"lexeme": "true", "category": "boolean","line": 1})
-token_list.append({"lexeme": "&&", "category": "operator","line": 1})
-token_list.append({"lexeme": "false", "category": "boolean","line": 1})
+token_list.append({"lexeme": "2", "category": "number","line": 1})
+token_list.append({"lexeme": ">", "category": "operator","line": 1})
+token_list.append({"lexeme": "1", "category": "number","line": 1})
 token_list.append({"lexeme": ")", "category": "CLOSE_PARENTHESIS", "line": 1})
 token_list.append({"lexeme": "||", "category": "operator","line": 1})
-token_list.append({"lexeme": "true", "category": "number","line": 1})
+token_list.append({"lexeme": "variavel", "category": "identifer","line": 1})
+token_list.append({"lexeme": "==", "category": "operator","line": 1})
+token_list.append({"lexeme": "3", "category": "number","line": 1})
 
 for item in token_list:
     print(item["lexeme"], end=" ")
