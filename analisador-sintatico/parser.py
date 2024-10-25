@@ -54,4 +54,45 @@ class Parser():
     def registers(self):
         self.match_lexeme("register")
     
-    # Fazer o resto, de constants, variables, functions
+    # ---- Laços de repetição ---
+
+    # <for> ::= 'for' '(' <initialization> ';' <relational expression> ';' identifier <increment terminal> ')' '{' <body> '}'
+    def for_statement(self):
+        """ Regra para <for> ::= 'for' '(' <initialization> ';' <relational expression> ';' identifier <increment terminal> ')' '{' <body> '}' """
+        self.match_lexeme(["for"])
+        self.match_lexeme(["("])
+        #self.initialization()          # Remover comentário ao implementar função
+        self.match_lexeme([";"])
+        #self.relational_expression()   # Remover comentário ao implementar função
+        self.match_lexeme([";"])
+        self.match_category(["IDENTIFIER"])
+        #self.increment_terminal()      # Remover comentário ao implementar função
+        self.match_lexeme([")"])
+        self.match_lexeme(["{"])
+        #self.body()                    # Remover comentário ao implementar função
+        self.match_lexeme(["}"])
+
+    # <initialization> ::= "integer" identifier "=" <arithmetic expression> | identifier "=" <arithmetic expression>
+    def initialization(self):
+        """ Regra para <initialization> ::= "integer" identifier "=" <arithmetic expression> | identifier "=" <arithmetic expression> """
+        if self.lookahead()["lexeme"] == "integer":
+            self.match_lexeme(["integer"])
+        self.match_category(["IDENTIFIER"])
+        self.match_lexeme(["="])
+        #self.arithmetic_expression()      # Remover comentário ao implementar função
+    
+    # <increment terminal> ::= '++' | '--'
+    def increment_terminal(self):
+        """ Regra para <increment terminal> ::= '++' | '--' """    
+        self.match_lexeme(["++", "--"])
+    
+    # <while>::= 'while' '(' <logic expression> ')' '{' <body> '}'
+    def while_statement(self):
+        """ Regra para <while>::= 'while' '(' <logic expression> ')' '{' <body> '}' """
+        self.match_lexeme(["while"])
+        self.match_lexeme(["("])
+        #self.logic_expression()    # Remover comentário ao implementar função
+        self.match_lexeme([")"])
+        self.match_lexeme(["{"])
+        #self.body()                # Remover comentário ao implementar função
+        self.match_lexeme(["}"])
