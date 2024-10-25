@@ -54,9 +54,8 @@ class Parser():
     def registers(self):
         self.match_lexeme(["register"])
         self.match_category(["IDENTIFIER"])
-        cur_index = self.index
-        self.match_lexeme(['{'])
-        if cur_index != self.index:
+        if self.lookahead()["lexeme"] == "{":
+            self.match_lexeme(['{'])
             self.register_body()
             self.match_lexeme(['}']) 
 
@@ -72,9 +71,8 @@ class Parser():
     
     def constants(self):
         self.match_lexeme(['constants']) 
-        cur_index = self.index
-        self.match_lexeme(['{'])
-        if cur_index != self.index:
+        if self.lookahead()["lexeme"] == "{":
+            self.match_lexeme(['{'])
             self.constants_declarations()  
             self.match_lexeme(['}']) 
 
