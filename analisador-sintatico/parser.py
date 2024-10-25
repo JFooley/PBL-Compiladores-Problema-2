@@ -55,3 +55,61 @@ class Parser():
         self.match_lexeme("register")
     
     # Fazer o resto, de constants, variables, functions
+
+#<if>::= <fixed if>  | <fixed if> 'else' '{' <body> '}'
+#<fixed if>::= 'if' '(' <logic expression> ')' 'then' '{' <body> '}' 
+#--------------------- Condicionais ---------------------
+    def condicional(self):
+        self.match_lexeme("if")
+        self.match_lexeme("(")
+        #self.logic_expression()
+        self.match_lexeme("expressao") #Remover quando tiver o logic_expression()
+        self.match_lexeme(")")
+        self.match_lexeme("then")
+        self.match_lexeme("{")
+        #self.body()
+        self.match_lexeme("body") #Remover quando tiver o body()
+        self.match_lexeme("}")
+
+        if (self.lookahead()["lexeme"] == "else"):
+            self.match_lexeme("else")
+            self.match_lexeme("{")
+            #self.body()
+            self.match_lexeme("body") #Remover quando tiver o body()
+            self.match_lexeme("}")
+
+
+#<write>::= 'write' '(' <write list> ')' ';'
+#<write list> ::= <value> ',' <write list> | <value>
+#--------------------- Write ---------------------
+    def write(self):
+        self.match_lexeme("write")
+        self.match_lexeme("(")
+        
+        #self.value()  
+        self.match_lexeme("value") #Remover quando tiver
+        while self.lookahead()["lexeme"] == ",":  
+            self.match_lexeme(",")  
+            #self.value() 
+            self.match_lexeme("value") #Remover quando tiver
+
+        self.match_lexeme(")")
+        self.match_lexeme(";")
+
+
+#<read>::= 'read' '(' <read list> ')' ';'
+#<read list>::= <attribute>  ',' <read list> | <attribute>
+#--------------------- Read ---------------------
+    def read(self):
+        self.match_lexeme("write")
+        self.match_lexeme("(")
+        
+        #self.attribute()  
+        self.match_lexeme("attribute") #Remover quando tiver
+        while self.lookahead()["lexeme"] == ",":  
+            self.match_lexeme(",")  
+            #self.attribute() 
+            self.match_lexeme("attribute") #Remover quando tiver
+
+        self.match_lexeme(")")
+        self.match_lexeme(";")
