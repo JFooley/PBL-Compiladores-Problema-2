@@ -7,7 +7,7 @@ class Parser():
     # Função match para verificar categoria
     def match_category(self, expected_token_category):
         current_token = self.lookahead()
-        if current_token['category'] in expected_token_category:
+        if current_token['category'] != None and current_token['category'] in expected_token_category:
             self.index += 1 # Move to the next token
             return current_token
         else:
@@ -16,7 +16,7 @@ class Parser():
     # Função match para verificar o lexema
     def match_lexeme(self, expected_token_lexeme):
         current_token = self.lookahead()
-        if current_token['lexeme'] in expected_token_lexeme:
+        if current_token['lexeme'] != None and current_token['lexeme'] in expected_token_lexeme:
             self.index += 1 # Move to the next token
             return current_token
         else:
