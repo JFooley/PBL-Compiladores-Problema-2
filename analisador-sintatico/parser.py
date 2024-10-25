@@ -31,7 +31,7 @@ class Parser():
     # Executa o algorítimo
     def run(self):
         self.start()
-        return len(self.error_list) > 0
+        return len(self.error_list) == 0
     
     ### Produções ###
     def start(self):
