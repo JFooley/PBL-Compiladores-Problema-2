@@ -42,7 +42,7 @@ class Parser():
         #           | <registers> <constants> <variables> <main> 
         #           | <constants> <variables> <functions> <main>
         #           | <constants> <variables> <main>
-        
+        self.value()
         if self.lookahead()["lexeme"] == "register":
             self.registers()
 
@@ -76,8 +76,7 @@ class Parser():
                 #self.function_call()
                 pass
             else:
-                #self.attribute
-                pass
+                self.attribute()
 
     def arithmetic_sum(self):
         self.match_lexeme(['+', '-'])
@@ -146,8 +145,7 @@ class Parser():
     def condicional(self):
         self.match_lexeme(["if"])
         self.match_lexeme(["("])
-        #self.logic_expression()
-        self.match_lexeme("expressao") #Remover quando tiver o logic_expression()
+        self.logic_expression()
         self.match_lexeme([")"])
         self.match_lexeme(["then"])
         self.match_lexeme(["{"])
@@ -200,8 +198,7 @@ class Parser():
         elif self.lookahead()["category"] == "CHARACTER":
             self.match_category(["CHARACTER"])
         else:
-            #self.logic_expression()
-            self.match_lexeme(["expressao"]) #Remover quando tiver o logic_expression()
+            self.logic_expression()
 
 # <type>::= <primitive type> | identifier
     def type(self):
@@ -262,37 +259,7 @@ def commands(self):
         self.read()
     elif self.lookahead()["lexeme"] == "return":
         #self.return()
-        self.match_lexeme(["return"])
+        self.match_lexeme(["return"]) #REMOVER
     else:
         self.function_call()
         self.match_lexeme([";"])
-    
-
-'''
-token_list = []
-token_list.append({"lexeme": "\"string\"" , "category": "STRING", "line": 1})
-token_list.append({"lexeme": "'c'", "category": "CHARACTER", "line": 1})
-token_list.append({"lexeme":"integer", "category":"KEYWORD", "line":1})
-token_list.append({"lexeme":"boolean", "category":"KEYWORD", "line":1})
-token_list.append({"lexeme":"string", "category":"KEYWORD", "line":1})
-token_list.append({"lexeme":"float", "category":"KEYWORD", "line":1})
-token_list.append({"lexeme":"abcde", "category":"IDENTIFIER", "line":1})
-token_list.append({"lexeme":"id", "category":"IDENTIFIER", "line":1})
-token_list.append({"lexeme":"=", "category":"DELIMITED", "line":1})
-token_list.append({"lexeme":"'C'", "category":"CHARACTER", "line":1})
-token_list.append({"lexeme":";", "category":"DELIMITED", "line":1})
-
-token_list.append({"lexeme":"increment_terminal", "category":"DELIMITED", "line":1})
-token_list.append({"lexeme":";", "category":"DELIMITED", "line":1})
-
-token_list.append({"lexeme":".", "category":"DELIMITED", "line":1})
-token_list.append({"lexeme":"register_position", "category":"DELIMITED", "line":1})
-
-token_list.append({"lexeme":"[", "category":"DELIMITED", "line":1})
-token_list.append({"lexeme":"vector_position", "category":"DELIMITED", "line":1})
-
-
-p = Parser(token_list)
-
-p.run()
-'''
