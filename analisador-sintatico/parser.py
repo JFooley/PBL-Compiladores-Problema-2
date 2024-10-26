@@ -44,8 +44,6 @@ class Parser():
         #           | <registers> <constants> <variables> <main> 
         #           | <constants> <variables> <functions> <main>
         #           | <constants> <variables> <main>
-        self.value()
-        '''    
         if self.lookahead()["lexeme"] == "register":
             self.registers()
 
@@ -56,12 +54,172 @@ class Parser():
             self.functions()
 
         self.main()
-        '''
+
     
     def registers(self):
         self.match_lexeme("register")
     
     # Fazer o resto, de constants, variables, functions
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #<if>::= <fixed if>  | <fixed if> 'else' '{' <body> '}'
 #<fixed if>::= 'if' '(' <logic expression> ')' 'then' '{' <body> '}' 
