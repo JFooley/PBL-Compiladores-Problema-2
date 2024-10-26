@@ -65,10 +65,8 @@ class Parser():
 
         #self.main() TODO Ainda não implementado
     
-    def arithmetic_expression(self):
-        self.arithmetic_operating()
-        if self.lookahead()["lexeme"] in ['+', '-']:
-            self.arithmetic_sum()
+    def registers(self):
+        self.match_lexeme("register")
     
     def arithmetic_operating(self):
         self.arithmetic_value()
