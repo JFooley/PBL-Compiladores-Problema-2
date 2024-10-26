@@ -55,3 +55,39 @@ class Parser():
         self.match_lexeme("register")
     
     # Fazer o resto, de constants, variables, functions
+    def arithmetic_expression(self):
+        self.arithmetic_operating()
+        if self.lookahead()["lexeme"] in ['+', '-']:
+            self.arithmetic_sum()
+    
+    def arithmetic_operating(self):
+        self.arithmetic_value()
+        if self.lookahead()["lexeme"] in ['*', '/']:
+            self.arithmetic_multiplication()
+
+    def arithmetic_value(self):
+        if self.lookahead()["category"] == "number":
+            self.match_category("number")
+        elif self.lookahead()["lexeme"] == "(":
+            self.match_lexeme("(")
+            self.arithmetic_expression()
+            self.match_lexeme(")")
+        elif self.lookahead()["category"] == "identifier":
+            if self.lookahead(1)["category"] == "(":
+                #self.function_call()
+                pass
+            else:
+                #self.attribute
+                pass
+
+    def arithmetic_sum(self):
+        self.match_lexeme(['+', '-'])
+        self.arithmetic_operating()
+        if self.lookahead()["lexeme"] in ['+', '-']:
+            self.arithmetic_sum()
+      
+    def arithmetic_multiplication(self):
+        self.match_lexeme(['*', '/'])
+        self.arithmetic_value()
+        if self.lookahead()["lexeme"] in ['*', '/']:
+            self.arithmetic_multiplication()
