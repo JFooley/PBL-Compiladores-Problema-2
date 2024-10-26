@@ -4,11 +4,14 @@ class Parser():
         self.error_list = []
         self.index = 0
     
+    def show_error_list(self):
+        return self.error_list
+    
     # Função match para verificar categoria
     def match_category(self, expected_token_category):
         current_token = self.lookahead()
+        self.index += 1 # Move to the next token
         if current_token['category'] != None and current_token['category'] in expected_token_category:
-            self.index += 1 # Move to the next token
             return current_token
         else:
             self.error_list.append({"position":current_token["line"], "expected":expected_token_category, "received":current_token["category"]})
@@ -16,8 +19,8 @@ class Parser():
     # Função match para verificar o lexema
     def match_lexeme(self, expected_token_lexeme):
         current_token = self.lookahead()
+        self.index += 1 # Move to the next token
         if current_token['lexeme'] != None and current_token['lexeme'] in expected_token_lexeme:
-            self.index += 1 # Move to the next token
             return current_token
         else:
             self.error_list.append({"position":current_token["line"], "expected":expected_token_lexeme, "received":current_token["lexeme"]})
@@ -31,12 +34,7 @@ class Parser():
     # Executa o algorítimo
     def run(self):
         self.start()
-        if len(self.error_list) < 0:
-            print("sucesso")
-        else:
-            for item in token_list:
-                print(item)
-
+        return len(self.error_list) == 0
     
     ### Produções ###
     def start(self):
@@ -44,6 +42,7 @@ class Parser():
         #           | <registers> <constants> <variables> <main> 
         #           | <constants> <variables> <functions> <main>
         #           | <constants> <variables> <main>
+        
         if self.lookahead()["lexeme"] == "register":
             self.registers()
 
@@ -54,173 +53,93 @@ class Parser():
             self.functions()
 
         self.main()
-
     
-    def registers(self):
-        self.match_lexeme("register")
+    def arithmetic_expression(self):
+        self.arithmetic_operating()
+        if self.lookahead()["lexeme"] in ['+', '-']:
+            self.arithmetic_sum()
     
-    # Fazer o resto, de constants, variables, functions
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    def arithmetic_operating(self):
+        self.arithmetic_value()
+        if self.lookahead()["lexeme"] in ['*', '/']:
+            self.arithmetic_multiplication()
+
+    def arithmetic_value(self):
+        if self.lookahead()["category"] == "number":
+            self.match_category("number")
+        elif self.lookahead()["lexeme"] == "(":
+            self.match_lexeme("(")
+            self.arithmetic_expression()
+            self.match_lexeme(")")
+        elif self.lookahead()["category"] == "identifier":
+            if self.lookahead(1)["category"] == "(":
+                #self.function_call()
+                pass
+            else:
+                #self.attribute
+                pass
+
+    def arithmetic_sum(self):
+        self.match_lexeme(['+', '-'])
+        self.arithmetic_operating()
+        if self.lookahead()["lexeme"] in ['+', '-']:
+            self.arithmetic_sum()
+      
+    def arithmetic_multiplication(self):
+        self.match_lexeme(['*', '/'])
+        self.arithmetic_value()
+        if self.lookahead()["lexeme"] in ['*', '/']:
+            self.arithmetic_multiplication()
+
+    def logic_expression(self):
+        current_token = self.lookahead()
+        # Caso: '(' <logic expression> ')' ou '(' <logic expression> ')' <logic terminal> <logic expression>
+        if current_token["lexeme"] == "(":
+            self.match_lexeme(["("]) 
+            self.logic_expression() 
+            self.match_lexeme([")"]) 
+            # Check for the optional <logic terminal> and further <logic expression>
+            if self.lookahead()["lexeme"] in ['&&', '||']:
+                self.logic_terminal() 
+                self.logic_expression()
+        # Caso: <logic value> ou <logic value> <logic terminal> <logic expression>
+        else:
+            self.logic_value()
+            if self.lookahead()["lexeme"] in ['&&', '||']:
+                self.logic_terminal()
+                self.logic_expression()
+                            
+    def logic_value(self):
+        current_token = self.lookahead()
+        if current_token["lexeme"] in ['true', 'false']: 
+            self.match_lexeme(['true', 'false'])
+        else:
+            self.relational_expression()  
+
+    def logic_terminal(self):
+        self.match_lexeme(['&&', '||']) 
+
+    def relational_expression(self):
+        current_token = self.lookahead()
+        # Caso: '(' <relational expression> ')' ou '(' <relational expression> ')' <relational terminal> <relational expression>
+        if current_token["lexeme"] == "(":
+            self.match_lexeme(["("])
+            self.relational_expression()
+            self.match_lexeme([")"]) 
+            # Verify <relational terminal> and further <relational expression>
+            if self.lookahead()["lexeme"] in ['>', '<', '!=', '>=', '<=', '==']:
+                self.relational_terminal()
+                self.relational_expression()
+        # Caso: <arithmetic expression> ou <arithmetic expression> <relational terminal> <relational expression>
+        else:
+            self.arithmetic_expression()
+            if self.lookahead()["lexeme"] in ['>', '<', '!=', '>=', '<=', '==']:
+                self.relational_terminal()
+                self.relational_expression()
+
+    def relational_terminal(self):
+        self.match_lexeme(['>', '<', '!=', '>=', '<=', '=='])
+        
 #<if>::= <fixed if>  | <fixed if> 'else' '{' <body> '}'
 #<fixed if>::= 'if' '(' <logic expression> ')' 'then' '{' <body> '}' 
 #--------------------- Condicionais ---------------------
