@@ -223,6 +223,7 @@ class Parser():
     def assignment(self):
         self.attribute()
         if self.lookahead()["lexeme"] == "=":
+            self.match_lexeme(["="])
             self.value()
             self.match_lexeme([";"])
         else:
