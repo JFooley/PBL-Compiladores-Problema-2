@@ -4,9 +4,6 @@ class Parser():
         self.error_list = []
         self.index = 0
     
-    def show_error_list(self):
-        return self.error_list
-    
     # Função match para verificar categoria
     def match_category(self, expected_token_category):
         current_token = self.lookahead()
