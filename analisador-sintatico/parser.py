@@ -9,7 +9,10 @@ class Parser():
     
     # Função match para verificar categoria
     def match_category(self, expected_token_category):
+       
         current_token = self.lookahead()
+        expected = current_token['category']
+        print(f'Token esperado: {expected_token_category},Token recebido: {expected}')
         self.index += 1 # Move to the next token
         if current_token['category'] != None and current_token['category'] in expected_token_category:
             return current_token
@@ -19,6 +22,9 @@ class Parser():
     # Função match para verificar o lexema
     def match_lexeme(self, expected_token_lexeme):
         current_token = self.lookahead()
+        expected = current_token['lexeme']
+        
+        print(f'Token esperado: {expected_token_lexeme},Token recebido: {expected}')
         self.index += 1 # Move to the next token
         if current_token['lexeme'] != None and current_token['lexeme'] in expected_token_lexeme:
             return current_token
@@ -59,6 +65,8 @@ class Parser():
 
         #self.constants() # TODO Ainda não implementado
         #self.variables() # TODO Ainda não implementado
+        self.variables()
+        print(self.error_list)
         
         if self.lookahead()["lexeme"] == "function":
             self.functions() 
@@ -188,3 +196,83 @@ class Parser():
             self.match_lexeme(")")
         else:
             self._log_error("',' or ')'")
+
+    
+    
+    # Caso: <primitive type> identifier ';' | identifier identifier ';' | <primitive type> identifier '=' <value> ';' | <primitive type> <vector position> ';'                                
+    def expression_declaration(self):
+        if self.lookahead()['category'] == 'KEYWORD':
+            # Chamar func do primitive type
+            self.match_category("KEYWORD")
+            if self.lookahead()['category'] == 'IDENTIFIER':
+                self.match_category("IDENTIFIER")
+                if self.lookahead()['lexeme'] == ';':
+                    self.match_lexeme([";"])
+                elif self.lookahead()['lexeme'] == '=':
+                    self.match_lexeme(["="])
+                  
+                    self.match_lexeme(["3"])
+                    # Chamar func de value
+                    self.match_lexeme([";"])
+                else:
+                    self._log_error("Unexpected character received")
+            elif self.lookahead()['lexeme'] == '[':
+                # Chamar func de vector position
+                print('')
+                self.match_lexeme([";"])
+
+            else:
+                self._log_error("Unexpected character received")
+        elif self.lookahead()['category'] == 'IDENTIFIER':
+            self.match_category('IDENTIFIER')
+            self.match_category('IDENTIFIER')
+            self.match_lexeme([";"])
+
+        else:
+            self._log_error("Unexpected character received")
+            
+    # Caso: <expression declaration> <expression variables> | <expression declaration>
+    def expression_variables(self):
+        self.expression_declaration()
+        if self.lookahead()['category'] == 'KEYWORD':
+            self.expression_variables()
+       
+    
+    def variables(self):
+        if self.lookahead()['category'] == 'KEYWORD':
+            self.match_lexeme('variables')
+            self.match_lexeme('{')
+            if self.lookahead()['category'] == 'KEYWORD':
+                self.expression_variables()
+                self.match_lexeme(['}'])
+
+            elif self.lookahead()['lexeme'] == '}':
+                self.match_lexeme(['}'])
+            else: 
+                self._log_error("Unexpected character received")
+        self._log_error("Identifier")
+
+
+
+token_list = []
+token_list.append({"lexeme": "variables","category": "KEYWORD", "line": 1})
+token_list.append({"lexeme": "{","category": "OPEN_CURLY_BRACE","line": 1})
+token_list.append({"lexeme": "integer","category": "KEYWORD","line": 1})
+token_list.append({"lexeme": "a","category": "IDENTIFIER", "line": 1})
+token_list.append({"lexeme": "=","category": "OPERATOR","line": 1})
+token_list.append({"lexeme": "3","category": "NUMBER","line": 1})
+token_list.append({"lexeme": ";","category": "DELIMITER","line": 1})
+token_list.append({"lexeme": "integer","category": "KEYWORD","line": 1})
+token_list.append({"lexeme": "a","category": "IDENTIFIER", "line": 1})
+token_list.append({"lexeme": "=","category": "OPERATOR","line": 1})
+token_list.append({"lexeme": "3","category": "NUMBER","line": 1})
+token_list.append({"lexeme": ";","category": "DELIMITER","line": 1})
+token_list.append({"lexeme": "}","category": "OPEN_CURLY_BRACE","line": 1})
+
+
+for item in token_list:
+    print(item["lexeme"], end=" ")
+
+p = Parser(token_list)
+
+p.run()
