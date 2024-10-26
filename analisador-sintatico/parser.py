@@ -27,6 +27,17 @@ class Parser():
         if self.index + K < len(self.token_list):
             return self.token_list[self.index + K]
         return {"lexeme": None,"category": None,"line": None}
+
+    def _log_error(self, expected_token):
+        current_token = self.lookahead()
+        self.error_list.append({
+            "position": current_token["line"], 
+            "expected": expected_token, 
+            "received": current_token["lexeme"]
+        })
+
+    def get_error_list(self):
+        return self.error_list
     
     # Executa o algorítimo
     def run(self):
@@ -40,16 +51,16 @@ class Parser():
         #           | <constants> <variables> <functions> <main>
         #           | <constants> <variables> <main>
         
-        if self.lookahead()["lexeme"] == "register":
-            self.registers()
+        #if self.lookahead()["lexeme"] == "register": # TODO Ainda não implementado
+        #    self.registers()
 
-        self.constants()
-        self.variables()
+        #self.constants() # TODO Ainda não implementado
+        #self.variables() # TODO Ainda não implementado
         
         if self.lookahead()["lexeme"] == "function":
-            self.functions()
+            self.functions() 
 
-        self.main()
+        #self.main() TODO Ainda não implementado
     
     def arithmetic_expression(self):
         self.arithmetic_operating()
@@ -136,3 +147,41 @@ class Parser():
 
     def relational_terminal(self):
         self.match_lexeme(['>', '<', '!=', '>=', '<=', '=='])
+
+    def function(self):
+        if self.lookahead()['lexeme'] == "function":
+            self.match_lexeme("function")
+            self.match_category("KEYWORD")
+            self.match_category("IDENTIFIER")
+            self.parameters()
+            self.match_lexeme("{")
+            #self.parse_statements() # TODO
+            self.match_lexeme("}")
+        else:
+            self._log_error('function')
+
+    def parameters(self):
+        if self.lookahead()['lexeme'] == "(":
+            self.match_lexeme("(")
+            self.parameter()
+        else:
+            self._log_error('(')
+
+    def parameter(self):
+        if self.lookahead()['category'] == "KEYWORD":
+            self.match_category("KEYWORD")
+            self.match_category("IDENTIFIER")
+            self.parameter_list()
+        elif self.lookahead()['lexeme'] == ")":
+            self.match_lexeme(")")
+        else:
+            self._log_error(')')  
+
+    def parameter_list(self):
+        if self.lookahead()['lexeme'] == ",":
+            self.match_lexeme(",")
+            self.parameter()
+        elif self.lookahead()['lexeme'] == ")":
+            self.match_lexeme(")")
+        else:
+            self._log_error("',' or ')'")
