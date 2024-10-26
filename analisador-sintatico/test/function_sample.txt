@@ -1,0 +1,5 @@
+function string example() { }
+
+function string example(integer abc) { }
+
+function string example(integer x, integer y) { }
