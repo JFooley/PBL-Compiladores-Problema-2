@@ -38,22 +38,9 @@ class Parser():
         return len(self.error_list) == 0
     
     ### Produções ###
-    # <start>::= <registers> <constants> <variables> <functions> <main> 
-    #           | <registers> <constants> <variables> <main> 
-    #           | <constants> <variables> <functions> <main>
-    #           | <constants> <variables> <main>
     def start(self):
         self.logic_expression()
     
-    # <registers>::= <register> | <register> <registers>
-    def registers(self):
-        self.match_lexeme("register")
-    
-    # <logic expression> ::= 
-    #       <logic value> 
-    #     | <logic value> <logic terminal> <logic expression> 
-    #     | '(' <logic expression> ')' 
-    #     | '(' <logic expression> ')' <logic terminal> <logic expression>
     def logic_expression(self):
         current_token = self.lookahead()
 
@@ -76,7 +63,6 @@ class Parser():
                 self.logic_terminal()
                 self.logic_expression()
                             
-    # <logic value> ::= booleanDeclarate | <relational expression>
     def logic_value(self):
         current_token = self.lookahead()
         
@@ -85,15 +71,9 @@ class Parser():
         else:
             self.relational_expression()  
 
-    # <logic terminal> ::= '&&' | '||'
     def logic_terminal(self):
         self.match_lexeme(['&&', '||']) 
-    
-    # <relational expression>::= 
-    #         <arithmetic expression> <relational terminal> <relational expression> 
-    #       | <arithmetic expression>
-    #       | '(' <relational expression> ')' <relational terminal> <relational expression> 
-    #       | '(' <relational expression> ')' 
+
     def relational_expression(self):
         current_token = self.lookahead()
 
@@ -116,18 +96,86 @@ class Parser():
                 self.relational_terminal()
                 self.relational_expression()
 
-    # <relational terminal> ::= '>' | '<' | '!=' | '>=' | '<=' | '=='
     def relational_terminal(self):
         self.match_lexeme(['>', '<', '!=', '>=', '<=', '=='])
 
     def arithmetic_expression(self):
-        ## SUBSTITUIR PELA CERTA DEPOIS ##
-        if self.lookahead()["lexeme"] in ['0', '1', '2', '3', '4', '5']:
-            self.match_lexeme(['0', '1', '2', '3', '4', '5'])
-        else:
-            self.match_category(["identifer"])
-        ## SUBSTITUIR PELA CERTA DEPOIS ##
+        self.arithmetic_operating()
+        if self.lookahead()["lexeme"] in ['+', '-']:
+            self.arithmetic_sum()
+    
+    def arithmetic_operating(self):
+        self.arithmetic_value()
+        if self.lookahead()["lexeme"] in ['*', '/']:
+            self.arithmetic_multiplication()
 
+    def arithmetic_value(self):
+        if self.lookahead()["category"] == "number":
+            self.match_category("number")
+        elif self.lookahead()["lexeme"] == "(":
+            self.match_lexeme("(")
+            self.arithmetic_expression()
+            self.match_lexeme(")")
+        elif self.lookahead()["category"] == "identifier":
+            if self.lookahead(1)["category"] == "(":
+                #self.function_call()
+                pass
+            else:
+                #self.attribute
+                pass
+
+    def arithmetic_sum(self):
+        self.match_lexeme(['+', '-'])
+        self.arithmetic_operating()
+        if self.lookahead()["lexeme"] in ['+', '-']:
+            self.arithmetic_sum()
+      
+    def arithmetic_multiplication(self):
+        self.match_lexeme(['*', '/'])
+        self.arithmetic_value()
+        if self.lookahead()["lexeme"] in ['*', '/']:
+            self.arithmetic_multiplication()
+
+    # <vector position>::= identifier <vector index>
+    def vector_position(self):
+        self.match_category(["identifier"])
+        self.vector_index()
+
+    # <vector index>::= 
+    #         '[' number ']' 
+    #       | '[' number ']' <vector index> 
+    #       | '[' identifier ']' 
+    #       | '[' identifier ']' <vector index> 
+    #       | '[' <arithmetic expression>']' 
+    #       | '[' <arithmetic expression>']' <vector index>
+    def vector_index(self):
+        self.match_lexeme(["["])
+
+        # Caso: '[' number ']' ...
+        if self.lookahead()["category"] == "number" and self.lookahead(1)["lexeme"] == "]":
+            self.match_category("number")
+
+        # Caso: Identifier
+        elif self.lookahead()["category"] == "identifier" and self.lookahead(1)["lexeme"] == "]":
+            self.match_category("identifier")
+
+        # Caso: Arithmetic expression
+        else:
+            self.arithmetic_expression()
+
+        self.match_lexeme(["]"])
+
+        # Olha se o proximo token é [ e depois se é algo que caracterize <vector index> (parte opcional)
+        if self.lookahead()["lexeme"] == "[" and (self.lookahead(1)["category"] in ["number", "identifier"] or self.lookahead(1)["lexeme"] == "("):
+            self.vector_index()
+            
+    # 
+    def register_position(self):
+        pass
+    
+    # 
+    def register_access(self):
+        pass
 
 # Testando a classe
 token_list = []
@@ -137,7 +185,7 @@ token_list.append({"lexeme": ">", "category": "operator","line": 1})
 token_list.append({"lexeme": "1", "category": "number","line": 1})
 token_list.append({"lexeme": ")", "category": "CLOSE_PARENTHESIS", "line": 1})
 token_list.append({"lexeme": "||", "category": "operator","line": 1})
-token_list.append({"lexeme": "variavel", "category": "identifer","line": 1})
+token_list.append({"lexeme": "variavel", "category": "IDENTIFIER","line": 1})
 token_list.append({"lexeme": "==", "category": "operator","line": 1})
 token_list.append({"lexeme": "3", "category": "number","line": 1})
 
