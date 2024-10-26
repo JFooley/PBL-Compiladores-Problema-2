@@ -210,19 +210,12 @@ class Parser():
                     self.match_lexeme([";"])
                 elif self.lookahead()['lexeme'] == '=':
                     self.match_lexeme(["="])
-                  
                     self.match_lexeme(["3"])
                     # Chamar func de value
                     self.match_lexeme([";"])
-                else:
-                    self._log_error("Unexpected character received")
             elif self.lookahead()['lexeme'] == '[':
                 # Chamar func de vector position
-                print('')
                 self.match_lexeme([";"])
-
-            else:
-                self._log_error("Unexpected character received")
         elif self.lookahead()['category'] == 'IDENTIFIER':
             self.match_category('IDENTIFIER')
             self.match_category('IDENTIFIER')
