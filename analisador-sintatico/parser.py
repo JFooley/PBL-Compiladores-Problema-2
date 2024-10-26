@@ -51,10 +51,6 @@ class Parser():
 
         self.main()
     
-    def registers(self):
-        self.match_lexeme("register")
-    
-    # Fazer o resto, de constants, variables, functions
     def arithmetic_expression(self):
         self.arithmetic_operating()
         if self.lookahead()["lexeme"] in ['+', '-']:
@@ -91,3 +87,52 @@ class Parser():
         self.arithmetic_value()
         if self.lookahead()["lexeme"] in ['*', '/']:
             self.arithmetic_multiplication()
+
+    def logic_expression(self):
+        current_token = self.lookahead()
+        # Caso: '(' <logic expression> ')' ou '(' <logic expression> ')' <logic terminal> <logic expression>
+        if current_token["lexeme"] == "(":
+            self.match_lexeme(["("]) 
+            self.logic_expression() 
+            self.match_lexeme([")"]) 
+            # Check for the optional <logic terminal> and further <logic expression>
+            if self.lookahead()["lexeme"] in ['&&', '||']:
+                self.logic_terminal() 
+                self.logic_expression()
+        # Caso: <logic value> ou <logic value> <logic terminal> <logic expression>
+        else:
+            self.logic_value()
+            if self.lookahead()["lexeme"] in ['&&', '||']:
+                self.logic_terminal()
+                self.logic_expression()
+                            
+    def logic_value(self):
+        current_token = self.lookahead()
+        if current_token["lexeme"] in ['true', 'false']: 
+            self.match_lexeme(['true', 'false'])
+        else:
+            self.relational_expression()  
+
+    def logic_terminal(self):
+        self.match_lexeme(['&&', '||']) 
+
+    def relational_expression(self):
+        current_token = self.lookahead()
+        # Caso: '(' <relational expression> ')' ou '(' <relational expression> ')' <relational terminal> <relational expression>
+        if current_token["lexeme"] == "(":
+            self.match_lexeme(["("])
+            self.relational_expression()
+            self.match_lexeme([")"]) 
+            # Verify <relational terminal> and further <relational expression>
+            if self.lookahead()["lexeme"] in ['>', '<', '!=', '>=', '<=', '==']:
+                self.relational_terminal()
+                self.relational_expression()
+        # Caso: <arithmetic expression> ou <arithmetic expression> <relational terminal> <relational expression>
+        else:
+            self.arithmetic_expression()
+            if self.lookahead()["lexeme"] in ['>', '<', '!=', '>=', '<=', '==']:
+                self.relational_terminal()
+                self.relational_expression()
+
+    def relational_terminal(self):
+        self.match_lexeme(['>', '<', '!=', '>=', '<=', '=='])
