@@ -96,16 +96,17 @@ class Parser():
         """ Regra para <for> ::= 'for' '(' <initialization> ';' <relational expression> ';' identifier <increment terminal> ')' '{' <body> '}' """
         self.match_lexeme(["for"])
         self.match_lexeme(["("])
-        #self.initialization()          # Remover comentário ao implementar função
+        self.initialization()
         self.match_lexeme([";"])
         #self.relational_expression()   # Remover comentário ao implementar função
         self.match_lexeme([";"])
         self.match_category(["IDENTIFIER"])
-        #self.increment_terminal()      # Remover comentário ao implementar função
+        self.increment_terminal()
         self.match_lexeme([")"])
         self.match_lexeme(["{"])
         #self.body()                    # Remover comentário ao implementar função
         self.match_lexeme(["}"])
+    
     # <initialization> ::= "integer" identifier "=" <arithmetic expression> | identifier "=" <arithmetic expression>
     def initialization(self):
         """ Regra para <initialization> ::= "integer" identifier "=" <arithmetic expression> | identifier "=" <arithmetic expression> """
