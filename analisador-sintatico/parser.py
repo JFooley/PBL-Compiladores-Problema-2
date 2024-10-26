@@ -45,64 +45,27 @@ class Parser():
     # Executa o algorítimo
     def run(self):
         self.start()
-        print(self.error_list)
         return len(self.error_list) > 0
     
     ### Produções ###
     def start(self):
-        self.arithmetic_expression()
+        # <start>::= <registers> <constants> <variables> <functions> <main> 
+        #           | <registers> <constants> <variables> <main> 
+        #           | <constants> <variables> <functions> <main>
+        #           | <constants> <variables> <main>
+        
+        if self.lookahead()["lexeme"] == "register":
+            self.registers()
+
+        self.constants()
+        self.variables()
+        
+        if self.lookahead()["lexeme"] == "function":
+            self.functions()
+
+        self.main()
     
-    def arithmetic_expression(self):
-        self.arithmetic_operating()
-        if self.lookahead()["lexeme"] in ['+', '-']:
-            self.arithmetic_sum()
+    def registers(self):
+        self.match_lexeme("register")
     
-    def arithmetic_operating(self):
-        self.arithmetic_value()
-        if self.lookahead()["lexeme"] in ['*', '/']:
-            self.arithmetic_multiplication()
-
-    def arithmetic_value(self):
-        if self.lookahead()["category"] == "number":
-            self.match_category("number")
-        elif self.lookahead()["lexeme"] == "(":
-            self.match_lexeme("(")
-            self.arithmetic_expression()
-            self.match_lexeme(")")
-        elif self.lookahead()["category"] == "identifier":
-            if self.lookahead(1)["category"] == "(":
-                #self.function_call()
-                pass
-            else:
-                #self.attribute
-                pass
-
-    def arithmetic_sum(self):
-        self.match_lexeme(['+', '-'])
-        self.arithmetic_operating()
-        if self.lookahead()["lexeme"] in ['+', '-']:
-            self.arithmetic_sum()
-      
-    def arithmetic_multiplication(self):
-        self.match_lexeme(['*', '/'])
-        self.arithmetic_value()
-        if self.lookahead()["lexeme"] in ['*', '/']:
-            self.arithmetic_multiplication()
-
-
-# Testando a classe
-token_list = []
-token_list.append({"lexeme": "(","category": "OPEN_PARENTHESIS", "line": 1})
-token_list.append({"lexeme": "1","category": "number","line": 1})
-token_list.append({"lexeme": "+","category": "operator","line": 1})
-token_list.append({"lexeme": "3","category": "number","line": 1})
-token_list.append({"lexeme": ")","category": "CLOSE_PARENTHESIS", "line": 1})
-token_list.append({"lexeme": "*","category": "operator","line": 1})
-token_list.append({"lexeme": "3","category": "number","line": 1})
-
-for item in token_list:
-    print(item["lexeme"], end=" ")
-
-p = Parser(token_list)
-
-p.run()
+    # Fazer o resto, de constants, variables, functions
