@@ -100,7 +100,6 @@ class Parser():
             self.arithmetic_multiplication()
     
     def function_call(self):
-        # <function call> ::= <identifier> "(" <argument list> ")"
         self.match_category("identifier")  # Nome da função
         self.match_lexeme("(")  # Parêntese de abertura
         self.argument_list()  # Argumentos
