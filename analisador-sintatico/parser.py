@@ -61,7 +61,8 @@ class Parser():
             self.functions() 
 
         #self.main() TODO Ainda não implementado
-    
+
+ #--------------------- Expressões aritméticas ---------------------   
     def arithmetic_expression(self):
         self.arithmetic_operating()
         if self.lookahead()["lexeme"] in ['+', '-']:
@@ -84,8 +85,8 @@ class Parser():
                 #self.function_call()
                 pass
             else:
-                #self.attribute
-                pass
+                self.attribute()
+               
 
     def arithmetic_sum(self):
         self.match_lexeme(['+', '-'])
@@ -99,6 +100,7 @@ class Parser():
         if self.lookahead()["lexeme"] in ['*', '/']:
             self.arithmetic_multiplication()
 
+#--------------------- Expressões lógicas ---------------------
     def logic_expression(self):
         current_token = self.lookahead()
         # Caso: '(' <logic expression> ')' ou '(' <logic expression> ')' <logic terminal> <logic expression>
@@ -127,6 +129,7 @@ class Parser():
     def logic_terminal(self):
         self.match_lexeme(['&&', '||']) 
 
+#--------------------- Expressões relacionais ---------------------
     def relational_expression(self):
         current_token = self.lookahead()
         # Caso: '(' <relational expression> ')' ou '(' <relational expression> ')' <relational terminal> <relational expression>
@@ -148,6 +151,7 @@ class Parser():
     def relational_terminal(self):
         self.match_lexeme(['>', '<', '!=', '>=', '<=', '=='])
 
+#--------------------- Função ---------------------
     def function(self):
         if self.lookahead()['lexeme'] == "function":
             self.match_lexeme("function")
@@ -160,6 +164,7 @@ class Parser():
         else:
             self._log_error('function')
 
+#--------------------- Parâmetros ---------------------
     def parameters(self):
         if self.lookahead()['lexeme'] == "(":
             self.match_lexeme("(")
@@ -185,3 +190,124 @@ class Parser():
             self.match_lexeme(")")
         else:
             self._log_error("',' or ')'")
+
+#--------------------- Condicionais ---------------------
+    def condicional(self):
+        self.match_lexeme(["if"])
+        self.match_lexeme(["("])
+        self.logic_expression()
+        self.match_lexeme([")"])
+        self.match_lexeme(["then"])
+        self.match_lexeme(["{"])
+        #self.body()
+        self.match_lexeme(["}"])
+
+        if (self.lookahead()["lexeme"] == "else"):
+            self.match_lexeme(["else"])
+            self.match_lexeme(["{"])
+            #self.body()
+            self.match_lexeme(["}"])
+
+
+#<write>::= 'write' '(' <write list> ')' ';'
+#<write list> ::= <value> ',' <write list> | <value>
+#--------------------- Write ---------------------
+    def write(self):
+        self.match_lexeme(["write"])
+        self.match_lexeme(["("])
+        
+        self.value()  
+        while self.lookahead()["lexeme"] == ",":  
+            self.match_lexeme([","])  
+            self.value() 
+
+        self.match_lexeme([")"])
+        self.match_lexeme([";"])
+
+#<read>::= 'read' '(' <read list> ')' ';'
+#<read list>::= <attribute>  ',' <read list> | <attribute>
+#--------------------- Read ---------------------
+    def read(self):
+        self.match_lexeme(["read"])
+        self.match_lexeme(["("])
+        
+        self.attribute()  
+        while self.lookahead()["lexeme"] == ",":  
+            self.match_lexeme([","])  
+            self.attribute() 
+
+        self.match_lexeme([")"])
+        self.match_lexeme([";"])
+
+#<value>::= stringDeclarate | character | <logic expression>
+    def value(self):
+        if self.lookahead()["category"] == "STRING":
+            self.match_category(["STRING"])
+        elif self.lookahead()["category"] == "CHARACTER":
+            self.match_category(["CHARACTER"])
+        else:
+            self.logic_expression()
+
+# <type>::= <primitive type> | identifier
+    def type(self):
+        if self.lookahead()["category"] == "IDENTIFIER":
+             self.match_category(["IDENTIFIER"])
+        else:
+            self.primitive_type()
+    
+#<primitive type>::= 'integer' | 'float' | 'boolean' | 'string'
+    def primitive_type(self):
+        if self.lookahead()["lexeme"] == "integer":
+            self.match_lexeme(["integer"])
+        elif self.lookahead()["lexeme"] == "float":
+            self.match_lexeme(["float"])
+        elif self.lookahead()["lexeme"] == "boolean":
+            self.match_lexeme(["boolean"])
+        else:
+            self.match_lexeme(["string"])
+
+
+#<assignment>::= <attribute> '=' <value> ';'| <attribute> <increment terminal> ';'
+    def assignment(self):
+        self.attribute()
+        if self.lookahead()["lexeme"] == "=":
+            self.match_lexeme(["="])
+            self.value()
+            self.match_lexeme([";"])
+        else:
+            #self.increment_terminal()
+            self.match_lexeme([";"])
+
+#<attribute>::= identifier | <register position> | <vector position>
+    def attribute(self):
+        if self.lookahead()["category"] == "IDENTIFIER":
+            self.match_category(["IDENTIFIER"])
+            if self.lookahead()["lexeme"] == ".":
+                #self.register_position()
+                pass
+            elif self.lookahead()["lexeme"] == "[":
+                #self.vector_position()
+                pass
+        else: 
+            self.match_category(["IDENTIFIER"])
+
+    #<commands>::= <for> | <while> | <if> | <write> | <read> | <return> | <function call> ';'
+    def commands(self):
+        if self.lookahead()["lexeme"] == "for":
+            #self.for()
+            pass
+        elif self.lookahead()["lexeme"] == "while":
+            #self.while()
+            pass
+        elif self.lookahead()["lexeme"] == "if":
+            self.condicional()
+        elif self.lookahead()["lexeme"] == "write":
+            self.write()
+        elif self.lookahead()["lexeme"] == "read":
+            self.read()
+        elif self.lookahead()["lexeme"] == "return":
+            #self.return()
+            pass
+        else:
+            self.function_call()
+            self.match_lexeme([";"])
