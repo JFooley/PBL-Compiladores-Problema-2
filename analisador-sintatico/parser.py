@@ -121,6 +121,26 @@ def function_call(self):
     else:
         self._log_error("identifier")  # Caso não haja identificador, registra o erro
 
+    def arguments(self):
+            if self.lookahead()['lexeme'] == "(" and self.lookahead(1)['lexeme'] == ")":
+                # Caso: parênteses vazios, correspondendo a '()'
+                self.match_lexeme("(")  # Consome o '('
+                self.match_lexeme(")")  # Consome o ')'
+            elif self.lookahead()['lexeme'] == "(":
+                # Caso: parêntese de abertura seguido de valores
+                self.match_lexeme("(")  # Consome o '('
+                self.value()  # Processa o primeiro argumento
+                self.argument_tail()  # Processa os argumentos adicionais, se houver
+                self.match_lexeme(")")  # Consome o ')'
+            else:
+                # Caso de erro se nenhum dos formatos válidos foi encontrado
+                self._log_error("expected '()' or '(' with arguments")
+
+    def argument_tail(self):
+        # Processa os argumentos adicionais separados por vírgula
+        while self.lookahead()["lexeme"] == ",":
+            self.match_lexeme(",")  # Consome a vírgula
+            self.value()  # Processa o próximo argumento
 
     def logic_expression(self):
         current_token = self.lookahead()
