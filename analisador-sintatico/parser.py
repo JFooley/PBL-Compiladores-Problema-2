@@ -239,18 +239,15 @@ class Parser():
         self.match_lexeme([")"])
         self.match_lexeme(["then"])
         self.match_lexeme(["{"])
-        #self.body()
+        self.body()
         self.match_lexeme(["}"])
 
         if (self.lookahead()["lexeme"] == "else"):
             self.match_lexeme(["else"])
             self.match_lexeme(["{"])
-            #self.body()
+            self.body()
             self.match_lexeme(["}"])
 
-
-#<write>::= 'write' '(' <write list> ')' ';'
-#<write list> ::= <value> ',' <write list> | <value>
 #--------------------- Write ---------------------
     def write(self):
         self.match_lexeme(["write"])
@@ -264,8 +261,6 @@ class Parser():
         self.match_lexeme([")"])
         self.match_lexeme([";"])
 
-#<read>::= 'read' '(' <read list> ')' ';'
-#<read list>::= <attribute>  ',' <read list> | <attribute>
 #--------------------- Read ---------------------
     def read(self):
         self.match_lexeme(["read"])
@@ -279,7 +274,6 @@ class Parser():
         self.match_lexeme([")"])
         self.match_lexeme([";"])
 
-#<value>::= stringDeclarate | character | <logic expression>
     def value(self):
         if self.lookahead()["category"] == "STRING":
             self.match_category(["STRING"])
@@ -288,14 +282,12 @@ class Parser():
         else:
             self.logic_expression()
 
-# <type>::= <primitive type> | identifier
     def type(self):
         if self.lookahead()["category"] == "IDENTIFIER":
              self.match_category(["IDENTIFIER"])
         else:
             self.primitive_type()
-    
-#<primitive type>::= 'integer' | 'float' | 'boolean' | 'string'
+
     def primitive_type(self):
         if self.lookahead()["lexeme"] == "integer":
             self.match_lexeme(["integer"])
@@ -306,8 +298,6 @@ class Parser():
         else:
             self.match_lexeme(["string"])
 
-
-#<assignment>::= <attribute> '=' <value> ';'| <attribute> <increment terminal> ';'
     def assignment(self):
         self.attribute()
         if self.lookahead()["lexeme"] == "=":
@@ -315,30 +305,25 @@ class Parser():
             self.value()
             self.match_lexeme([";"])
         else:
-            #self.increment_terminal()
+            self.increment_terminal()
             self.match_lexeme([";"])
 
-#<attribute>::= identifier | <register position> | <vector position>
     def attribute(self):
         if self.lookahead()["category"] == "IDENTIFIER":
             self.match_category(["IDENTIFIER"])
             if self.lookahead()["lexeme"] == ".":
-                #self.register_position()
-                pass
+                self.register_position()
             elif self.lookahead()["lexeme"] == "[":
-                #self.vector_position()
-                pass
+                self.vector_position()
         else: 
             self.match_category(["IDENTIFIER"])
 
     #<commands>::= <for> | <while> | <if> | <write> | <read> | <return> | <function call> ';'
     def commands(self):
         if self.lookahead()["lexeme"] == "for":
-            #self.for()
-            pass
+            self.for_loop()
         elif self.lookahead()["lexeme"] == "while":
-            #self.while()
-            pass
+            self.while_loop()
         elif self.lookahead()["lexeme"] == "if":
             self.condicional()
         elif self.lookahead()["lexeme"] == "write":
