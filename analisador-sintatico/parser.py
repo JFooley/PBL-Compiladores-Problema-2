@@ -169,13 +169,17 @@ class Parser():
         if self.lookahead()["lexeme"] == "[" and (self.lookahead(1)["category"] in ["number", "identifier"] or self.lookahead(1)["lexeme"] == "("):
             self.vector_index()
             
-    # 
+    # <register position>::= identifier <register access>
     def register_position(self):
-        pass
+        self.match_category(["identifier"])
+        self.register_access()
     
-    # 
+    # <register access>::= '.' identifier <register access> | ε
     def register_access(self):
-        pass
+        if self.lookahead()["lexeme"] == ".":
+            self.match_lexeme(["."])
+            self.match_category(["identifier"])
+            self.register_access()
 
 # Testando a classe
 token_list = []
