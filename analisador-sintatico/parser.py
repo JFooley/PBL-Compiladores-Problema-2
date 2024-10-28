@@ -150,19 +150,12 @@ class Parser():
     #       | '[' <arithmetic expression>']' <vector index>
     def vector_index(self):
         self.match_lexeme(["["])
-
-        # Caso: '[' number ']' ...
         if self.lookahead()["category"] == "number" and self.lookahead(1)["lexeme"] == "]":
             self.match_category("number")
-
-        # Caso: Identifier
         elif self.lookahead()["category"] == "identifier" and self.lookahead(1)["lexeme"] == "]":
             self.match_category("identifier")
-
-        # Caso: Arithmetic expression
         else:
             self.arithmetic_expression()
-
         self.match_lexeme(["]"])
 
         # Olha se o proximo token é [ e depois se é algo que caracterize <vector index> (parte opcional)
