@@ -94,7 +94,7 @@ class Parser():
         self.match_lexeme(['}'])
 
 
-     def arithmetic_expression(self):
+    def arithmetic_expression(self):
             self.arithmetic_operating()
             if self.lookahead()["lexeme"] in ['+', '-']:
                 self.arithmetic_sum()
@@ -130,45 +130,51 @@ class Parser():
         self.arithmetic_value()
         if self.lookahead()["lexeme"] in ['*', '/']:
             self.arithmetic_multiplication()
-    
-def function_call(self):
-    # Passo 1: Verificar o identificador da função
-    if self.lookahead()['category'] == "identifier":
-        self.match_category("identifier")  # Espera um identificador
 
-        # Passo 2: Abrir parênteses
-        if self.lookahead()['lexeme'] == "(":
-            self.match_lexeme("(")  # Espera '('
+#--------------------- Função ---------------------
+#DESENVOLVER O FUNCTIONS
+    def function(self):
+        self.match_lexeme("function")
+        self.type()
+        self.match_category("IDENTIFIER")
+        self.parameters()
+        self.match_lexeme("{")
+        self.statements()
+        self.match_lexeme("}")
 
-            # Passo 3: Processar a lista de argumentos (opcional)
-            # Se o próximo token não for ')', há ao menos um argumento
-            if self.lookahead()['lexeme'] != ")":
-                self.argument()  # Chama a função para processar o primeiro argumento
-                self.argument_list()  # Processa os argumentos restantes, se houver
+#--------------------- Parâmetros ---------------------
+    def parameters(self):
+        self.match_lexeme(["("])
+        if self.lookahead()['lexeme'] == ")" :
+            self.match_lexeme([")"])
+        else: 
+            self.parameter()
+            self.match_lexeme([")"])
+        
+    def parameter(self):
+        self.type()
+        self.match_category("IDENTIFIER")
+        if self.lookahead()['lexeme'] == ",":
+            self.match_lexeme(",")
+            self.parameter()
 
-            # Passo 4: Fechar parênteses
-            self.match_lexeme(")")  # Espera ')'
-        else:
-            self._log_error("(")  # Caso não haja '(', registra o erro
-    else:
-        self._log_error("identifier")  # Caso não haja identificador, registra o erro
+    def function_call(self):
+        # Passo 1: Verificar o identificador da função
+        self.match_category(["IDENTIFIER"])  # Espera um identificador
+        self.arguments()
 
     def arguments(self):
-            if self.lookahead()['lexeme'] == "(" and self.lookahead(1)['lexeme'] == ")":
-                # Caso: parênteses vazios, correspondendo a '()'
-                self.match_lexeme("(")  # Consome o '('
-                self.match_lexeme(")")  # Consome o ')'
-            elif self.lookahead()['lexeme'] == "(":
-                # Caso: parêntese de abertura seguido de valores
-                self.match_lexeme("(")  # Consome o '('
-                self.value()  # Processa o primeiro argumento
-                self.argument_tail()  # Processa os argumentos adicionais, se houver
-                self.match_lexeme(")")  # Consome o ')'
-            else:
-                # Caso de erro se nenhum dos formatos válidos foi encontrado
-                self._log_error("expected '()' or '(' with arguments")
+        self.match_lexeme("(")
+        if self.lookahead()['lexeme'] == ")":
+            # Caso: parênteses vazios, correspondendo a '()'
+            self.match_lexeme(")")  # Consome o ')'
+        else:
+            # Caso: parêntese de abertura seguido de valores
+            self.value()  # Processa o primeiro argumento
+            self.argument()  # Processa os argumentos adicionais, se houver
+            self.match_lexeme(")")  # Consome o ')'
 
-    def argument_tail(self):
+    def argument(self):
         # Processa os argumentos adicionais separados por vírgula
         while self.lookahead()["lexeme"] == ",":
             self.match_lexeme(",")  # Consome a vírgula
@@ -224,46 +230,6 @@ def function_call(self):
 
     def relational_terminal(self):
         self.match_lexeme(['>', '<', '!=', '>=', '<=', '=='])
-
-#--------------------- Função ---------------------
-    def function(self):
-        if self.lookahead()['lexeme'] == "function":
-            self.match_lexeme("function")
-            self.match_category("KEYWORD")
-            self.match_category("IDENTIFIER")
-            self.parameters()
-            self.match_lexeme("{")
-            #self.parse_statements() # TODO
-            self.match_lexeme("}")
-        else:
-            self._log_error('function')
-
-#--------------------- Parâmetros ---------------------
-    def parameters(self):
-        if self.lookahead()['lexeme'] == "(":
-            self.match_lexeme("(")
-            self.parameter()
-        else:
-            self._log_error('(')
-
-    def parameter(self):
-        if self.lookahead()['category'] == "KEYWORD":
-            self.match_category("KEYWORD")
-            self.match_category("IDENTIFIER")
-            self.parameter_list()
-        elif self.lookahead()['lexeme'] == ")":
-            self.match_lexeme(")")
-        else:
-            self._log_error(')')  
-
-    def parameter_list(self):
-        if self.lookahead()['lexeme'] == ",":
-            self.match_lexeme(",")
-            self.parameter()
-        elif self.lookahead()['lexeme'] == ")":
-            self.match_lexeme(")")
-        else:
-            self._log_error("',' or ')'")
 
 #--------------------- Condicionais ---------------------
     def condicional(self):
