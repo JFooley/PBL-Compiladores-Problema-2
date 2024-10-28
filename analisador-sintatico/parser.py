@@ -65,7 +65,10 @@ class Parser():
             self.register_body()
 
     def declaration(self):
-        self.match_lexeme(['integer','float','boolean','string'])
+        if self.lookahead()["category"] == "IDENTIFIER":
+            self.match_category(["IDENTIFIER"]);    
+        else:
+            self.match_lexeme(['integer','float','boolean','string'])
         self.match_category(['IDENTIFIER']) 
         self.match_lexeme([';']) 
     
