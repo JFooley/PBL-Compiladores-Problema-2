@@ -337,10 +337,12 @@ class Parser():
             self.function_call()
             self.match_lexeme([";"])
 
+    # <register>::= 'register' identifier '{' <register body> '}'
     def vector_position(self):
         self.match_category(["IDENTIFIER"])
         self.vector_index()
 
+    # <register body>::= <declaration> | <declaration> <register body>
     def vector_index(self):
         self.match_lexeme(["["])
         if self.lookahead()["category"] == "NUMBER" and self.lookahead(1)["lexeme"] == "]":
@@ -354,4 +356,19 @@ class Parser():
         # Olha se o proximo token é [ e depois se é algo que caracterize <vector index> (parte opcional)
         if self.lookahead()["lexeme"] == "[" and (self.lookahead(1)["category"] in ["NUMBER", "IDENTIFIER"] or self.lookahead(1)["lexeme"] == "("):
             self.vector_index()
-           
+            
+    # <register position>::= identifier <register access>
+    def register_position(self):
+        self.match_category(["IDENTIFIER"])
+        self.register_access()
+    
+    # '.' identifier | '.' identifier <register access> | '.' <vector position>
+    def register_access(self):
+        self.match_lexeme(["."])
+        if self.lookahead()["category"] == "IDENTIFIER":
+            self.match_category(["IDENTIFIER"])
+            if self.lookahead()["lexeme"] == ".":
+                self.register_access()
+        else:
+            self.vector_position()
+
