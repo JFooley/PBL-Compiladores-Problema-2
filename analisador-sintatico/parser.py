@@ -136,10 +136,12 @@ class Parser():
         if self.lookahead()["lexeme"] in ['*', '/']:
             self.arithmetic_multiplication()
 
+    # <register>::= 'register' identifier '{' <register body> '}'
     def vector_position(self):
         self.match_category(["IDENTIFIER"])
         self.vector_index()
 
+    # <register body>::= <declaration> | <declaration> <register body>
     def vector_index(self):
         self.match_lexeme(["["])
         if self.lookahead()["category"] == "NUMBER" and self.lookahead(1)["lexeme"] == "]":
@@ -154,6 +156,7 @@ class Parser():
         if self.lookahead()["lexeme"] == "[" and (self.lookahead(1)["category"] in ["NUMBER", "IDENTIFIER"] or self.lookahead(1)["lexeme"] == "("):
             self.vector_index()
             
+    # <register position>::= identifier <register access>
     def register_position(self):
         self.match_category(["IDENTIFIER"])
         self.register_access()
