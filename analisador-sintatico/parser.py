@@ -351,3 +351,22 @@ class Parser():
         else:
             self.function_call()
             self.match_lexeme([";"])
+
+    def vector_position(self):
+        self.match_category(["IDENTIFIER"])
+        self.vector_index()
+
+    def vector_index(self):
+        self.match_lexeme(["["])
+        if self.lookahead()["category"] == "NUMBER" and self.lookahead(1)["lexeme"] == "]":
+            self.match_category("NUMBER")
+        elif self.lookahead()["category"] == "IDENTIFIER" and self.lookahead(1)["lexeme"] == "]":
+            self.match_category("IDENTIFIER")
+        else:
+            self.arithmetic_expression()
+        self.match_lexeme(["]"])
+
+        # Olha se o proximo token é [ e depois se é algo que caracterize <vector index> (parte opcional)
+        if self.lookahead()["lexeme"] == "[" and (self.lookahead(1)["category"] in ["NUMBER", "IDENTIFIER"] or self.lookahead(1)["lexeme"] == "("):
+            self.vector_index()
+           
