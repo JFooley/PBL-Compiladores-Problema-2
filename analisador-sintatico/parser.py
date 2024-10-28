@@ -39,7 +39,7 @@ class Parser():
     
     ### Produções ###
     def start(self):
-        self.logic_expression()
+        self.vector_position()
     
     def logic_expression(self):
         current_token = self.lookahead()
@@ -111,11 +111,11 @@ class Parser():
 
     def arithmetic_value(self):
         if self.lookahead()["category"] == "NUMBER":
-            self.match_category("NUMBER")
+            self.match_category(["NUMBER"])
         elif self.lookahead()["lexeme"] == "(":
-            self.match_lexeme("(")
+            self.match_lexeme(["("])
             self.arithmetic_expression()
-            self.match_lexeme(")")
+            self.match_lexeme([")"])
         elif self.lookahead()["category"] == "IDENTIFIER":
             if self.lookahead(1)["category"] == "(":
                 #self.function_call()
@@ -169,6 +169,8 @@ token_list = []
 token_list.append({"lexeme": "vetor", "category": "IDENTIFIER", "line": 1})
 token_list.append({"lexeme": "[", "category": "DELIMETER", "line": 1})
 token_list.append({"lexeme": "2", "category": "NUMBER", "line": 1})
+token_list.append({"lexeme": "+", "category": "OPERATOR", "line": 1})
+token_list.append({"lexeme": "2", "category": "IDENTIFIER", "line": 1})
 token_list.append({"lexeme": "]", "category": "DELIMETER", "line": 1})
 
 
