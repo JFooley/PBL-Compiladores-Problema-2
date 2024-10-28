@@ -126,15 +126,19 @@ class Parser():
             self.arithmetic_multiplication()
 
 #--------------------- Função ---------------------
-#DESENVOLVER O FUNCTIONS
+    def functions(self):
+        self.function()
+        if self.lookahead()["lexeme"] == "function":
+            self.functions()
+
     def function(self):
-        self.match_lexeme("function")
+        self.match_lexeme(["function"])
         self.type()
-        self.match_category("IDENTIFIER")
+        self.match_category(["IDENTIFIER"])
         self.parameters()
-        self.match_lexeme("{")
+        self.match_lexeme(["{"])
         self.statements()
-        self.match_lexeme("}")
+        self.match_lexeme(["}"])
 
 #--------------------- Parâmetros ---------------------
     def parameters(self):
@@ -149,30 +153,32 @@ class Parser():
         self.type()
         self.match_category("IDENTIFIER")
         if self.lookahead()['lexeme'] == ",":
-            self.match_lexeme(",")
+            self.match_lexeme([","])
             self.parameter()
 
     def function_call(self):
-        # Passo 1: Verificar o identificador da função
-        self.match_category(["IDENTIFIER"])  # Espera um identificador
+        self.match_category(["IDENTIFIER"])
         self.arguments()
 
     def arguments(self):
-        self.match_lexeme("(")
+        self.match_lexeme(["("])
         if self.lookahead()['lexeme'] == ")":
-            # Caso: parênteses vazios, correspondendo a '()'
-            self.match_lexeme(")")  # Consome o ')'
+            self.match_lexeme([")"])  
         else:
-            # Caso: parêntese de abertura seguido de valores
-            self.value()  # Processa o primeiro argumento
-            self.argument()  # Processa os argumentos adicionais, se houver
-            self.match_lexeme(")")  # Consome o ')'
+            self.value() 
+            self.argument() 
+            self.match_lexeme([")"]) 
 
     def argument(self):
-        # Processa os argumentos adicionais separados por vírgula
         while self.lookahead()["lexeme"] == ",":
-            self.match_lexeme(",") 
+            self.match_lexeme([","]) 
             self.value()  
+
+    def return_statement(self):
+        self.match_lexeme(["return"])  
+        if self.lookahead()['lexeme'] not in [";"]:
+            self.value()
+        self.match_lexeme([";"])
 
 #--------------------- Expressões lógicas ---------------------
     def logic_expression(self):
