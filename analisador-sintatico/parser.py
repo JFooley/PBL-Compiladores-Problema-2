@@ -62,58 +62,52 @@ class Parser():
 
         #self.main() TODO Ainda não implementado
 
- #--------------------- Expressões aritméticas ---------------------   
-    # Caso: <primitive type> identifier ';' | identifier identifier ';' | <primitive type> identifier '=' <value> ';' | <primitive type> <vector position> ';'                                
+ #--------------------- Expressões aritméticas ---------------------                             
     def expression_declaration(self):
         if self.lookahead()['category'] == 'IDENTIFIER':
-            self.match_category("IDENTIFIER")
+            self.match_category(["IDENTIFIER"])
+            self.match_category(["IDENTIFIER"])
         else:
-            #self.primitive_type()
+            self.primitive_type()
             if self.lookahead()['category'] == 'IDENTIFIER':
-                self.match_category("IDENTIFIER")
+                self.match_category(["IDENTIFIER"])
                 if self.lookahead()['lexeme'] == '=':
-                    #self.value()
-                    pass
+                    self.match_lexeme(["="])
+                    self.value()
             else:
-                #self.vector_position()
-                pass
+                self.vector_position()
         self.match_lexeme([";"])
             
-    # Caso: <expression declaration> <expression variables> | <expression declaration>
     def expression_variables(self):
         self.expression_declaration()
         if self.lookahead()['category'] == 'IDENTIFIER' or self.lookahead()['lexeme'] in ['integer', 'float', 'boolean', 'string']:
             self.expression_variables()
        
-    
     def variables(self):
-        self.match_lexeme('variables')
-        self.match_lexeme('{')
+        self.match_lexeme(['variables'])
+        self.match_lexeme(['{'])
         if self.lookahead()['category'] == 'IDENTIFIER' or self.lookahead()['lexeme'] in ['integer', 'float', 'boolean', 'string']:
             self.expression_variables()
         self.match_lexeme(['}'])
-
-
+              
     def arithmetic_expression(self):
-            self.arithmetic_operating()
-            if self.lookahead()["lexeme"] in ['+', '-']:
-                self.arithmetic_sum()
-    
+        self.arithmetic_operating()
+        if self.lookahead()["lexeme"] in ['+', '-']:
+            self.arithmetic_sum()
+
     def arithmetic_operating(self):
         self.arithmetic_value()
         if self.lookahead()["lexeme"] in ['*', '/']:
             self.arithmetic_multiplication()
-
+  
     def arithmetic_value(self):
         if self.lookahead()["category"] == "NUMBER":
             self.match_category("number")
         elif self.lookahead()["category"] == "IDENTIFIER":
             if self.lookahead(1)["category"] == "(":
-                #self.function_call()
-                pass
+                self.function_call()
             else:
-                #self.attribute()
-                pass
+                self.attribute()
         else:
             self.match_lexeme("(")
             self.arithmetic_expression()
@@ -124,7 +118,7 @@ class Parser():
         self.arithmetic_operating()
         if self.lookahead()["lexeme"] in ['+', '-']:
             self.arithmetic_sum()
-      
+
     def arithmetic_multiplication(self):
         self.match_lexeme(['*', '/'])
         self.arithmetic_value()
@@ -183,16 +177,13 @@ class Parser():
 #--------------------- Expressões lógicas ---------------------
     def logic_expression(self):
         current_token = self.lookahead()
-        # Caso: '(' <logic expression> ')' ou '(' <logic expression> ')' <logic terminal> <logic expression>
         if current_token["lexeme"] == "(":
             self.match_lexeme(["("]) 
             self.logic_expression() 
             self.match_lexeme([")"]) 
-            # Check for the optional <logic terminal> and further <logic expression>
             if self.lookahead()["lexeme"] in ['&&', '||']:
                 self.logic_terminal() 
                 self.logic_expression()
-        # Caso: <logic value> ou <logic value> <logic terminal> <logic expression>
         else:
             self.logic_value()
             if self.lookahead()["lexeme"] in ['&&', '||']:
@@ -212,16 +203,13 @@ class Parser():
 #--------------------- Expressões relacionais ---------------------
     def relational_expression(self):
         current_token = self.lookahead()
-        # Caso: '(' <relational expression> ')' ou '(' <relational expression> ')' <relational terminal> <relational expression>
         if current_token["lexeme"] == "(":
             self.match_lexeme(["("])
             self.relational_expression()
             self.match_lexeme([")"]) 
-            # Verify <relational terminal> and further <relational expression>
             if self.lookahead()["lexeme"] in ['>', '<', '!=', '>=', '<=', '==']:
                 self.relational_terminal()
                 self.relational_expression()
-        # Caso: <arithmetic expression> ou <arithmetic expression> <relational terminal> <relational expression>
         else:
             self.arithmetic_expression()
             if self.lookahead()["lexeme"] in ['>', '<', '!=', '>=', '<=', '==']:
@@ -337,12 +325,10 @@ class Parser():
             self.function_call()
             self.match_lexeme([";"])
 
-    # <register>::= 'register' identifier '{' <register body> '}'
     def vector_position(self):
         self.match_category(["IDENTIFIER"])
         self.vector_index()
 
-    # <register body>::= <declaration> | <declaration> <register body>
     def vector_index(self):
         self.match_lexeme(["["])
         if self.lookahead()["category"] == "NUMBER" and self.lookahead(1)["lexeme"] == "]":
@@ -353,16 +339,13 @@ class Parser():
             self.arithmetic_expression()
         self.match_lexeme(["]"])
 
-        # Olha se o proximo token é [ e depois se é algo que caracterize <vector index> (parte opcional)
         if self.lookahead()["lexeme"] == "[" and (self.lookahead(1)["category"] in ["NUMBER", "IDENTIFIER"] or self.lookahead(1)["lexeme"] == "("):
             self.vector_index()
             
-    # <register position>::= identifier <register access>
     def register_position(self):
         self.match_category(["IDENTIFIER"])
         self.register_access()
     
-    # '.' identifier | '.' identifier <register access> | '.' <vector position>
     def register_access(self):
         self.match_lexeme(["."])
         if self.lookahead()["category"] == "IDENTIFIER":
