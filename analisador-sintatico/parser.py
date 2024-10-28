@@ -110,13 +110,13 @@ class Parser():
             self.arithmetic_multiplication()
 
     def arithmetic_value(self):
-        if self.lookahead()["category"] == "number":
-            self.match_category("number")
+        if self.lookahead()["category"] == "NUMBER":
+            self.match_category("NUMBER")
         elif self.lookahead()["lexeme"] == "(":
             self.match_lexeme("(")
             self.arithmetic_expression()
             self.match_lexeme(")")
-        elif self.lookahead()["category"] == "identifier":
+        elif self.lookahead()["category"] == "IDENTIFIER":
             if self.lookahead(1)["category"] == "(":
                 #self.function_call()
                 pass
@@ -136,55 +136,41 @@ class Parser():
         if self.lookahead()["lexeme"] in ['*', '/']:
             self.arithmetic_multiplication()
 
-    # <vector position>::= identifier <vector index>
     def vector_position(self):
-        self.match_category(["identifier"])
+        self.match_category(["IDENTIFIER"])
         self.vector_index()
 
-    # <vector index>::= 
-    #         '[' number ']' 
-    #       | '[' number ']' <vector index> 
-    #       | '[' identifier ']' 
-    #       | '[' identifier ']' <vector index> 
-    #       | '[' <arithmetic expression>']' 
-    #       | '[' <arithmetic expression>']' <vector index>
     def vector_index(self):
         self.match_lexeme(["["])
-        if self.lookahead()["category"] == "number" and self.lookahead(1)["lexeme"] == "]":
-            self.match_category("number")
-        elif self.lookahead()["category"] == "identifier" and self.lookahead(1)["lexeme"] == "]":
-            self.match_category("identifier")
+        if self.lookahead()["category"] == "NUMBER" and self.lookahead(1)["lexeme"] == "]":
+            self.match_category("NUMBER")
+        elif self.lookahead()["category"] == "IDENTIFIER" and self.lookahead(1)["lexeme"] == "]":
+            self.match_category("IDENTIFIER")
         else:
             self.arithmetic_expression()
         self.match_lexeme(["]"])
 
         # Olha se o proximo token é [ e depois se é algo que caracterize <vector index> (parte opcional)
-        if self.lookahead()["lexeme"] == "[" and (self.lookahead(1)["category"] in ["number", "identifier"] or self.lookahead(1)["lexeme"] == "("):
+        if self.lookahead()["lexeme"] == "[" and (self.lookahead(1)["category"] in ["NUMBER", "IDENTIFIER"] or self.lookahead(1)["lexeme"] == "("):
             self.vector_index()
             
-    # <register position>::= identifier <register access>
     def register_position(self):
-        self.match_category(["identifier"])
+        self.match_category(["IDENTIFIER"])
         self.register_access()
     
-    # <register access>::= '.' identifier <register access> | ε
     def register_access(self):
         if self.lookahead()["lexeme"] == ".":
             self.match_lexeme(["."])
-            self.match_category(["identifier"])
+            self.match_category(["IDENTIFIER"])
             self.register_access()
 
 # Testando a classe
 token_list = []
-token_list.append({"lexeme": "(", "category": "OPEN_PARENTHESIS", "line": 1})
-token_list.append({"lexeme": "2", "category": "number","line": 1})
-token_list.append({"lexeme": ">", "category": "operator","line": 1})
-token_list.append({"lexeme": "1", "category": "number","line": 1})
-token_list.append({"lexeme": ")", "category": "CLOSE_PARENTHESIS", "line": 1})
-token_list.append({"lexeme": "||", "category": "operator","line": 1})
-token_list.append({"lexeme": "variavel", "category": "IDENTIFIER","line": 1})
-token_list.append({"lexeme": "==", "category": "operator","line": 1})
-token_list.append({"lexeme": "3", "category": "number","line": 1})
+token_list.append({"lexeme": "vetor", "category": "IDENTIFIER", "line": 1})
+token_list.append({"lexeme": "[", "category": "DELIMETER", "line": 1})
+token_list.append({"lexeme": "2", "category": "NUMBER", "line": 1})
+token_list.append({"lexeme": "]", "category": "DELIMETER", "line": 1})
+
 
 for item in token_list:
     print(item["lexeme"], end=" ")
