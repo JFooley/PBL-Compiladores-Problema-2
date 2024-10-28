@@ -84,19 +84,19 @@ class Parser():
             self.arithmetic_multiplication()
 
     def arithmetic_value(self):
-        if self.lookahead()["category"] == "number":
+        if self.lookahead()["category"] == "NUMBER":
             self.match_category("number")
-        elif self.lookahead()["lexeme"] == "(":
-            self.match_lexeme("(")
-            self.arithmetic_expression()
-            self.match_lexeme(")")
-        elif self.lookahead()["category"] == "identifier":
+        elif self.lookahead()["category"] == "IDENTIFIER":
             if self.lookahead(1)["category"] == "(":
                 #self.function_call()
                 pass
             else:
                 #self.attribute
                 pass
+        else:
+            self.match_lexeme("(")
+            self.arithmetic_expression()
+            self.match_lexeme(")")
 
     def arithmetic_sum(self):
         self.match_lexeme(['+', '-'])
