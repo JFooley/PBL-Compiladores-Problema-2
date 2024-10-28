@@ -136,7 +136,6 @@ def function_call(self):
             # Caso de erro se nenhum dos formatos válidos foi encontrado
             self._log_error("expected '()' or '(' with arguments")
 
-
     def argument_tail(self):
         # Processa os argumentos adicionais separados por vírgula
         while self.lookahead()["lexeme"] == ",":
@@ -173,7 +172,6 @@ def function_call(self):
             if self.lookahead()["lexeme"] in ['&&', '||']:
                 self.logic_terminal()
                 self.logic_expression()
-
                          
     def logic_value(self):
         current_token = self.lookahead()
