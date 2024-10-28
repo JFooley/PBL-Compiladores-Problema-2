@@ -158,11 +158,16 @@ class Parser():
         self.match_category(["IDENTIFIER"])
         self.register_access()
     
+    # '.' identifier | '.' identifier <register access> | '.' <vector position>
     def register_access(self):
-        if self.lookahead()["lexeme"] == ".":
-            self.match_lexeme(["."])
+        self.match_lexeme(["."])
+        if self.lookahead()["category"] == "IDENTIFIER":
             self.match_category(["IDENTIFIER"])
-            self.register_access()
+            if self.lookahead()["lexeme"] == ".":
+                self.register_access()
+        else:
+            self.vector_position()
+
 
 # Testando a classe
 token_list = []
