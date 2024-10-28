@@ -122,25 +122,39 @@ def function_call(self):
         self._log_error("identifier")  # Caso não haja identificador, registra o erro
 
     def arguments(self):
-            if self.lookahead()['lexeme'] == "(" and self.lookahead(1)['lexeme'] == ")":
-                # Caso: parênteses vazios, correspondendo a '()'
-                self.match_lexeme("(")  # Consome o '('
-                self.match_lexeme(")")  # Consome o ')'
-            elif self.lookahead()['lexeme'] == "(":
-                # Caso: parêntese de abertura seguido de valores
-                self.match_lexeme("(")  # Consome o '('
-                self.value()  # Processa o primeiro argumento
-                self.argument_tail()  # Processa os argumentos adicionais, se houver
-                self.match_lexeme(")")  # Consome o ')'
-            else:
-                # Caso de erro se nenhum dos formatos válidos foi encontrado
-                self._log_error("expected '()' or '(' with arguments")
+        if self.lookahead()['lexeme'] == "(" and self.lookahead(1)['lexeme'] == ")":
+            # Caso: parênteses vazios, correspondendo a '()'
+            self.match_lexeme(["("])  # Consome o '('
+            self.match_lexeme([")"])  # Consome o ')'
+        elif self.lookahead()['lexeme'] == "(":
+            # Caso: parêntese de abertura seguido de valores
+            self.match_lexeme(["("])  # Consome o '('
+            self.value()  # Processa o primeiro argumento
+            self.argument_tail()  # Processa os argumentos adicionais, se houver
+            self.match_lexeme([")"])  # Consome o ')'
+        else:
+            # Caso de erro se nenhum dos formatos válidos foi encontrado
+            self._log_error("expected '()' or '(' with arguments")
+
 
     def argument_tail(self):
         # Processa os argumentos adicionais separados por vírgula
         while self.lookahead()["lexeme"] == ",":
-            self.match_lexeme(",")  # Consome a vírgula
+            self.match_lexeme([","])  # Consome a vírgula
             self.value()  # Processa o próximo argumento
+
+    def return_statement(self):
+        # Verifica se o token atual é a palavra-chave "return"
+        if self.lookahead()['lexeme'] == "return":
+            self.match_lexeme(["return"])  # Consome o token "return"
+            
+            # Verifica se há uma expressão a ser retornada usando lookahead
+            if self.lookahead()['lexeme'] not in [";"]:
+                # Caso não seja o token de fim, processa a expressão a ser retornada
+                self.parse_expression()
+            # Finaliza a instrução com ponto e vírgula
+            self.match_lexeme([";"])
+
 
     def logic_expression(self):
         current_token = self.lookahead()
@@ -159,7 +173,8 @@ def function_call(self):
             if self.lookahead()["lexeme"] in ['&&', '||']:
                 self.logic_terminal()
                 self.logic_expression()
-                            
+
+                         
     def logic_value(self):
         current_token = self.lookahead()
         if current_token["lexeme"] in ['true', 'false']: 
