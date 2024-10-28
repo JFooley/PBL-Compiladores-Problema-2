@@ -99,6 +99,49 @@ class Parser():
         self.arithmetic_value()
         if self.lookahead()["lexeme"] in ['*', '/']:
             self.arithmetic_multiplication()
+    
+def function_call(self):
+    # Passo 1: Verificar o identificador da função
+    if self.lookahead()['category'] == "identifier":
+        self.match_category("identifier")  # Espera um identificador
+
+        # Passo 2: Abrir parênteses
+        if self.lookahead()['lexeme'] == "(":
+            self.match_lexeme("(")  # Espera '('
+
+            # Passo 3: Processar a lista de argumentos (opcional)
+            # Se o próximo token não for ')', há ao menos um argumento
+            if self.lookahead()['lexeme'] != ")":
+                self.argument()  # Chama a função para processar o primeiro argumento
+                self.argument_list()  # Processa os argumentos restantes, se houver
+
+            # Passo 4: Fechar parênteses
+            self.match_lexeme(")")  # Espera ')'
+        else:
+            self._log_error("(")  # Caso não haja '(', registra o erro
+    else:
+        self._log_error("identifier")  # Caso não haja identificador, registra o erro
+
+    def arguments(self):
+            if self.lookahead()['lexeme'] == "(" and self.lookahead(1)['lexeme'] == ")":
+                # Caso: parênteses vazios, correspondendo a '()'
+                self.match_lexeme("(")  # Consome o '('
+                self.match_lexeme(")")  # Consome o ')'
+            elif self.lookahead()['lexeme'] == "(":
+                # Caso: parêntese de abertura seguido de valores
+                self.match_lexeme("(")  # Consome o '('
+                self.value()  # Processa o primeiro argumento
+                self.argument_tail()  # Processa os argumentos adicionais, se houver
+                self.match_lexeme(")")  # Consome o ')'
+            else:
+                # Caso de erro se nenhum dos formatos válidos foi encontrado
+                self._log_error("expected '()' or '(' with arguments")
+
+    def argument_tail(self):
+        # Processa os argumentos adicionais separados por vírgula
+        while self.lookahead()["lexeme"] == ",":
+            self.match_lexeme(",")  # Consome a vírgula
+            self.value()  # Processa o próximo argumento
 
 #--------------------- Expressões lógicas ---------------------
     def logic_expression(self):
