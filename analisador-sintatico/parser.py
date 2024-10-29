@@ -440,7 +440,7 @@ class Parser():
   
     def arithmetic_value(self):
         if self.lookahead()["category"] == "NUMBER":
-            self.match_category("number")
+            self.match_category("NUMBER")
         elif self.lookahead()["category"] == "IDENTIFIER":
             if self.lookahead(1)["category"] == "(":
                 self.function_call()
