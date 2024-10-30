@@ -4,24 +4,32 @@ class Parser():
         self.error_list = []
         self.index = 0
     
-    # Função match para verificar categoria
+    # Função match para verificar a categoria
     def match_category(self, expected_token_category):
         current_token = self.lookahead()
-        self.index += 1 # Move to the next token
         if current_token['category'] != None and current_token['category'] in expected_token_category:
+            self.index += 1 # Move to the next token
             return current_token
         else:
-            self.error_list.append({"position":current_token["line"], "expected":expected_token_category, "received":current_token["category"]})
+            self.error_recovery(current_token['line'], expected_token_category)
             
     # Função match para verificar o lexema
     def match_lexeme(self, expected_token_lexeme):
         current_token = self.lookahead()
-        self.index += 1 # Move to the next token
         if current_token['lexeme'] != None and current_token['lexeme'] in expected_token_lexeme:
+            self.index += 1 # Move to the next token
             return current_token
         else:
-            self.error_list.append({"position":current_token["line"], "expected":expected_token_lexeme, "received":current_token["lexeme"]})
-    
+            self.error_recovery(current_token['line'], expected_token_lexeme)
+
+    def error_recovery(self, line_number, expected_token):
+        errors_sync = ['(',')','}','{',';']
+        tokens_error = []
+        while not self.lookahead()["lexeme"] in errors_sync:
+            tokens_error.append(self.lookahead()["lexeme"])
+            self.index += 1
+        self.error_list.append({"position":line_number, "expected":expected_token, "received": tokens_error})
+        
     def lookahead(self, K = 0):
         if self.index + K < len(self.token_list):
             return self.token_list[self.index + K]
