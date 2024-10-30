@@ -171,7 +171,6 @@ class Parser():
         else:
             self.vector_position()
 
-
 # Testando a classe
 token_list = []
 token_list.append({"lexeme": "vetor", "category": "IDENTIFIER", "line": 1})
