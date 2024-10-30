@@ -108,7 +108,10 @@ class Parser():
 
     def function(self):
         self.match_lexeme(["function"])
-        self.type()
+        if self.lookahead()['lexeme'] == "empty": # ALTERADO
+            self.match_lexeme(["empty"])
+        else:
+            self.type()
         self.match_category(["IDENTIFIER"])
         self.parameters()
         self.match_lexeme(["{"])
@@ -172,7 +175,7 @@ class Parser():
         self.attribute()
         if self.lookahead()["lexeme"] == "=":
             self.match_lexeme(["="])
-            self.value()
+            self.value() # <---- prOBLEMA NOS PARENTESES 
             self.match_lexeme([";"])
         else:
             self.increment_terminal()
@@ -192,7 +195,7 @@ class Parser():
             self.match_category(["IDENTIFIER"])
         else:
             self.primitive_type()
-            if self.lookahead()['category'] == 'IDENTIFIER':
+            if self.lookahead()['category'] == 'IDENTIFIER' and self.lookahead(1)['lexeme'] != "[": ## Alterado
                 self.match_category(["IDENTIFIER"])
                 if self.lookahead()['lexeme'] == '=':
                     self.match_lexeme(["="])
@@ -202,14 +205,14 @@ class Parser():
         self.match_lexeme([";"])
 
     def attribute(self):
-        if self.lookahead()["category"] == "IDENTIFIER":
-            self.match_category(["IDENTIFIER"])
-            if self.lookahead()["lexeme"] == ".":
-                self.register_position()
-            elif self.lookahead()["lexeme"] == "[":
-                self.vector_position()
-        else: 
-            self.match_category(["IDENTIFIER"])
+        #self.match_category(["IDENTIFIER"]) ALTERADO 
+        if self.lookahead()["category"] == "IDENTIFIER" and self.lookahead(1)["lexeme"] == ".":
+            self.register_position()
+        elif self.lookahead()["category"] == "IDENTIFIER" and self.lookahead(1)["lexeme"] == "[":
+            self.vector_position()
+        else:
+            self.match_category(["IDENTIFIER"])  
+       
 
     def vector_position(self):
         self.match_category(["IDENTIFIER"])
@@ -450,7 +453,7 @@ class Parser():
         if self.lookahead()["category"] == "NUMBER":
             self.match_category("NUMBER")
         elif self.lookahead()["category"] == "IDENTIFIER":
-            if self.lookahead(1)["category"] == "(":
+            if self.lookahead(1)["lexeme"] == "(":
                 self.function_call()
             else:
                 self.attribute()
