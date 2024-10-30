@@ -18,13 +18,13 @@ def main():
 		- Use parser.nome_da_producao_que_estou_trabalhando() para testar o seu código;
 
 	'''
-	#TEST_FILE = './test/nome_do_arquivo_de_teste_que_estou_trabalhando.txt' # Exemplo: ./test/function_sample.txt (não esquecer de remover antes antes de enviar para o repositório)
+	TEST_FILE = './test/main.txt' # Exemplo: ./test/function_sample.txt (não esquecer de remover antes antes de enviar para o repositório)
 
 	tokens = lexical_analise(TEST_FILE)
 	if tokens :
 		#print(tokens)
 		parser = Parser(tokens)
-		#parser.run()  
+		parser.run()  
 	
 		#parser.nome_da_producao_que_estou_trabalhando() # Usar para testar o seu código (não esquecer de remover antes antes de enviar para o repositório)
 		
