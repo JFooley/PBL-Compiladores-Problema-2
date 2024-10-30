@@ -250,7 +250,8 @@ class LexicalFiniteAutomaton:
                 
 
     def save_token_and_restart(self, line_number, token_type):
-        self.token_valid_list.append(Tokens.get_token(self.lexeme, token_type, line_number))
+        if (token_type != TokenType.BLOCK_COMMENT and token_type != TokenType.LINE_COMMENT):
+            self.token_valid_list.append(Tokens.get_token(self.lexeme, token_type, line_number))
         self.lexeme = ''
         self.state = 0
 

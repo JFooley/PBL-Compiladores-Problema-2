@@ -1,4 +1,5 @@
-
+/*TESTE COMENTARIO */
+//COMENTARIO  X+4
 register my_register {
   integer reg1; 
   boolean reg2; 
