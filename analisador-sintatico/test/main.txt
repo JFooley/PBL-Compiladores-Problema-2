@@ -66,9 +66,20 @@ main() {
   }
   num = 2;
 
+  num = -2;
+
   num++;
 
+  num = 4 - 2;
+  num = a - 3;
+
   result = num * 3 + 1;
+
+  result = 4 + 5 /5;
+
+  result = 0 - 1;
+
+  result = (a && b) + 4 / 8;
   
   a = (idade[0] + pessoa.idade) - 1;
 

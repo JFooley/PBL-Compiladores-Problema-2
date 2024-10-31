@@ -8,7 +8,7 @@ class Parser():
     def match_category(self, expected_token_category):
         current_token = self.lookahead()
         if current_token['category'] != None and current_token['category'] in expected_token_category:
-            self.index += 1 # Move to the next token
+            self.index += 1
             return current_token
         else:
             self.error_recovery(current_token['line'], expected_token_category)
@@ -17,11 +17,12 @@ class Parser():
     def match_lexeme(self, expected_token_lexeme):
         current_token = self.lookahead()
         if current_token['lexeme'] != None and current_token['lexeme'] in expected_token_lexeme:
-            self.index += 1 # Move to the next token
+            self.index += 1
             return current_token
         else:
             self.error_recovery(current_token['line'], expected_token_lexeme)
 
+    # Função para recuperação de erros
     def error_recovery(self, line_number, expected_token):
         errors_sync = ['(',')','}','{',';']
         tokens_error = []
@@ -29,7 +30,8 @@ class Parser():
             tokens_error.append(self.lookahead()["lexeme"])
             self.index += 1
         self.error_list.append({"position":line_number, "expected":expected_token, "received": tokens_error})
-        
+    
+    # Função para retornar o token atual ou referente ao index K
     def lookahead(self, K = 0):
         if self.index + K < len(self.token_list):
             return self.token_list[self.index + K]
@@ -41,7 +43,8 @@ class Parser():
     def run(self):
         self.start()
         return len(self.error_list) == 0
-    
+
+ #---------------------  ---------------------
     def start(self):
         if self.lookahead()["lexeme"] == "register": 
             self.registers()
@@ -54,6 +57,10 @@ class Parser():
 
         self.main() 
 
+        current_token = self.lookahead()
+        if current_token["lexeme"] != None:
+            self.error_list.append({"position":current_token["line"], "expected": "Nenhum token", "received": current_token["lexeme"]})
+    
  #--------------------- registers ---------------------
     def registers(self):
         self.register()
@@ -108,7 +115,7 @@ class Parser():
 
     def function(self):
         self.match_lexeme(["function"])
-        if self.lookahead()['lexeme'] == "empty": # ALTERADO
+        if self.lookahead()['lexeme'] == "empty": 
             self.match_lexeme(["empty"])
         else:
             self.type()
@@ -175,7 +182,7 @@ class Parser():
         self.attribute()
         if self.lookahead()["lexeme"] == "=":
             self.match_lexeme(["="])
-            self.value() # <---- prOBLEMA NOS PARENTESES 
+            self.value()
             self.match_lexeme([";"])
         else:
             self.increment_terminal()
@@ -195,7 +202,7 @@ class Parser():
             self.match_category(["IDENTIFIER"])
         else:
             self.primitive_type()
-            if self.lookahead()['category'] == 'IDENTIFIER' and self.lookahead(1)['lexeme'] != "[": ## Alterado
+            if self.lookahead()['category'] == 'IDENTIFIER' and self.lookahead(1)['lexeme'] != "[": 
                 self.match_category(["IDENTIFIER"])
                 if self.lookahead()['lexeme'] == '=':
                     self.match_lexeme(["="])
@@ -205,7 +212,6 @@ class Parser():
         self.match_lexeme([";"])
 
     def attribute(self):
-        #self.match_category(["IDENTIFIER"]) ALTERADO 
         if self.lookahead()["category"] == "IDENTIFIER" and self.lookahead(1)["lexeme"] == ".":
             self.register_position()
         elif self.lookahead()["category"] == "IDENTIFIER" and self.lookahead(1)["lexeme"] == "[":
@@ -382,83 +388,62 @@ class Parser():
             self.body()  
 
 #--------------------- Expressões lógicas ---------------------
-    def logic_expression(self):
-        current_token = self.lookahead()
-        if current_token["lexeme"] == "(":
-            self.match_lexeme(["("]) 
-            self.logic_expression() 
-            self.match_lexeme([")"]) 
-            if self.lookahead()["lexeme"] in ['&&', '||']:
-                self.logic_terminal() 
-                self.logic_expression()
-        else:
-            self.logic_value()
-            if self.lookahead()["lexeme"] in ['&&', '||']:
-                self.logic_terminal()
-                self.logic_expression()
-                            
-    def logic_value(self):
-        current_token = self.lookahead()
-        if current_token["lexeme"] in ['true', 'false']: 
-            self.match_lexeme(['true', 'false'])
-        else:
-            self.relational_expression()  
 
-    def logic_terminal(self):
-        self.match_lexeme(['&&', '||']) 
+    def logic_expression(self):
+        self.logic_value()
+        while self.lookahead()["lexeme"] in ['||', '&&']:
+            self.logic_operator()
+            self.logic_value()
+
+    def logic_value(self):
+        if self.lookahead()["lexeme"] in ["true", "false"]:
+            self.match_lexeme(["true", "false"])
+        else:
+            self.relational_expression()
+
+    def logic_operator(self):
+        self.match_lexeme(['||', '&&'])
 
 #--------------------- Expressões relacionais ---------------------
     def relational_expression(self):
-        if self.lookahead()["lexeme"] == "(": ### Esse teste não garante que o ( é de relational_expression() ao invés de arithmetic_expression()
-            self.match_lexeme(["("])
-            self.relational_expression()
-            self.match_lexeme([")"]) 
-            if self.lookahead()["lexeme"] in ['>', '<', '!=', '>=', '<=', '==']:
-                self.relational_terminal()
-                self.relational_expression()
-        else:
+        self.arithmetic_expression()  
+        if self.lookahead()["lexeme"] in ['>', '<', '!=', '>=', '<=', '==']:
+            self.relational_operator()
             self.arithmetic_expression()
-            if self.lookahead()["lexeme"] in ['>', '<', '!=', '>=', '<=', '==']:
-                self.relational_terminal()
-                self.relational_expression()
 
-    def relational_terminal(self):
+    def relational_operator(self):
         self.match_lexeme(['>', '<', '!=', '>=', '<=', '=='])
 
-#--------------------- Expressões aritméticas ---------------------                             
+#--------------------- Expressões aritméticas ---------------------   
     def arithmetic_expression(self):
-        self.arithmetic_operating()
-        if self.lookahead()["lexeme"] in ['+', '-']:
-            self.arithmetic_sum()
+        self.arithmetic_term()
+        while self.lookahead()["lexeme"] in ['+', '-']:
+            self.arithmetic_operator()
+            self.arithmetic_term()
 
-    def arithmetic_sum(self):
-        self.match_lexeme(['+', '-'])
-        self.arithmetic_operating()
-        if self.lookahead()["lexeme"] in ['+', '-']:
-            self.arithmetic_sum()
-
-    def arithmetic_multiplication(self):
-        self.match_lexeme(['*', '/'])
+    def arithmetic_term(self):
         self.arithmetic_value()
-        if self.lookahead()["lexeme"] in ['*', '/']:
-            self.arithmetic_multiplication()
+        while self.lookahead()["lexeme"] in ['*', '/']:
+            self.arithmetic_operator()
+            self.arithmetic_value()
 
-    def arithmetic_operating(self):
-        self.arithmetic_value()
-        if self.lookahead()["lexeme"] in ['*', '/']:
-            self.arithmetic_multiplication()
-  
     def arithmetic_value(self):
-        if self.lookahead()["category"] == "NUMBER":
-            self.match_category("NUMBER")
+        if self.lookahead()["lexeme"] == "(":
+            self.match_lexeme(["("])
+            self.logic_expression()
+            self.match_lexeme([")"])
+
+        elif self.lookahead()["lexeme"] == "-":
+            self.match_lexeme(["-"])
+            self.match_category(["NUMBER"])
+
         elif self.lookahead()["category"] == "IDENTIFIER":
             if self.lookahead(1)["lexeme"] == "(":
                 self.function_call()
             else:
                 self.attribute()
         else:
-            self.match_lexeme("(")
-            self.arithmetic_expression()
-            self.match_lexeme(")")
+            self.match_category(["NUMBER"])
 
-   
+    def arithmetic_operator(self):
+        self.match_lexeme(['+', '-', '*', '/'])

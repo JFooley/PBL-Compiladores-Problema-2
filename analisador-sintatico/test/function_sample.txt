@@ -1,9 +1,0 @@
-function string example(float x, integer b) { 
-    variables {
-        integer a = 2;
-        float x;
-        float result = 0;
-    }
-    result = a * x + b;
-    return (result / 7);
-}
