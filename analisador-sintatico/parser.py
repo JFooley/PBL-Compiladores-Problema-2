@@ -382,83 +382,69 @@ class Parser():
             self.body()  
 
 #--------------------- Expressões lógicas ---------------------
+    # <logic expression> ::= <logic value> (<logic operator> <logic value>)*
     def logic_expression(self):
-        current_token = self.lookahead()
-        if current_token["lexeme"] == "(":
-            self.match_lexeme(["("]) 
-            self.logic_expression() 
-            self.match_lexeme([")"]) 
-            if self.lookahead()["lexeme"] in ['&&', '||']:
-                self.logic_terminal() 
-                self.logic_expression()
-        else:
+        self.logic_value()
+        while self.lookahead()["lexeme"] in ['||', '&&']:
+            self.logic_operator()
             self.logic_value()
-            if self.lookahead()["lexeme"] in ['&&', '||']:
-                self.logic_terminal()
-                self.logic_expression()
-                            
-    def logic_value(self):
-        current_token = self.lookahead()
-        if current_token["lexeme"] in ['true', 'false']: 
-            self.match_lexeme(['true', 'false'])
-        else:
-            self.relational_expression()  
 
-    def logic_terminal(self):
-        self.match_lexeme(['&&', '||']) 
+    # <logic value> ::= "true" | "false" | <relational expression>
+    def logic_value(self):
+        if self.lookahead()["lexeme"] in ["true", "false"]:
+            self.match_lexeme(["true", "false"])
+        else:
+            self.relational_expression()
+
+    # <logic operator> ::= "||" | "&&"
+    def logic_operator(self):
+        self.match_lexeme(['||', '&&'])
 
 #--------------------- Expressões relacionais ---------------------
+    # <relational expression> ::= <arithmetic expression> (<relational operator> <arithmetic expression>)*
     def relational_expression(self):
-        if self.lookahead()["lexeme"] == "(": ### Esse teste não garante que o ( é de relational_expression() ao invés de arithmetic_expression()
-            self.match_lexeme(["("])
-            self.relational_expression()
-            self.match_lexeme([")"]) 
-            if self.lookahead()["lexeme"] in ['>', '<', '!=', '>=', '<=', '==']:
-                self.relational_terminal()
-                self.relational_expression()
-        else:
+        self.arithmetic_expression()  
+        if self.lookahead()["lexeme"] in ['>', '<', '!=', '>=', '<=', '==']:
+            self.relational_operator()
             self.arithmetic_expression()
-            if self.lookahead()["lexeme"] in ['>', '<', '!=', '>=', '<=', '==']:
-                self.relational_terminal()
-                self.relational_expression()
 
-    def relational_terminal(self):
+    # <relational operator> ::= '>' | '<' | '!=' | '>=' | '<=' | '=='
+    def relational_operator(self):
         self.match_lexeme(['>', '<', '!=', '>=', '<=', '=='])
 
-#--------------------- Expressões aritméticas ---------------------                             
+#--------------------- Expressões aritméticas ---------------------   
+    # <arithmetic expression> ::= <arithmetic term> (<arithmetic operator> <arithmetic_term>)*
     def arithmetic_expression(self):
-        self.arithmetic_operating()
-        if self.lookahead()["lexeme"] in ['+', '-']:
-            self.arithmetic_sum()
+        self.arithmetic_term()
+        while self.lookahead()["lexeme"] in ['+', '-']:
+            self.arithmetic_operator()
+            self.arithmetic_term()
 
-    def arithmetic_sum(self):
-        self.match_lexeme(['+', '-'])
-        self.arithmetic_operating()
-        if self.lookahead()["lexeme"] in ['+', '-']:
-            self.arithmetic_sum()
-
-    def arithmetic_multiplication(self):
-        self.match_lexeme(['*', '/'])
+    # <arithmetic term> ::= <arithmetic value> (<arithmetic operator> <arithmetic value>)*
+    def arithmetic_term(self):
         self.arithmetic_value()
-        if self.lookahead()["lexeme"] in ['*', '/']:
-            self.arithmetic_multiplication()
+        while self.lookahead()["lexeme"] in ['*', '/']:
+            self.arithmetic_operator()
+            self.arithmetic_value()
 
-    def arithmetic_operating(self):
-        self.arithmetic_value()
-        if self.lookahead()["lexeme"] in ['*', '/']:
-            self.arithmetic_multiplication()
-  
+    # <arithmetic value> ::= "(" <logic expression> ")" | NUMBER | <function call> | <atribute>
     def arithmetic_value(self):
-        if self.lookahead()["category"] == "NUMBER":
-            self.match_category("NUMBER")
+        if self.lookahead()["lexeme"] == "(":
+            self.match_lexeme(["("])
+            self.logic_expression()
+            self.match_lexeme([")"])
+
+        elif self.lookahead()["category"] == "NUMBER":
+            self.match_category(["NUMBER"])
+
         elif self.lookahead()["category"] == "IDENTIFIER":
             if self.lookahead(1)["lexeme"] == "(":
                 self.function_call()
             else:
                 self.attribute()
         else:
-            self.match_lexeme("(")
-            self.arithmetic_expression()
-            self.match_lexeme(")")
+            self.match_category(["NUMBER"])
 
-   
+    # <arithmetic operator> ::= '+' | '-' | '*' | '/'
+    def arithmetic_operator(self):
+        self.match_lexeme(['+', '-', '*', '/'])

@@ -22,7 +22,9 @@ def main():
 
 	tokens = lexical_analise(TEST_FILE)
 	if tokens :
-		#print(tokens)
+		for token in tokens:
+			print(token)
+
 		parser = Parser(tokens)
 		parser.run()  
 	
