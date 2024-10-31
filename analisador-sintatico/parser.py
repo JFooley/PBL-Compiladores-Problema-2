@@ -409,8 +409,7 @@ class Parser():
 
 #--------------------- Expressões relacionais ---------------------
     def relational_expression(self):
-        current_token = self.lookahead()
-        if current_token["lexeme"] == "(":
+        if self.lookahead()["lexeme"] == "(": ### Esse teste não garante que o ( é de relational_expression() ao invés de arithmetic_expression()
             self.match_lexeme(["("])
             self.relational_expression()
             self.match_lexeme([")"]) 
