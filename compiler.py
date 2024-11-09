@@ -15,7 +15,7 @@ Felipe Silva Queiroz
 Francisco Ferreira
 Georgenes Caleo Silva Pinheiro
 '''
-from analisador_sintatico.tokenizer.lexicalAnalyzer import lexical_analise
+from analisador_lexico.lexicalAnalyzer import lexical_analise
 from analisador_sintatico.parser import Parser
 from analisador_semantico.semantic_analyzer import SemanticAnalyzer
 
