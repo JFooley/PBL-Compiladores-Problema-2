@@ -1,5 +1,6 @@
 class Parser():
-    def __init__(self, token_list):
+    def __init__(self, semantic_analyzer, token_list):
+        self.sem_analyzer = semantic_analyzer
         self.token_list = token_list
         self.error_list = []
         self.index = 0
