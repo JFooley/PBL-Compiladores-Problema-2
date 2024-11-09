@@ -30,4 +30,4 @@ class SemanticAnalyzer:
         self.error_list = []
 
     def get_error_list(self):
-        return error_list
+        return self.error_list

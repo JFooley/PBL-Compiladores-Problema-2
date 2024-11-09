@@ -17,7 +17,7 @@ Georgenes Caleo Silva Pinheiro
 '''
 from analisador_sintatico.tokenizer.lexicalAnalyzer import lexical_analise
 from analisador_sintatico.parser import Parser
-from semantic_analyzer.semantic_analyzer import SemanticAnalyzer
+from analisador_semantico.semantic_analyzer import SemanticAnalyzer
 
 def write_file(file_name, list, message):
 	with open(file_name, "w", encoding="utf-8") as file:
@@ -34,14 +34,19 @@ def main():
 
 	tokens = lexical_analise(TEST_FILE)
 	if tokens :
-		sem_analyzer = SemanticAnalyzer()
-		parser = Parser(sem_analyzer, tokens)
+		validator = SemanticAnalyzer()
+		parser = Parser(validator, tokens)
 		parser.run()  
 
 		if parser.get_error_list(): 
 			print("Erros encontrados durante a análise sintática.")
 		else:
 			print("A análise sintática foi realizada com sucesso.")
+
+		if validator.get_error_list(): 
+			print("Erros encontrados durante a análise semântica.")
+		else:
+			print("A análise semântica foi realizada com sucesso.")			
 
 		#write_file("./analisador_sintatico/saida/parser_result.txt", parser.get_error_list(), "A análise sintática foi realizada com sucesso.")
 	else:
