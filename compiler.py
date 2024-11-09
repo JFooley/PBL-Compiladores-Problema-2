@@ -39,12 +39,12 @@ def main():
 		parser.run()  
 
 		if parser.get_error_list(): 
-			print("Erros encontrados durante a análise sintática.")
+			print("Erros foram encontrados durante a análise sintática.")
 		else:
 			print("A análise sintática foi realizada com sucesso.")
 
 		if validator.get_error_list(): 
-			print("Erros encontrados durante a análise semântica.")
+			print("Erros foram encontrados durante a análise semântica.")
 		else:
 			print("A análise semântica foi realizada com sucesso.")			
 
