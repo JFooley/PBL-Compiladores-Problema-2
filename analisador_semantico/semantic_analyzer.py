@@ -13,7 +13,7 @@ class SemanticAnalyzer:
                 )
             )
         '''
-        self.symbol_table = []
+        self.symbol_map = dict()
 
         '''
             dict(
