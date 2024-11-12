@@ -1,8 +1,8 @@
-// Código fonte de teste
-
+/*TESTE COMENTARIO */
+//COMENTARIO  X+4
 register my_register {
-  integer reg1; // reg1
-  boolean reg2; /** reg2 **/
+  integer reg1; 
+  boolean reg2; 
 }
 
 constants {
@@ -32,7 +32,7 @@ function integer compute_sum(int x, int y) {
   return x + y;
 }
 
-function empty functionEmpty(int a){
+function empty functionEmpty(integer a){
   variables {}
   temperature = my_array[0];
   num--;
@@ -41,7 +41,7 @@ function empty functionEmpty(int a){
   num = c >=b;
 }
 
-function integer fact(int number){
+function integer fact(inter number){
     variables {}
     if(number < 0) then {
     return 1;
@@ -59,9 +59,6 @@ function string example(){
   return "Hello World";
 }
 
-/** 
-Essa é a nossa função main 
-**/
 main() {
   variables {
     integer num = 1;
@@ -69,9 +66,20 @@ main() {
   }
   num = 2;
 
+  num = -2;
+
   num++;
 
+  num = 4 - 2;
+  num = a - 3;
+
   result = num * 3 + 1;
+
+  result = 4 + 5 /5;
+
+  result = 0 - 1;
+
+  result = (a && b) + 4 / 8;
   
   a = (idade[0] + pessoa.idade) - 1;
 
