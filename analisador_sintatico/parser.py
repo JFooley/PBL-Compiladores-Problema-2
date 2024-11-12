@@ -3,6 +3,7 @@ class Parser():
         self.validator = semantic_analyzer
         self.token_list = token_list
         self.error_list = []
+        self.token_accumulator_list = []
         self.index = 0
     
     # Função match para verificar a categoria
@@ -10,6 +11,7 @@ class Parser():
         current_token = self.lookahead()
         if current_token['category'] != None and current_token['category'] in expected_token_category:
             self.index += 1
+            self.token_accumulator_list.append(current_token)
             return current_token
         else:
             self.error_recovery(current_token['line'], expected_token_category)
@@ -19,6 +21,7 @@ class Parser():
         current_token = self.lookahead()
         if current_token['lexeme'] != None and current_token['lexeme'] in expected_token_lexeme:
             self.index += 1
+            self.token_accumulator_list.append(current_token)
             return current_token
         else:
             self.error_recovery(current_token['line'], expected_token_lexeme)
