@@ -5,6 +5,13 @@ register my_register {
   boolean reg2; 
 }
 
+register Pessoa {
+  integer idade; 
+  string nome;
+  float dinheiro; 
+
+}
+
 constants {
   integer min = 10;
   float max = 100.0;

@@ -9,14 +9,6 @@ class TabelaIdentificadores():
     
     def __repr__(self):
         pass
-    
-class TabelaDeclaracaoRegistradores():
-    def __init__(self, nome, atributos):
-        self.nome = nome
-        self.atributos = atributos # {“nome atributo”: {tipo: “...”, “tamanho”: “...”} }
-
-    def __repr__(self):
-            pass
 
 class TabelaPares():
     def __init__(self):

@@ -4,12 +4,54 @@ class Parser():
         self.token_list = token_list
         self.error_list = []
         self.index = 0
+        
+        self.valid_tokens = []  # Lista para acumular tokens válidos
+        self.declaracao_registradores = {}  # Dicionário final de declarações de registradores
+    
+    def consumo_declaracao_registradores(self):
+        register_name = self.valid_tokens[1]["lexeme"]
+        
+        # Tem que verificar se já existe um registrador com o mesmo nome:  
+        # Verifica se o registrador já foi declarado
+        if register_name in self.declaracao_registradores:
+            print(f"Erro: Registrador '{register_name}' já foi declarado.")
+            return
+             
+        self.declaracao_registradores[register_name] = {}
+        nomeParametro = ""
+        tipoParametro = ""
+
+        for token in self.valid_tokens[3:]:  # Começa após o token de abertura "{"
+            if (token['category'] == 'KEYWORD'):
+                tipoParametro = token['lexeme']
+            elif (token['category'] == 'IDENTIFIER'):
+                nomeParametro = token['lexeme']
+            elif (token['category'] == 'DELIMITER' and token['lexeme'] == ";"):
+                self.declaracao_registradores[register_name][nomeParametro] = {"tipo": tipoParametro}
+                nomeParametro, tipoParametro = "", ""
+
+        
+        print("Dicionário de declaração atualizado:", self.declaracao_registradores)
+
+
+
+    def consumir_tokens(self, initial_error_count):
+        if len(self.error_list) == initial_error_count:
+            if (self.valid_tokens[0]["lexeme"] == "register"):
+                self.consumo_declaracao_registradores()
+                
+            # print("Tokens consumidos com sucesso:", self.valid_tokens)
+        else:
+            print("Erro encontrado! Tokens desconsiderados.")
+            self.valid_tokens.clear()
+
     
     # Função match para verificar a categoria
     def match_category(self, expected_token_category):
         current_token = self.lookahead()
         if current_token['category'] != None and current_token['category'] in expected_token_category:
             self.index += 1
+            self.valid_tokens.append(current_token)  # Armazena o token válido
             return current_token
         else:
             self.error_recovery(current_token['line'], expected_token_category)
@@ -19,6 +61,7 @@ class Parser():
         current_token = self.lookahead()
         if current_token['lexeme'] != None and current_token['lexeme'] in expected_token_lexeme:
             self.index += 1
+            self.valid_tokens.append(current_token)  # Armazena o token válido
             return current_token
         else:
             self.error_recovery(current_token['line'], expected_token_lexeme)
@@ -69,11 +112,18 @@ class Parser():
             self.registers()
 
     def register(self):
+        # Limpa a lista de tokens válidos ao iniciar a análise do bloco
+        self.valid_tokens.clear()
+        initial_error_count = len(self.error_list)  # Contagem de erros no início
+        
         self.match_lexeme(["register"])
         self.match_category(["IDENTIFIER"])
         self.match_lexeme(['{'])
         self.register_body()
         self.match_lexeme(['}']) 
+        
+        # Consumir tokens acumulados e verificar erros
+        self.consumir_tokens(initial_error_count)
 
     def register_body(self):
         self.declaration()
@@ -82,13 +132,22 @@ class Parser():
 
 #--------------------- constants ---------------------
     def constants(self):
+        # Limpa a lista de tokens válidos ao iniciar a análise do bloco
+        self.valid_tokens.clear()
+        
+        # Armazena a contagem de erros no início da análise
+        initial_error_count = len(self.error_list)        
+        
         self.match_lexeme(['constants']) 
         self.match_lexeme(['{'])
         if self.lookahead()["lexeme"] == "}":
             self.match_lexeme(['}']) 
         else:
-            self.constants_declarations()  
-            self.match_lexeme(['}']) 
+            self.constants_declarations()  # Dentro daqui há outros match_lexeme
+            self.match_lexeme(['}'])
+
+        # Consumir tokens acumulados e verificar erros
+        self.consumir_tokens(initial_error_count)
 
     def constants_declarations(self):
         self.assignment_declaration()
