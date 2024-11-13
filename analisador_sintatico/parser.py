@@ -1,3 +1,6 @@
+from analisador_semantico.tables import TabelaPares, TabelaIdentificadores
+
+
 class Parser():
     def __init__(self, semantic_analyzer, token_list):
         self.validator = semantic_analyzer
@@ -7,11 +10,13 @@ class Parser():
         
         self.valid_tokens = []  # Lista para acumular tokens válidos
         self.declaracao_registradores = {}  # Dicionário final de declarações de registradores
+        
+        self.tabela_pares = TabelaPares()  # Instância global de TabelaPares
+
     
     def consumo_declaracao_registradores(self):
         register_name = self.valid_tokens[1]["lexeme"]
         
-        # Tem que verificar se já existe um registrador com o mesmo nome:  
         # Verifica se o registrador já foi declarado
         if register_name in self.declaracao_registradores:
             print(f"Erro: Registrador '{register_name}' já foi declarado.")
@@ -28,18 +33,52 @@ class Parser():
                 nomeParametro = token['lexeme']
             elif (token['category'] == 'DELIMITER' and token['lexeme'] == ";"):
                 self.declaracao_registradores[register_name][nomeParametro] = {"tipo": tipoParametro}
-                nomeParametro, tipoParametro = "", ""
+                nomeParametro, tipoParametro = "", ""        
+        self.valid_tokens.clear()
+
+    def consumo_declaracao_constants(self):
+        tipoConstante = ""
+        nomeConstante = ""
+        valorConstante = ""
+        
+        for i in range(2, len(self.valid_tokens)):  # Começa após o token de abertura "{"
+            token = self.valid_tokens[i]
+            
+            if token['category'] == 'KEYWORD': 
+                tipoConstante = token['lexeme']
+            
+            elif token['category'] == 'IDENTIFIER':
+                nomeConstante = token['lexeme']
+            
+            elif token['category'] == 'OPERATOR' and token['lexeme'] == '=':
+                # Pegando o próximo token, que é o valor da constante
+                valorConstante = self.valid_tokens[i + 1]['lexeme']
+                    
+            elif token['category'] == 'DELIMITER' and token['lexeme'] == ";":  # Encontrando o delimitador ';'
+                # Criando a TabelaIdentificadores para a constante
+                constante = TabelaIdentificadores(
+                    nome=nomeConstante,
+                    tipo=tipoConstante,
+                    valor=valorConstante,
+                    tamanho=0
+                )
+                
+                # Adicionando à TabelaPares
+                self.tabela_pares.adicionarPar(pai=0, tabelaIdentificadores=constante)
+                
+                # Resetando as variáveis para a próxima constante
+                tipoConstante, nomeConstante, valorConstante = "", "", ""
+        self.valid_tokens.clear()
+
+
 
         
-        print("Dicionário de declaração atualizado:", self.declaracao_registradores)
-
-
-
     def consumir_tokens(self, initial_error_count):
         if len(self.error_list) == initial_error_count:
             if (self.valid_tokens[0]["lexeme"] == "register"):
                 self.consumo_declaracao_registradores()
-                
+            elif (self.valid_tokens[0]["lexeme"] == "constants"):
+                self.consumo_declaracao_constants()               
             # print("Tokens consumidos com sucesso:", self.valid_tokens)
         else:
             print("Erro encontrado! Tokens desconsiderados.")

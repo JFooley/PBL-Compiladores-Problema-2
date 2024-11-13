@@ -8,7 +8,9 @@ class TabelaIdentificadores():
         self.tamanho = tamanho
     
     def __repr__(self):
-        pass
+        return (f"TabelaIdentificadores(nome={self.nome}, tipo={self.tipo}, "
+                f"valor={self.valor}, tipoRetorno={self.tipoRetorno}, "
+                f"parametros={self.parametros}, tamanho={self.tamanho})")
 
 class TabelaPares():
     def __init__(self):
@@ -23,5 +25,6 @@ class TabelaPares():
         self.tabela.append(novoPar)
     
     def __repr__(self):
-            pass
+        return f"TabelaPares(tabela={self.tabela})"
+
         

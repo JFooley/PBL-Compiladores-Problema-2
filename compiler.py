@@ -36,7 +36,11 @@ def main():
 	if tokens :
 		validator = SemanticAnalyzer()
 		parser = Parser(validator, tokens)
-		parser.run()  
+		parser.run() 
+  
+		print("tabela_pares: \n", parser.tabela_pares)
+  
+		print("\n\ndeclaracao_registradores: \n", parser.declaracao_registradores)
 
 		if parser.get_error_list(): 
 			print("Erros foram encontrados durante a análise sintática.")
