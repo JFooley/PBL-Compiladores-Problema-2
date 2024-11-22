@@ -2,9 +2,8 @@ from analisador_semantico.tables import TabelaPares, EntryRegistradores, EntryId
 
 class SemanticAnalyzer:
     def __init__(self):
-        # Lista de objetos EntryIdentificadores
-        self.symbol_map: list[EntryIdentificadores] = []
-
+        self.current_table_index = 0
+        
         # Tabela de pares
         self.registers_type_table: list[EntryRegistradores] = []
 
