@@ -4,7 +4,7 @@ class SemanticAnalyzer:
     def __init__(self):
         self.current_table_index = 0
         
-        # Tabela de pares
+        # Tabela de registradores
         self.registers_type_table: list[EntryRegistradores] = []
 
         # Tabela de pares
@@ -41,4 +41,21 @@ class SemanticAnalyzer:
 
         return selected_entry
 
+    def create_local_table(self):
+        local_table: list[EntryIdentificadores] = []
+        TabelaPares.adicionarPar(self.current_table_index, local_table)
+        self.current_table_index = self.current_table_index + 1
+    
+    def create_global_table(self):
+        global_table: list[EntryIdentificadores] = []
+        TabelaPares.adicionarPar(self.current_table_index, global_table)
+        self.current_table_index = 0
+        
+    def remove_local_table(self):
+        if (self.current_table_index != 0) :
+            self.pairs_table.pop(self.current_table_index)
+            self.current_table_index = self.current_table_index - 1
     ################################ Funções de erro ################################
+    
+    def is_int(self,token):
+        return "." not in token["lexeme"]
