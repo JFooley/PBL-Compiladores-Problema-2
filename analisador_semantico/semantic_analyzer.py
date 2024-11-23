@@ -1,54 +1,44 @@
+from analisador_semantico.tables import TabelaPares, EntryRegistradores, EntryIdentificadores
+
 class SemanticAnalyzer:
     def __init__(self):
-        '''
-            dict(
-                parent=integer(referência de escopo),
-                dict(
-                    name=string, 
-                    type=string(function, register, tipos_primitivos)
-                    value=any,
-                    return_type=string(tipos_primitivos, empty),
-                    parameters=string(tipos_primitivos, register)
-                    size=integer(para size > 0 é vetor/matriz, caso contrário é um variável unidmensional)
-                )
-            )
-        '''
-        self.symbol_map = dict()
+        self.current_table_index = 0
+        
+        # Tabela de pares
+        self.registers_type_table: list[EntryRegistradores] = []
 
-        '''
-            dict(
-                name=string(nome do register),
-                attribute_name=string(nome do atributo),
-                attribute_type=string(tipo do atributo)
-            )
-        '''
-        self.register_symbol_map = dict()
+        # Tabela de pares
+        self.pairs_table = TabelaPares()
 
-        '''
-            Lista de erros semânticos
-        '''
+        # Lista de erros semânticos
         self.error_list = []
 
+        self.tokens = []
+
+    ################################ Funções auxiliares ################################
     def get_error_list(self):
         return self.error_list
     
-    # Validar parametro (luis)
-    def func_parameter_validator(token_list):
-        parameter_list = []
-        for token in token_list:
-            if token['category'] == 'IDENTIFIER':
-                parameter_list.append(token)
-        function_name = parameter_list.pop(0)
-        function_name = function_name['lexeme']
-    
-        parameters_types = self.symbol_map['global'][function_name]['parameters']
-    
-        n = 0
-        while n  < len(parameter_list):
-            if parameter_list[0]['category'] == 'IDENTIFIER':
-                parameter_type = self.symbol_map[self.scope][parameter['lexeme']]['type']
-                if parameter_type != parameters_types[n]:
-                    self.error_list.append("parametro invalido") #falta deixar bonitinho ainda
-            # demais casos, numeros, strings...
-    
-            n += 1
+    ## Gera um erro na lista de erros ## 
+    def throw_error(self, message, token):
+        self.error_list.append({"position": token["line"], "message": message})
+
+    ## Busca uma entrada específica na cadeia de tabelas designada ## 
+    def find_table_entry(self, target_table_index, token, throw_erro = True):
+        selected_entry = None
+
+        # Busca no escopo atual
+        for entry in self.pairs_table.tabela[target_table_index]["tabela"]:
+            if entry.nome == token["lexeme"]:
+                selected_entry = entry
+
+        # Busca recursivamente no escopo pai até chegar na global, caso não tenha achado
+        if selected_entry == None and target_table_index > 0:
+            selected_entry = self.find_table_entry(self.pairs_table.tabela[target_table_index]["pai"], token, throw_erro)
+        
+        # Causa erro se necessário
+        if (throw_erro and selected_entry == None): self.throw_error(f"{token["lexeme"]} não existe nesse escopo.", token)
+
+        return selected_entry
+
+    ################################ Funções de erro ################################
