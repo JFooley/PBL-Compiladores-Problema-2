@@ -1,11 +1,11 @@
 class EntryIdentificadores():
     def __init__(self, nome, tipo, valor=None, tipoRetorno=None, parametros=None, tamanho=0):
-        self.nome = nome
-        self.tipo = tipo
-        self.valor = valor
-        self.tipoRetorno = tipoRetorno
-        self.parametros = parametros
-        self.tamanho = tamanho
+        self.nome = nome # nome da varíavael/função/constante
+        self.tipo = tipo # tipo, primitivo ou register, da variável
+        self.valor = valor # Valor da variável
+        self.tipoRetorno = tipoRetorno # Para entrys de funções
+        self.parametros = parametros # ex: [int, int, float, bool]
+        self.tamanho = tamanho # =1: variável, >1: vetor 
     
     def __repr__(self):
         pass
@@ -24,8 +24,8 @@ class TabelaPares():
          
     def adicionarPar(self, pai, tabelaIdentificadores: list[EntryIdentificadores]):
         novoPar = {
-            "pai": pai,
-            "tabela": tabelaIdentificadores
+            "pai": pai, # índice da tabela "pai" da atual
+            "tabela": tabelaIdentificadores # Tabela list[EntryIdentificadores]
         }
         
         self.tabela.append(novoPar)
