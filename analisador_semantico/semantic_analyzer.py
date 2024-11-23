@@ -59,3 +59,19 @@ class SemanticAnalyzer:
     
     def is_int(self,token):
         return "." not in token["lexeme"]
+
+    def error_vector_size(self,token):
+        if (token["category"] == "NUMBER" and not self.is_int(token)):
+            self.throw_error("O indíce do vetor deve ser inteiro", token)
+        elif (token["category"] == "IDENTIFIER"):
+            object = self.find_table_entry(self.current_table_index,token)
+            if(object != None and not object.tipo == "int"):
+                self.throw_error("O indíce do vetor deve ser inteiro", token)   
+
+    def error_has_value(self,token):
+        if (token["category"] == "IDENTIFIER"):
+            object = self.find_table_entry(self.current_table_index,token)
+            if(object != None and object.valor == None):
+                self.throw_error("A variável não foi inicializada", token)
+
+    #Modificar valor de uma constante  (Felipe e Estéfane);
