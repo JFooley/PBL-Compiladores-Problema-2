@@ -44,12 +44,12 @@ class SemanticAnalyzer:
 
     def create_local_table(self):
         local_table: list[EntryIdentificadores] = []
-        TabelaPares.adicionarPar(self.current_table_index, local_table)
+        self.pairs_table.adicionarPar(self.current_table_index, local_table)
         self.current_table_index = self.current_table_index + 1
     
     def create_global_table(self):
         global_table: list[EntryIdentificadores] = []
-        TabelaPares.adicionarPar(self.current_table_index, global_table)
+        self.pairs_table.adicionarPar(self.current_table_index, global_table)
         self.current_table_index = 0
         
     def remove_local_table(self):
