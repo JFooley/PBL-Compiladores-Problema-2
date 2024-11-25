@@ -9,6 +9,7 @@ class SemanticAnalyzer:
 
         # Tabela de pares
         self.pairs_table = TabelaPares()
+        self.pairs_table.adicionarPar(-1, []) # Inicializa a tabela global
 
         # Lista de erros semânticos
         self.error_list = []
@@ -59,3 +60,17 @@ class SemanticAnalyzer:
     
     def is_int(self,token):
         return "." not in token["lexeme"]
+    
+    ################################ Funções de Adicionar na tabela ################################
+
+    def add_function_to_table(self, token_list):
+        return_type = token_list[0]['lexeme']
+        function_name = token_list[1]['lexeme']
+        parameters_type_list = []
+        i = 3
+        while i < len(token_list):
+            parameters_type_list.append(token_list[i]['lexeme'])
+            i += 3
+        function_entry = EntryIdentificadores(function_name, 'function', None, return_type, parameters_type_list, None)
+        self.pairs_table.tabela[0]['tabela'].append(function_entry)
+        print(self.pairs_table.tabela[0]['tabela'])

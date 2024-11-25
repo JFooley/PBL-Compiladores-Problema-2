@@ -119,12 +119,14 @@ class Parser():
 
     def function(self):
         self.match_lexeme(["function"])
+        self.token_accumulator_list = [] # reseta a lista de tokens acumulados
         if self.lookahead()['lexeme'] == "empty": 
             self.match_lexeme(["empty"])
         else:
             self.type()
         self.match_category(["IDENTIFIER"])
         self.parameters()
+        self.validator.add_function_to_table(self.token_accumulator_list) # adiciona na tabela de simbolos
         self.match_lexeme(["{"])
         self.statements()
         self.match_lexeme(["}"])
@@ -359,6 +361,7 @@ class Parser():
 
 #--------------------- Chamada de função  ---------------------
     def function_call(self):
+        self.token_accumulator_list = [] # reseta a lista de tokens acumulados
         self.match_category(["IDENTIFIER"])
         self.arguments()
 

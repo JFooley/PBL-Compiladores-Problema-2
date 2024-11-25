@@ -1,0 +1,27 @@
+constants {
+}
+
+variables {
+}
+
+function integer sum(integer a, integer b) {
+  variables {  
+  }
+  return a + b;
+}
+
+main() {
+  variables {
+    integer a;
+    integer b;
+    integer result;
+  }
+  read(a);
+  read(b);
+  result = sum(a, b);
+  write(result);
+}
+  
+
+  
+  
