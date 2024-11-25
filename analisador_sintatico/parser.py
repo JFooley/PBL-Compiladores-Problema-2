@@ -181,6 +181,7 @@ class Parser():
         self.match_lexeme(['=']) 
         self.value() 
         self.match_lexeme([';']) 
+        #Chama a função de verificar os atributos das constantes e adicionar
 
     def assignment(self):
         self.attribute()
