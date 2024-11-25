@@ -74,3 +74,4 @@ class SemanticAnalyzer:
         function_entry = EntryIdentificadores(function_name, 'function', None, return_type, parameters_type_list, None)
         self.pairs_table.tabela[0]['tabela'].append(function_entry)
         print(self.pairs_table.tabela[0]['tabela'])
+    #
