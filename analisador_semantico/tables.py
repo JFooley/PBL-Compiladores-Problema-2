@@ -1,11 +1,11 @@
 class EntryIdentificadores():
     def __init__(self, nome, tipo, valor=None, tipoRetorno=None, parametros=None, tamanho=0):
-        self.nome = nome # nome da varíavael/função/constante
+        self.nome = nome # nome da varíavael/função/constante -- vai salvar Constantes com: constants:nome_constante
         self.tipo = tipo # tipo, primitivo ou register, da variável
         self.valor = valor # Valor da variável
         self.tipoRetorno = tipoRetorno # Para entrys de funções
         self.parametros = parametros # ex: [int, int, float, bool]
-        self.tamanho = tamanho # =1: variável, >1: vetor 
+        self.tamanho = tamanho # =0: variável, >0: vetor 
     
     def __repr__(self):
         pass

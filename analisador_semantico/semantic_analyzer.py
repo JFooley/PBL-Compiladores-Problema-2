@@ -74,4 +74,14 @@ class SemanticAnalyzer:
             if(object != None and object.valor == None):
                 self.throw_error("A variável não foi inicializada", token)
 
-    #Modificar valor de uma constante  (Felipe e Estéfane);
+    '''Modificar valor de uma constante  (Felipe e Estéfane); Essa função precisa ser verificada junto com de  atribuição do valor igual ao tipo
+    então o jeito que ela está não verifica se está no formato a = 5; só verifica se "a" não é uma constante. Provavel que essa função se junta com outras.
+    '''
+    def error_modify_constant(self,token):
+        if (token["category"] == "IDENTIFIER"):
+            token["lexeme"]= "constant:"+ token["lexeme"]
+            object = self.find_table_entry(self.current_table_index,token,False)
+            if(object != None):
+                self.throw_error("O valor de uma constante não pode ser alterado.", token)
+        
+
