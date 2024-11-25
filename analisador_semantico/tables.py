@@ -5,7 +5,7 @@ class EntryIdentificadores():
         self.valor = valor # Valor da variável
         self.tipoRetorno = tipoRetorno # Para entrys de funções
         self.parametros = parametros # ex: [int, int, float, bool]
-        self.tamanho = tamanho # =1: variável, >1: vetor 
+        self.tamanho = tamanho # =0: variável, >0: vetor 
     
     def __repr__(self):
         pass
