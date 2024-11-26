@@ -59,3 +59,22 @@ class SemanticAnalyzer:
     
     def is_int(self,token):
         return "." not in token["lexeme"]
+    
+
+    ################################ Tratamento de Erros Semânticos ################################
+
+    def verificar_chamada_funcao(self, token):
+        """
+        Verifica se um identificador chamado como função é de fato uma função.
+        """
+        entry = self.find_table_entry(self.current_table_index, token)
+        if entry and entry.tipoRetorno is None:
+            self.throw_error(f"Erro: Identificador '{token['lexeme']}' não é uma função.", token)
+
+    def verificar_acesso_vetor(self, token):
+        """
+        Verifica se um identificador acessado como vetor é de fato um vetor.
+        """
+        entry = self.find_table_entry(self.current_table_index, token)
+        if entry and entry.tamanho <= 1:
+            self.throw_error(f"Erro: Identificador '{token['lexeme']}' não é um vetor.", token)
