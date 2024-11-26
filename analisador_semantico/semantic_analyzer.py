@@ -2,14 +2,13 @@ from analisador_semantico.tables import TabelaPares, EntryRegistradores, EntryId
 
 class SemanticAnalyzer:
     def __init__(self):
-        self.current_table_index = 0
+        self.current_table_index = -1
         
         # Tabela de registradores
         self.registers_type_table: list[EntryRegistradores] = []
 
         # Tabela de pares
         self.pairs_table = TabelaPares()
-        self.pairs_table.adicionarPar(-1, []) # Inicializa a tabela global
 
         # Lista de erros semânticos
         self.error_list = []
@@ -45,17 +44,17 @@ class SemanticAnalyzer:
 
     def create_local_table(self):
         local_table: list[EntryIdentificadores] = []
-        TabelaPares.adicionarPar(self.current_table_index, local_table)
+        self.pairs_table.adicionarPar(self.current_table_index, local_table)
         self.current_table_index = self.current_table_index + 1
     
     def create_global_table(self):
         global_table: list[EntryIdentificadores] = []
-        TabelaPares.adicionarPar(self.current_table_index, global_table)
+        self.pairs_table.adicionarPar(self.current_table_index, global_table)
         self.current_table_index = 0
         
     def remove_local_table(self):
         if (self.current_table_index != 0) :
-            self.pairs_table.pop(self.current_table_index)
+            self.pairs_table.tabela.pop(self.current_table_index)
             self.current_table_index = self.current_table_index - 1
 
     ################################ Funções de erro ################################
@@ -175,6 +174,7 @@ class SemanticAnalyzer:
         #Declaração repetida entre 2 atributos dos registros;
         #Declação de vetor, se o identificador ou number do tamanho é int
         #criar na tabela global
+        return
         
     def add_constants_to_table(self,token_list):
         tipo = token_list[0]
@@ -183,6 +183,7 @@ class SemanticAnalyzer:
         #Verificar se o identificador ja não existe como constante ou variaveis na tabela de simbolos
         #Verificar se o tipo primitivo é do mesmo valor adicionado
         #Se nenhum desses casos ser vdd, adicionar na tabela global
+        return
     
 
     def add_variables_to_table(self,token_list):
@@ -190,7 +191,9 @@ class SemanticAnalyzer:
         #verificar tipo e valor, quando tem atibuição;
         #Se for vetor, verificar se o tamanho é int(number ou identificador)
         #criar linha na tabela
+        return
 
     def error_function_call(self,token_list):
         #Verificar erro se a função existe
         #Verificar erro dos parametros
+        return

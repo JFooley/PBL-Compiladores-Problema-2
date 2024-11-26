@@ -11,7 +11,7 @@ class EntryIdentificadores():
     def __repr__(self):
         pass
     
-class EntryRegisters():
+class EntryRegistradores():
     def __init__(self, nome, atributos):
         self.nome = nome #nome dos registro
         self.atributos = atributos # {“nome atributo”: {tipo: “...”, “tamanho”: “...”} }
