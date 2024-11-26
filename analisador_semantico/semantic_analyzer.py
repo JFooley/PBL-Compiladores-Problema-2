@@ -15,6 +15,7 @@ class SemanticAnalyzer:
         self.error_list = []
 
         self.tokens = []
+        self.create_global_table()
 
     ################################ Funções auxiliares ################################
     def get_error_list(self):
@@ -62,6 +63,7 @@ class SemanticAnalyzer:
     def is_int(self,token):
         return "." not in token["lexeme"]
     
+
     ################################ Funções de Adicionar na tabela ################################
 
     # verificar se ja nao existe um id com o mesmo nome
@@ -141,5 +143,54 @@ class SemanticAnalyzer:
                 self.throw_error(f"{i}º parametro de {token_list[0]} é diferente de {arguments_types[i]}", token_list[0])
                 return
             i += 1
+       
+    #------------------------------ Metas Estéfane e felipe -----------------------------------
+    def error_vector_size(self,token):
+        if (token["category"] == "NUMBER" and not self.is_int(token)):
+            self.throw_error("O indíce do vetor deve ser inteiro", token)
+        elif (token["category"] == "IDENTIFIER"):
+            object = self.find_table_entry(self.current_table_index,token)
+            if(object != None and not object.tipo == "int"):
+                self.throw_error("O indíce do vetor deve ser inteiro", token)   
+
+    def error_has_value(self,token):
+        if (token["category"] == "IDENTIFIER"):
+            object = self.find_table_entry(self.current_table_index,token)
+            if(object != None and object.valor == None):
+                self.throw_error("A variável não foi inicializada", token)
+
+    '''Modificar valor de uma constante  (Felipe e Estéfane); Essa função precisa ser verificada junto com de  atribuição do valor igual ao tipo
+    então o jeito que ela está não verifica se está no formato a = 5; só verifica se "a" não é uma constante. Provavel que essa função se junta com outras.
+    '''
+    def error_modify_constant(self,token):
+        if (token["category"] == "IDENTIFIER"):
+            object = self.find_table_entry(self.current_table_index,token,False)
+            if(object != None and object.isConstant):
+                self.throw_error("O valor de uma constante não pode ser alterado.", token)
+
+    #--------------------------------------------------------
+    def add_registers_to_table(self,token_list):
+        #percorrer a lista
+        #verificar se o nome do registro já não está na tabela de simbolos, ou como constants
+        #Declaração repetida entre 2 atributos dos registros;
+        #Declação de vetor, se o identificador ou number do tamanho é int
+        #criar na tabela global
         
-        
+    def add_constants_to_table(self,token_list):
+        tipo = token_list[0]
+        nome = token_list[1] 
+        valor = token_list[3]
+        #Verificar se o identificador ja não existe como constante ou variaveis na tabela de simbolos
+        #Verificar se o tipo primitivo é do mesmo valor adicionado
+        #Se nenhum desses casos ser vdd, adicionar na tabela global
+    
+
+    def add_variables_to_table(self,token_list):
+        #Verificar se já existe variavel com mesmo nome na tabela de simbolos
+        #verificar tipo e valor, quando tem atibuição;
+        #Se for vetor, verificar se o tamanho é int(number ou identificador)
+        #criar linha na tabela
+
+    def error_function_call(self,token_list):
+        #Verificar erro se a função existe
+        #Verificar erro dos parametros
