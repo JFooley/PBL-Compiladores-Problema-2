@@ -142,6 +142,52 @@ class SemanticAnalyzer:
                 self.throw_error(f"{i}º parametro de {token_list[0]} é diferente de {arguments_types[i]}", token_list[0])
                 return
             i += 1
+
+
+    ################ Função para tratar o tipo do token ######################
+    # Usei essa função pois, a categoria do token recebido não se encaixa com o token verificado
+    def conversion(self, value):
+        # Tentar converter para int
+        try:
+            return "integer"
+        except ValueError:
+            pass
+
+        # Tentar converter para float
+        try:
+            return "float"
+        except ValueError:
+            pass
+
+        # Tentar converter para bool
+        if value.lower() in ("true", "false"):
+            return "boolean"
+
+        # Caso não seja nenhum dos anteriores, manter como string
+        return "string"
+
+    
+    #################### Função para validar o return (inteiro / identificador) ##################
+    def validate_function_return(self, token_list):
+        # Recebendo o tipo do que está sendo retornado
+        token = {"lexeme": None,"category": None,"line": None}
+        
+        if token_list[1]['lexeme'] == ';':
+            token = token_list[0]
+            
+        # Busca pelo identificador na tabela
+        function_entry = None
+        if token['category'] == "IDENTIFIER":
+            function_entry = self.find_table_entry(self.current_table_index, token=token)
+            
+        # busca o retorno da função a partir da tabela de símbolos
+        return_entry = self.pairs_table.tabela[self.current_table_index]['tabela'][0]
+        
+        if function_entry != None and function_entry.tipo != return_entry.tipoRetorno:
+            self.throw_error("O tipo de retorno não corresponde ao tipo da função", token)
+        elif function_entry == None and token['lexeme'] != None: # Verificar se o valor é igual ao tipo da função
+            if(self.conversion(token['lexeme']) != return_entry.tipoRetorno):
+                self.throw_error("O tipo de retorno não corresponde ao tipo da função", token)
        
     #------------------------------ Metas Estéfane e felipe -----------------------------------
     def error_vector_size(self,token):
