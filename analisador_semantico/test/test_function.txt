@@ -1,7 +1,14 @@
+register r {
+  integer a; 
+  integer b; 
+}
+
 constants {
+  integer c = 1;
 }
 
 variables {
+  integer g = 1;
 }
 
 function integer sum(integer a, integer b) {
@@ -12,14 +19,23 @@ function integer sum(integer a, integer b) {
 
 main() {
   variables {
-    integer a;
-    integer b;
+    integer a = 1;
+    integer b = 1;
+    integer v[2];
+    integer m[1][2];
     integer result;
   }
-  read(a);
-  read(b);
+  v[0] = 1;
+  v[1] = 1;
+  m[0][0] = 1;
+  m[0][1] = 1;
   result = sum(a, b);
-  write(result);
+  result = sum(v[0], v[1]);
+  result = sum(m[0][0], m[0][1]);
+  result = sum(r.a, r.b);
+  result = sum(1, 2);
+  result = sum(c, g);
+  result = sum(sum(a, b), sum(a, b));
 }
   
 
