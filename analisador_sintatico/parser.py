@@ -72,11 +72,16 @@ class Parser():
             self.registers()
 
     def register(self):
+        size_error = len(self.error_list)
         self.match_lexeme(["register"])
+        self.token_accumulator_list = []
         self.match_category(["IDENTIFIER"])
         self.match_lexeme(['{'])
         self.register_body()
         self.match_lexeme(['}']) 
+        
+        if (len(self.error_list) == size_error):
+            self.validator.add_registers_to_table(self.token_accumulator_list)
 
     def register_body(self):
         self.declaration()
@@ -102,8 +107,13 @@ class Parser():
     def variables(self):
         self.match_lexeme(['variables'])
         self.match_lexeme(['{'])
+        self.token_accumulator_list = []
+        size_error = len(self.error_list)
         if self.lookahead()['category'] == 'IDENTIFIER' or self.lookahead()['lexeme'] in ['integer', 'float', 'boolean', 'string']:
             self.expression_variables()
+        
+        if (len(self.error_list) == size_error):
+            self.validator.add_variables_to_table(self.token_accumulator_list)
         self.match_lexeme(['}'])
 
     def expression_variables(self):
@@ -176,12 +186,16 @@ class Parser():
         self.match_lexeme([';']) 
 
     def assignment_declaration(self):
+        self.token_accumulator_list = []
+        size_erro = len(self.error_list)
         self.primitive_type()
         self.match_category(['IDENTIFIER']) 
         self.match_lexeme(['=']) 
         self.value() 
         self.match_lexeme([';']) 
-        #Chama a função de verificar os atributos das constantes e adicionar
+        if (len(self.error_list) == size_erro):  #Verificar se houve erros sintáticos
+            self.validator.add_constants_to_table(self.token_accumulator_list)
+
 
     def assignment(self):
         self.attribute()
@@ -379,8 +393,10 @@ class Parser():
 
 #--------------------- statements ---------------------
     def statements(self):
+        self.validator.create_local_table() #cria a tabela local para o escopo da função/main
         self.variables()
         self.body()            
+        self.validator.remove_local_table()
 
 #--------------------- body ---------------------
     def body(self):         

@@ -14,6 +14,7 @@ class SemanticAnalyzer:
         self.error_list = []
 
         self.tokens = []
+        self.create_global_table()
 
     ################################ Funções auxiliares ################################
     def get_error_list(self):
@@ -80,12 +81,39 @@ class SemanticAnalyzer:
     '''
     def error_modify_constant(self,token):
         if (token["category"] == "IDENTIFIER"):
-            token["lexeme"]= "constant:"+ token["lexeme"]
             object = self.find_table_entry(self.current_table_index,token,False)
-            if(object != None):
+            if(object != None and object.isConstant):
                 self.throw_error("O valor de uma constante não pode ser alterado.", token)
 
     #--------------------------------------------------------
+    def add_registers_to_table(self,token_list):
+        #percorrer a lista
+        #verificar se o nome do registro já não está na tabela de simbolos, ou como constants
+        #Declaração repetida entre 2 atributos dos registros;
+        #Declação de vetor, se o identificador ou number do tamanho é int
+        #criar na tabela global
         
+    def add_constants_to_table(self,token_list):
+        tipo = token_list[0]
+        nome = token_list[1] 
+        valor = token_list[3]
+        #Verificar se o identificador ja não existe como constante ou variaveis na tabela de simbolos
+        #Verificar se o tipo primitivo é do mesmo valor adicionado
+        #Se nenhum desses casos ser vdd, adicionar na tabela global
+    
+
+    def add_variables_to_table(self,token_list):
+        #Verificar se já existe variavel com mesmo nome na tabela de simbolos
+        #verificar tipo e valor, quando tem atibuição;
+        #Se for vetor, verificar se o tamanho é int(number ou identificador)
+        #criar linha na tabela
+
+    def error_function_call(self,token_list):
+        #Verificar erro se a função existe
+        #Verificar erro dos parametros
+
+    
+
+ 
 
 
