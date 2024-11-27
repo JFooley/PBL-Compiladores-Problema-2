@@ -144,6 +144,37 @@ class SemanticAnalyzer:
             i += 1
 
 
+
+    # Precisa analisar se já existe na tabela
+    # Definir quando acaba o escopo da variável 
+    def add_variables_to_table(self, is_global, token_list):
+        variable_type = ""
+        variable_name = ""
+        variable_value = ""
+        vector_length = 0
+        for i in range(0, len(token_list)):
+            token = token_list[i]
+            if token['category'] == 'KEYWORD':
+                variable_type = token['lexeme']
+            
+            elif token['category'] == 'IDENTIFIER':
+                variable_name = token['lexeme']
+            
+            elif token['category'] == 'OPERATOR' and token['lexeme'] == '=':
+                variable_value = token_list[i + 1]['lexeme']
+            
+            elif token['category'] == 'DELIMITER' and token['lexeme'] == '[':
+                vector_length =  token_list[i + 1]['lexeme']
+                    
+            elif token['category'] == 'DELIMITER' and token['lexeme'] == ";":  # Encontrando o delimitador ';'
+                variables_entry = EntryIdentificadores(variable_name, variable_type, variable_value, None, None, vector_length)
+                self.create_local_table()
+                self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
+                # Resetando as variáveis para a próxima variável
+                variable_type, variable_name, variable_value = "", "", ""
+                vector_length = []
+    
+    
     ################ Função para tratar o tipo do token ######################
     # Usei essa função pois, a categoria do token recebido não se encaixa com o token verificado
     def conversion(self, value):
