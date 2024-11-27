@@ -116,10 +116,10 @@ class SemanticAnalyzer:
     
     # Precisa analisar se já existe na tabela
     # Definir quando acaba o escopo da variável 
-    def add_variables_to_table(self, is_global, token_list):
-        #Verificar se já existe variavel com mesmo nome na tabela de simbolos
-        #verificar tipo e valor, quando tem atibuição;
-        #Se for vetor, verificar se o tamanho é int(number ou identificador)
+    # Verificar se já existe variavel com mesmo nome na tabela de simbolos
+    # verificar tipo e valor, quando tem atibuição;
+    # Se for vetor, verificar se o tamanho é int(number ou identificador)
+     def add_variables_to_table(self, is_global, token_list):
         variable_type = ""
         variable_name = ""
         variable_value = ""
@@ -140,7 +140,7 @@ class SemanticAnalyzer:
                     
             elif token['category'] == 'DELIMITER' and token['lexeme'] == ";":  # Encontrando o delimitador ';'
                 variables_entry = EntryIdentificadores(variable_name, variable_type, variable_value, None, None, vector_length)
-                self.create_local_table()
+                # self.create_local_table()
                 self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
                 # Resetando as variáveis para a próxima variável
                 variable_type, variable_name, variable_value = "", "", ""
