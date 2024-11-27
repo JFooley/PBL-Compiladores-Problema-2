@@ -54,7 +54,7 @@ class Parser():
             self.registers()
 
         self.constants()
-        self.variables() 
+        self.variables(True) 
         
         if self.lookahead()["lexeme"] == "function":
             self.functions() 
@@ -104,7 +104,7 @@ class Parser():
             self.constants_declarations()
 
 #--------------------- Variaveis ---------------------
-    def variables(self):
+    def variables(self, is_global = False):
         self.match_lexeme(['variables'])
         self.match_lexeme(['{'])
         self.token_accumulator_list = []
@@ -113,7 +113,7 @@ class Parser():
             self.expression_variables()
         
         if (len(self.error_list) == size_error):
-            self.validator.add_variables_to_table(self.token_accumulator_list)
+            self.validator.add_variables_to_table(is_global, self.token_accumulator_list)
         self.match_lexeme(['}'])
 
     def expression_variables(self):
