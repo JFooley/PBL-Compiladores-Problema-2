@@ -188,7 +188,17 @@ class SemanticAnalyzer:
         elif function_entry == None and token['lexeme'] != None: # Verificar se o valor é igual ao tipo da função
             if(self.conversion(token['lexeme']) != return_entry.tipoRetorno):
                 self.throw_error("O tipo de retorno não corresponde ao tipo da função", token)
-       
+
+    #################### Função para validar o incremento ou decremento  ####################
+    def validate_increment_decrement(self, token_list: list):
+        token = token_list[0]  # Identificador deve ser o primeiro da lista de tokens
+        token_entry = self.find_table_entry(self.current_table_index, token)  # Busca a variável nas tabelas - Se não encontrou o elemento nas tabelas o erro é contabilizado pela propria função
+        if token_entry != None:  # Se encontrou o identificador na tabela
+            if (token_entry.tipoRetorno != None and (token_entry.tipoRetorno != "integer")):  # Para registrador
+                self.throw_error("A variável deve ser do tipo inteiro", token)
+            elif (token_entry.tipo != "integer"): # Para variável ou vetor
+                self.throw_error("A variável deve ser do tipo inteiro", token) 
+
     #------------------------------ Metas Estéfane e felipe -----------------------------------
     def error_vector_size(self,token):
         if (token["category"] == "NUMBER" and not self.is_int(token)):
