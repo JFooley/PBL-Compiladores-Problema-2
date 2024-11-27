@@ -81,6 +81,71 @@ class SemanticAnalyzer:
         function_entry = EntryIdentificadores(function_name, 'function', None, return_type, parameters_type_list, None)
         self.pairs_table.tabela[0]['tabela'].append(function_entry)
 
+    def add_registers_to_table(self,token_list):
+        size_error = len(self.error_list)
+        nome = token_list[0]
+        temp = []
+        #verificar se o nome do registro já não está na tabela de simbolos, ou como constants
+        for i in range(2, len(token_list) - 1, 3):
+            tipo = token_list[i]
+            atributo = token_list[i+1]
+            
+            #Se o tipo for um identificador, verificar se existe como registro
+            #Declaração repetida entre 2 atributos dos registros;
+            register_entry = EntryRegistradores(nome, {atributo: {"tipo": tipo}})
+            temp.append(register_entry)
+        
+        if(size_error == len(self.error_list)):
+            self.registers_type_table.append(temp)
+        
+    def add_constants_to_table(self,token_list):
+        tipo = token_list[0]
+        nome = token_list[1] 
+        valor = token_list[3]
+        
+        size_error = len(self.error_list)
+        #Verificar se o identificador ja não existe como constante ou variaveis na tabela de simbolos
+        #error_já_exite
+        #Verificar se o tipo primitivo é do mesmo valor adicionado
+        #erro_valor
+        #se list error size = list error size anterior pode adicionar
+        #Se nenhum desses casos ser vdd, adicionar na tabela global
+        if(size_error == len(self.error_list)):
+            constant_entry = EntryIdentificadores(nome, tipo, valor, None, None, 0, True)
+            self.pairs_table.tabela[0]['tabela'].append(constant_entry)
+    
+    # Precisa analisar se já existe na tabela
+    # Definir quando acaba o escopo da variável 
+    def add_variables_to_table(self, is_global, token_list):
+        #Verificar se já existe variavel com mesmo nome na tabela de simbolos
+        #verificar tipo e valor, quando tem atibuição;
+        #Se for vetor, verificar se o tamanho é int(number ou identificador)
+        variable_type = ""
+        variable_name = ""
+        variable_value = ""
+        vector_length = 0
+        for i in range(0, len(token_list)):
+            token = token_list[i]
+            if token['category'] == 'KEYWORD':
+                variable_type = token['lexeme']
+            
+            elif token['category'] == 'IDENTIFIER':
+                variable_name = token['lexeme']
+            
+            elif token['category'] == 'OPERATOR' and token['lexeme'] == '=':
+                variable_value = token_list[i + 1]['lexeme']
+            
+            elif token['category'] == 'DELIMITER' and token['lexeme'] == '[':
+                vector_length =  token_list[i + 1]['lexeme']
+                    
+            elif token['category'] == 'DELIMITER' and token['lexeme'] == ";":  # Encontrando o delimitador ';'
+                variables_entry = EntryIdentificadores(variable_name, variable_type, variable_value, None, None, vector_length)
+                self.create_local_table()
+                self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
+                # Resetando as variáveis para a próxima variável
+                variable_type, variable_name, variable_value = "", "", ""
+                vector_length = []
+    
     ################################ Funções de Verificar na tabela ################################
 
 
@@ -143,37 +208,6 @@ class SemanticAnalyzer:
                 return
             i += 1
 
-
-
-    # Precisa analisar se já existe na tabela
-    # Definir quando acaba o escopo da variável 
-    def add_variables_to_table(self, is_global, token_list):
-        variable_type = ""
-        variable_name = ""
-        variable_value = ""
-        vector_length = 0
-        for i in range(0, len(token_list)):
-            token = token_list[i]
-            if token['category'] == 'KEYWORD':
-                variable_type = token['lexeme']
-            
-            elif token['category'] == 'IDENTIFIER':
-                variable_name = token['lexeme']
-            
-            elif token['category'] == 'OPERATOR' and token['lexeme'] == '=':
-                variable_value = token_list[i + 1]['lexeme']
-            
-            elif token['category'] == 'DELIMITER' and token['lexeme'] == '[':
-                vector_length =  token_list[i + 1]['lexeme']
-                    
-            elif token['category'] == 'DELIMITER' and token['lexeme'] == ";":  # Encontrando o delimitador ';'
-                variables_entry = EntryIdentificadores(variable_name, variable_type, variable_value, None, None, vector_length)
-                self.create_local_table()
-                self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
-                # Resetando as variáveis para a próxima variável
-                variable_type, variable_name, variable_value = "", "", ""
-                vector_length = []
-    
     
     ################ Função para tratar o tipo do token ######################
     # Usei essa função pois, a categoria do token recebido não se encaixa com o token verificado
@@ -255,30 +289,7 @@ class SemanticAnalyzer:
                 self.throw_error("O valor de uma constante não pode ser alterado.", token)
 
     #--------------------------------------------------------
-    def add_registers_to_table(self,token_list):
-        #percorrer a lista
-        #verificar se o nome do registro já não está na tabela de simbolos, ou como constants
-        #Declaração repetida entre 2 atributos dos registros;
-        #Declação de vetor, se o identificador ou number do tamanho é int
-        #criar na tabela global
-        return
-        
-    def add_constants_to_table(self,token_list):
-        tipo = token_list[0]
-        nome = token_list[1] 
-        valor = token_list[3]
-        #Verificar se o identificador ja não existe como constante ou variaveis na tabela de simbolos
-        #Verificar se o tipo primitivo é do mesmo valor adicionado
-        #Se nenhum desses casos ser vdd, adicionar na tabela global
-        return
-    
-
-    def add_variables_to_table(self,token_list):
-        #Verificar se já existe variavel com mesmo nome na tabela de simbolos
-        #verificar tipo e valor, quando tem atibuição;
-        #Se for vetor, verificar se o tamanho é int(number ou identificador)
-        #criar linha na tabela
-        return
+   
 
     def error_function_call(self,token_list):
         #Verificar erro se a função existe
