@@ -63,6 +63,23 @@ class SemanticAnalyzer:
 
     ################################ Tratamento de Erros Semânticos ################################
 
+    def validate_is_register_access(self, token_list):
+    	'''
+    	Verifica se a list de tokens acumaladas são parâmetros de accesso de um registro. Usar essa função dentro de parser#register_position() e parser#register_access()
+    	É esperedo uma token_list do tipo: [TOKEN_IDENTIFIER, TOKEN_DOT, TOKEN_IDENTIFIER_1, ..., TOKEN_DOT, TOKEN_IDENTIFIER_N] -> identificador_register.identificador_atributo_1,.., .identificador_atributo_N
+    	'''
+    	if (len(token_list) < 3): 
+    		self.throw_error(f"Erro: Os tokens '{token_list}' não são tokens de acesso a um atributo de registro.", token_list)
+    		return
+    
+    	is_analysis_ok = False
+    	for i, curr_token in enumerate(token_list):
+    		if i > 0 and i < len(token_list) - 2 and "." in curr_token['lexeme']: 
+    			is_analysis_ok = (token_list[i - 1]['category'] == 'IDENTIFIER' and token_list[i + 1]['category'] == 'IDENTIFIER')
+    
+    	if not is_analysis_ok:
+    		self.throw_error(f"Erro: Os tokens '{token_list}' não são tokens de acesso a um atributo de registro.", token_list)
+
     def verificar_chamada_funcao(self, token):
         """
         Verifica se um identificador chamado como função é de fato uma função.
