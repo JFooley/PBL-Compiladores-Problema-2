@@ -82,7 +82,7 @@ class SemanticAnalyzer:
 
     def verificar_chamada_funcao(self, token):
         """
-        Verifica se um identificador chamado como função é de fato uma função.
+        Verifica se um identificador chamado como função é de fato uma função. Usar em parser#function_call(), arguments(), argument()
         """
         entry = self.find_table_entry(self.current_table_index, token)
         if entry and entry.tipoRetorno is None:
@@ -90,7 +90,7 @@ class SemanticAnalyzer:
 
     def verificar_acesso_vetor(self, token):
         """
-        Verifica se um identificador acessado como vetor é de fato um vetor.
+        Verifica se um identificador acessado como vetor é de fato um vetor. Usar em parser#vector_index()
         """
         entry = self.find_table_entry(self.current_table_index, token)
         if entry and entry.tamanho <= 1:
