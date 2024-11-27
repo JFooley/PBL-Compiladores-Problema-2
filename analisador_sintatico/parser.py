@@ -242,6 +242,8 @@ class Parser():
             self.vector_index()
             
     def register_position(self):
+        self.token_accumulator_list = [] # Inicia a validação do acesso a atributo de register
+        
         self.match_category(["IDENTIFIER"])
         self.register_access()
     
@@ -251,6 +253,9 @@ class Parser():
             self.match_category(["IDENTIFIER"])
             if self.lookahead()["lexeme"] == ".":
                 self.register_access()
+                
+            self.validate_is_register_access(token_accumulator_list)
+            self.token_accumulator_list = [] # Finaliza a validação do acesso a atributo de register
         else:
             self.vector_position()
 
