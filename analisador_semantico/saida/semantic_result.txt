@@ -1,16 +1,6 @@
-{'position': 32, 'message': 'a não existe nesse escopo.'}
-{'position': 32, 'message': 'a não existe nesse escopo.'}
-{'position': 33, 'message': 'v não existe nesse escopo.'}
-{'position': 33, 'message': 'v não existe nesse escopo.'}
-{'position': 34, 'message': 'm não existe nesse escopo.'}
-{'position': 34, 'message': 'm não existe nesse escopo.'}
 {'position': 35, 'message': 'r.a não existe nesse escopo.'}
 {'position': 35, 'message': 'r.a não existe nesse escopo.'}
 {'position': 36, 'message': '1 não existe nesse escopo.'}
 {'position': 36, 'message': '1 não existe nesse escopo.'}
 {'position': 37, 'message': 'c não existe nesse escopo.'}
 {'position': 37, 'message': 'c não existe nesse escopo.'}
-{'position': 38, 'message': 'a não existe nesse escopo.'}
-{'position': 38, 'message': 'a não existe nesse escopo.'}
-{'position': 38, 'message': 'a não existe nesse escopo.'}
-{'position': 38, 'message': 'a não existe nesse escopo.'}
