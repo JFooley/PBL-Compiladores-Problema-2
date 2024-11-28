@@ -38,7 +38,7 @@ class SemanticAnalyzer:
             selected_entry = self.find_table_entry(self.pairs_table.tabela[target_table_index]["pai"], token, throw_erro)
         
         # Causa erro se necessário
-        if (throw_erro and selected_entry == None): self.throw_error(f"{token["lexeme"]} não existe nesse escopo.", token)
+        if (throw_erro and selected_entry == None): self.throw_error(f"{token['lexeme']} não existe nesse escopo.", token)
 
         return selected_entry
     
