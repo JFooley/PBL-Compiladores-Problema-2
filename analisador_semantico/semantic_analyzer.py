@@ -1,4 +1,4 @@
-from analisador_semantico.tables import TabelaPares, EntryRegisters, EntryIdentificadores
+from tables import TabelaPares, EntryRegisters, EntryIdentificadores
 
 class SemanticAnalyzer:
     def __init__(self):
@@ -215,7 +215,7 @@ class SemanticAnalyzer:
         ## Verifica se um objeto não existe
         ## tokens: lista de tokens que definem o objeto (ex: "identifier" ou "identifier" "." "identifier" ou "identifier" "[" "number" "]" e etc)
         object_entry = self.identify_var_kind(tokens)
-        if self.find_table_entry(current_table_index, object_entry) == None:
+        if self.find_table_entry(current_table_index, object_entry["token"]) == None:
             return False
         else:
             return True
@@ -484,11 +484,13 @@ class SemanticAnalyzer:
 
 tokens = [
     {"lexeme" : "integer", "category": "KEYWORD", "line": 1},
-    {"lexeme" : "integer", "category": "IDENTIFIER", "line": 1},
-    {"lexeme" : "integer", "category": "OPERATOR", "line": 1},
+    {"lexeme" : "var", "category": "IDENTIFIER", "line": 1},
+    {"lexeme" : "=", "category": "OPERATOR", "line": 1},
     {"lexeme" : "10", "category": "NUMBER", "line": 1},
     {"lexeme" : ";", "category": "NUMBER", "line": 1},
     ]
 
 analizer = SemanticAnalyzer()
-analizer.add_variables_to_table()
+analizer.add_variables_to_table(True, tokens)
+
+print(analizer.non_declared_object(0, [{"lexeme" : "var", "category": "IDENTIFIER", "line": 1}]))
