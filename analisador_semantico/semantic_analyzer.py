@@ -50,8 +50,6 @@ class SemanticAnalyzer:
         
         if len(registers) == 0:
             return None
-        print("0-------------------busca de registro")
-        print(registers)
         return registers
     
     def create_local_table(self):
@@ -109,12 +107,10 @@ class SemanticAnalyzer:
         
         if(size_error == len(self.error_list)):
             self.registers_type_table.append(temp)
-        print("----------------register")
-        print(self.pairs_table.tabela[0]['tabela'])
 
     '''deve enviar a lista de tokens assim: Cadastro pessoa; ou Cadastro pessoa = pessoa1;
       Para o caso de Cadastro pessoa = pessoa1 precisa criar outra função para verificar o pessoa1  
-    ''' 
+    
     def add_register_instance_to_table(self,token_list): 
         register_type = token_list[0]
         instance_name = token_list[1]
@@ -128,7 +124,7 @@ class SemanticAnalyzer:
             #verificar se a instancia passada já existe e se é um register, se for: precisa preencher os valores
             print(".")
         print(self.pairs_table.tabela[0]['tabela'])
-
+    ''' 
     def add_constants_to_table(self,token_list):
         tipo = token_list[0]
         nome = token_list[1] 
@@ -144,8 +140,7 @@ class SemanticAnalyzer:
         if(size_error == len(self.error_list)):
             constant_entry = EntryIdentificadores(nome["lexeme"], tipo["lexeme"], valor["lexeme"], None, None, 0, True)
             self.pairs_table.tabela[0]['tabela'].append(constant_entry)
-        print("------------------constants")
-        print(self.pairs_table.tabela[0]['tabela'])
+
     
     # Precisa analisar se já existe na tabela
     # Definir quando acaba o escopo da variável 
