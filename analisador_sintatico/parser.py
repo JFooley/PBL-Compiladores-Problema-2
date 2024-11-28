@@ -1,6 +1,3 @@
-from analisador_semantico.tables import TabelaPares, TabelaIdentificadores
-
-
 class Parser():
     def __init__(self, semantic_analyzer, token_list):
         self.validator = semantic_analyzer
@@ -8,83 +5,6 @@ class Parser():
         self.error_list = []
         self.token_accumulator_list = []
         self.index = 0
-        
-        self.valid_tokens = []  # Lista para acumular tokens válidos
-        self.declaracao_registradores = {}  # Dicionário final de declarações de registradores
-        
-        self.tabela_pares = TabelaPares()  # Instância global de TabelaPares
-
-    
-    def consumo_declaracao_registradores(self):
-        register_name = self.valid_tokens[1]["lexeme"]
-        
-        # Verifica se o registrador já foi declarado
-        if register_name in self.declaracao_registradores:
-            print(f"Erro: Registrador '{register_name}' já foi declarado.")
-            return
-             
-        self.declaracao_registradores[register_name] = {}
-        nomeParametro = ""
-        tipoParametro = ""
-
-        for token in self.valid_tokens[3:]:  # Começa após o token de abertura "{"
-            if (token['category'] == 'KEYWORD'):
-                tipoParametro = token['lexeme']
-            elif (token['category'] == 'IDENTIFIER'):
-                nomeParametro = token['lexeme']
-            elif (token['category'] == 'DELIMITER' and token['lexeme'] == ";"):
-                self.declaracao_registradores[register_name][nomeParametro] = {"tipo": tipoParametro}
-                nomeParametro, tipoParametro = "", ""        
-        self.valid_tokens.clear()
-
-    def consumo_declaracao_constants(self):
-        tipoConstante = ""
-        nomeConstante = ""
-        valorConstante = ""
-        
-        for i in range(2, len(self.valid_tokens)):  # Começa após o token de abertura "{"
-            token = self.valid_tokens[i]
-            
-            if token['category'] == 'KEYWORD': 
-                tipoConstante = token['lexeme']
-            
-            elif token['category'] == 'IDENTIFIER':
-                nomeConstante = token['lexeme']
-            
-            elif token['category'] == 'OPERATOR' and token['lexeme'] == '=':
-                # Pegando o próximo token, que é o valor da constante
-                valorConstante = self.valid_tokens[i + 1]['lexeme']
-                    
-            elif token['category'] == 'DELIMITER' and token['lexeme'] == ";":  # Encontrando o delimitador ';'
-                # Criando a TabelaIdentificadores para a constante
-                constante = TabelaIdentificadores(
-                    nome=nomeConstante,
-                    tipo=tipoConstante,
-                    valor=valorConstante,
-                    tamanho=0
-                )
-                
-                # Adicionando à TabelaPares
-                self.tabela_pares.adicionarPar(pai=0, tabelaIdentificadores=constante)
-                
-                # Resetando as variáveis para a próxima constante
-                tipoConstante, nomeConstante, valorConstante = "", "", ""
-        self.valid_tokens.clear()
-
-
-
-        
-    def consumir_tokens(self, initial_error_count):
-        if len(self.error_list) == initial_error_count:
-            if (self.valid_tokens[0]["lexeme"] == "register"):
-                self.consumo_declaracao_registradores()
-            elif (self.valid_tokens[0]["lexeme"] == "constants"):
-                self.consumo_declaracao_constants()               
-            # print("Tokens consumidos com sucesso:", self.valid_tokens)
-        else:
-            print("Erro encontrado! Tokens desconsiderados.")
-            self.valid_tokens.clear()
-
     
     # Função match para verificar a categoria
     def match_category(self, expected_token_category):
@@ -161,7 +81,7 @@ class Parser():
         self.match_lexeme(['}']) 
         
         if (len(self.error_list) == size_error):
-            #self.validator.add_registers_to_table(self.token_accumulator_list)
+            self.validator.add_registers_to_table(self.token_accumulator_list)
             pass
 
     def register_body(self):
@@ -171,22 +91,13 @@ class Parser():
 
 #--------------------- constants ---------------------
     def constants(self):
-        # Limpa a lista de tokens válidos ao iniciar a análise do bloco
-        self.valid_tokens.clear()
-        
-        # Armazena a contagem de erros no início da análise
-        initial_error_count = len(self.error_list)        
-        
         self.match_lexeme(['constants']) 
         self.match_lexeme(['{'])
         if self.lookahead()["lexeme"] == "}":
             self.match_lexeme(['}']) 
         else:
-            self.constants_declarations()  # Dentro daqui há outros match_lexeme
-            self.match_lexeme(['}'])
-
-        # Consumir tokens acumulados e verificar erros
-        self.consumir_tokens(initial_error_count)
+            self.constants_declarations()  
+            self.match_lexeme(['}']) 
 
     def constants_declarations(self):
         self.assignment_declaration()

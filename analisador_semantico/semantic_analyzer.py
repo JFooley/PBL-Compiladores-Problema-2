@@ -38,7 +38,7 @@ class SemanticAnalyzer:
             selected_entry = self.find_table_entry(self.pairs_table.tabela[target_table_index]["pai"], token, throw_erro)
         
         # Causa erro se necessário
-        if (throw_erro and selected_entry == None): self.throw_error(f"{token["lexeme"]} não existe nesse escopo.", token)
+        if (throw_erro and selected_entry == None): self.throw_error(f"{token['lexeme']} não existe nesse escopo.", token)
 
         return selected_entry
     
@@ -105,7 +105,11 @@ class SemanticAnalyzer:
                 return {"tipo":"EXPRESSION", "token": tokens}
     
     #------------------------------ JG e Caleo -----------------------------------
-    def wrong_type_assign(self, current_table_index, variable, value): ## Identifica em uma atribuição a = b se o tipo de a é diferente do tipo de b
+    def wrong_type_assign(self, current_table_index, variable, value): 
+        ## Identifica em uma atribuição variable = value se o tipo de a é diferente do tipo de b
+        ## variable: lista de tokens do objeto varible (ex: "identifier" ou "identifier" "." "identifier" ou "identifier" "[" "number" "]" e etc)
+        ## value: lista de tokens do objeto value (ex: "identifier" ou "identifier" "." "identifier" ou "identifier" "[" "number" "]" e "identnfier" "(" ")")
+
         variable_dict = self.identify_var_kind(variable)
         value_dict = self.identify_var_kind(value)
 
@@ -186,6 +190,9 @@ class SemanticAnalyzer:
         return True
 
     def repeated_statement(self, current_table_index, new_variable):
+        ## Verifica se a variável definida pelo token new_variable já foi declarada
+        ## new_variable: token do objeto que vai ser declarado
+
         ## Verifica se a variável existe no escopo
         if (self.find_table_entry(current_table_index, new_variable, throw_erro= False) == None):
             self.throw_error(f"{new_variable["lexeme"]} já existe neste escopo.", new_variable)
@@ -204,8 +211,10 @@ class SemanticAnalyzer:
         
         return True
 
-    def non_declared_object(self, current_table_index, token):
-        object_entry = self.identify_var_kind(token)
+    def non_declared_object(self, current_table_index, tokens):
+        ## Verifica se um objeto não existe
+        ## tokens: lista de tokens que definem o objeto (ex: "identifier" ou "identifier" "." "identifier" ou "identifier" "[" "number" "]" e etc)
+        object_entry = self.identify_var_kind(tokens)
         if self.find_table_entry(current_table_index, object_entry) == None:
             return False
         else:
@@ -227,7 +236,7 @@ class SemanticAnalyzer:
         while i < len(token_list):
             parameters_type_list.append(token_list[i]['lexeme'])
             i += 3
-        function_entry = EntryIdentificadores(function_name, 'function', None, return_type, parameters_type_list, None)
+        function_entry = EntryIdentificadores(function_name, 'function', None, return_type, parameters_type_list, 0)
         self.pairs_table.tabela[0]['tabela'].append(function_entry)
 
     def add_registers_to_table(self,token_list):
@@ -321,6 +330,10 @@ class SemanticAnalyzer:
         if function_entry == None:
             return
         
+        if function_entry.tipo != 'function':
+            self.throw_error(f"{token_list[0]['lexeme']} não é uma função", token_list[0])
+            return
+        
         # Retira da lista de tokens acumulados apenas os tokens referentes aos argumentos passados na chamda
         function_call_arguments = []
         i = 1
@@ -353,24 +366,34 @@ class SemanticAnalyzer:
                     name['lexeme'] += '.' + function_call_arguments[i][j]['lexeme']
                     j += 1
                 entry = self.find_table_entry(self.current_table_index, name)
+                if entry == None:
+                    return
+                else:
+                    arguments_types.append(entry.tipoRetorno)
+            elif function_call_arguments[i]['category'] == 'NUMBER':
+                if '.' in function_call_arguments[i]['lexeme']:
+                    arguments_types.append('float')
+                else:
+                    arguments_types.append('integer')
+            elif function_call_arguments[i]['category'] in ['STRING','CHARACTER']:
+                arguments_types.append('string')
+            elif function_call_arguments[i]['lexeme'] in ['true', 'false']:
+                arguments_types.append('boolean')
             else:
                 entry = self.find_table_entry(self.current_table_index, function_call_arguments[i])
-
-            if entry == None:
-                return
-            
-            if type(function_call_arguments[i]) == list or entry.tipo == 'function':
-                arguments_types.append(entry.tipoRetorno)
-            else:
-                arguments_types.append(entry.tipo)
-        
+                if entry == None:
+                    return
+                elif entry.tipo == 'function':
+                     arguments_types.append(entry.tipoRetorno)
+                else:
+                    arguments_types.append(entry.tipo)
             i += 1
         
         # Compara os tipos da lista de parametros com o da lista de argumentos
         i = 0
         while i < len(function_entry.parametros):
             if arguments_types[i] != function_entry.parametros[i]:
-                self.throw_error(f"{i}º parametro de {token_list[0]} é diferente de {arguments_types[i]}", token_list[0])
+                self.throw_error(f"{i+1}º parametro de {token_list[0]['lexeme']} é {arguments_types[i]}, espera-se {function_entry.parametros[i]}", token_list[0])
                 return
             i += 1
 
