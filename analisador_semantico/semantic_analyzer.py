@@ -183,6 +183,10 @@ class SemanticAnalyzer:
         if function_entry == None:
             return
         
+        if function_entry.tipo != 'function':
+            self.throw_error(f"{token_list[0]['lexeme']} não é uma função", token_list[0])
+            return
+        
         # Retira da lista de tokens acumulados apenas os tokens referentes aos argumentos passados na chamda
         function_call_arguments = []
         i = 1
