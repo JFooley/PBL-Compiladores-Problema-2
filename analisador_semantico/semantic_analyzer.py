@@ -19,8 +19,59 @@ class SemanticAnalyzer:
     ################################ Funções auxiliares ################################
     def get_error_list(self):
         return self.error_list
+
+    ## Gera um erro na lista de erros ## 
+    def throw_error(self, message, token):
+        self.error_list.append({"position": token["line"], "message": message})
+
+    ## Busca uma entrada específica na cadeia de tabelas designada ## 
+    def find_table_entry(self, target_table_index, token, throw_erro = True):
+        selected_entry = None
+
+        # Busca no escopo atual
+        for entry in self.pairs_table.tabela[target_table_index]["tabela"]:
+            if entry.nome == token["lexeme"]:
+                selected_entry = entry
+
+        # Busca recursivamente no escopo pai até chegar na global, caso não tenha achado
+        if selected_entry == None and target_table_index > 0:
+            selected_entry = self.find_table_entry(self.pairs_table.tabela[target_table_index]["pai"], token, throw_erro)
+        
+        # Causa erro se necessário
+        if (throw_erro and selected_entry == None): self.throw_error(f"{token["lexeme"]} não existe nesse escopo.", token)
+
+        return selected_entry
     
-    def identify_var_kind(self, tokens): ## identifica qual tipo é a variável ou value passado e devolve só o token necessário
+    def get_registers(self, token):
+        registers = []
+        for entry in self.registers_type_table:
+            if entry.nome == token["lexeme"]:
+                registers.append(entry)
+        
+        if len(registers) == 0:
+            return None
+        return registers
+    
+    def create_local_table(self):
+        local_table: list[EntryIdentificadores] = []
+        self.pairs_table.adicionarPar(self.current_table_index, local_table)
+        self.current_table_index = self.current_table_index + 1
+    
+    def create_global_table(self):
+        global_table: list[EntryIdentificadores] = []
+        self.pairs_table.adicionarPar(self.current_table_index, global_table)
+        self.current_table_index = 0
+        
+    def remove_local_table(self):
+        if (self.current_table_index != 0) :
+            self.pairs_table.tabela.pop(self.current_table_index)
+            self.current_table_index = self.current_table_index - 1
+
+    ################################ Funções de erro ################################
+    def is_int(self,token):
+        return "." not in token["lexeme"]
+    
+    def identify_var_kind(self, tokens): ## identifica qual tipo é a variável ou value passado e devolve o tipo e o token necessário
         if len(tokens) == 1:
             ## Identifier
             if tokens[0]["category"] == "IDENTIFIER":
@@ -53,48 +104,8 @@ class SemanticAnalyzer:
             else:
                 return {"tipo":"EXPRESSION", "token": tokens}
     
-    ## Gera um erro na lista de erros ## 
-    def throw_error(self, message, token):
-        self.error_list.append({"position": token["line"], "message": message})
-
-    ## Busca uma entrada específica na cadeia de tabelas designada ## 
-    def find_table_entry(self, target_table_index, token, throw_erro = True):
-        selected_entry = None
-
-        # Busca no escopo atual
-        for entry in self.pairs_table.tabela[target_table_index]["tabela"]:
-            if entry.nome == token["lexeme"]:
-                selected_entry = entry
-
-        # Busca recursivamente no escopo pai até chegar na global, caso não tenha achado
-        if selected_entry == None and target_table_index > 0:
-            selected_entry = self.find_table_entry(self.pairs_table.tabela[target_table_index]["pai"], token, throw_erro)
-        
-        # Causa erro se necessário
-        if (throw_erro and selected_entry == None): self.throw_error(f"{token["lexeme"]} não existe nesse escopo.", token)
-
-        return selected_entry
-
-    def create_local_table(self):
-        local_table: list[EntryIdentificadores] = []
-        TabelaPares.adicionarPar(self.current_table_index, local_table)
-        self.current_table_index = self.current_table_index + 1
-    
-    def create_global_table(self):
-        global_table: list[EntryIdentificadores] = []
-        TabelaPares.adicionarPar(self.current_table_index, global_table)
-        self.current_table_index = 0
-        
-    def remove_local_table(self):
-        if (self.current_table_index != 0) :
-            self.pairs_table.pop(self.current_table_index)
-            self.current_table_index = self.current_table_index - 1
-    
-    ################################ Funções de erro ################################
-    def is_int(self,token):
-        return "." not in token["lexeme"]
-    
-    def wrong_type_assign(self, current_table_index, variable, value):
+    #------------------------------ JG e Caleo -----------------------------------
+    def wrong_type_assign(self, current_table_index, variable, value): ## Identifica em uma atribuição a = b se o tipo de a é diferente do tipo de b
         variable_dict = self.identify_var_kind(variable)
         value_dict = self.identify_var_kind(value)
 
@@ -122,18 +133,22 @@ class SemanticAnalyzer:
                     case "NUMBER":
                         if (variable_entry.tipo != "float" and variable_entry.tipo != "integer" and ("." in value["lexeme"] and variable_entry.tipo == "integer")):
                             self.throw_error(f"{value["category"]} não pode ser convertido em {variable_entry.tipo}.", value)
+                            return False
                     
                     case "STRING":
                         if (variable_entry.tipo != "string"):
                             self.throw_error(f"{value["category"]} não pode ser convertido em {variable_entry.tipo}.", value)
+                            return False
 
                     case "CHARACTER":
                         if (variable_entry.tipo != "character"):
                             self.throw_error(f"{value["category"]} não pode ser convertido em {variable_entry.tipo}.", value)
+                            return False
 
                     case "BOOLEAN":
                         if (variable_entry.tipo != "boolean"):
                             self.throw_error(f"{value["category"]} não pode ser convertido em {variable_entry.tipo}.", value)    
+                            return False
 
             case "REGISTER":
                 value_entry: EntryIdentificadores = self.find_table_entry(current_table_index, value["lexeme"])
@@ -189,60 +204,7 @@ class SemanticAnalyzer:
         
         return True
 
-analizador = SemanticAnalyzer()
-analizador.create_global_table()    
-    ## Gera um erro na lista de erros ## 
-    def throw_error(self, message, token):
-        self.error_list.append({"position": token["line"], "message": message})
-
-    ## Busca uma entrada específica na cadeia de tabelas designada ## 
-    def find_table_entry(self, target_table_index, token, throw_erro = True):
-        selected_entry = None
-
-        # Busca no escopo atual
-        for entry in self.pairs_table.tabela[target_table_index]["tabela"]:
-            if entry.nome == token["lexeme"]:
-                selected_entry = entry
-
-        # Busca recursivamente no escopo pai até chegar na global, caso não tenha achado
-        if selected_entry == None and target_table_index > 0:
-            selected_entry = self.find_table_entry(self.pairs_table.tabela[target_table_index]["pai"], token, throw_erro)
-        
-        # Causa erro se necessário
-        if (throw_erro and selected_entry == None): self.throw_error(f"{token["lexeme"]} não existe nesse escopo.", token)
-
-        return selected_entry
-    
-    def get_registers(self, token):
-        registers = []
-        for entry in self.registers_type_table:
-            if entry.nome == token["lexeme"]:
-                registers.append(entry)
-        
-        if len(registers) == 0:
-            return None
-        return registers
-    
-    def create_local_table(self):
-        local_table: list[EntryIdentificadores] = []
-        self.pairs_table.adicionarPar(self.current_table_index, local_table)
-        self.current_table_index = self.current_table_index + 1
-    
-    def create_global_table(self):
-        global_table: list[EntryIdentificadores] = []
-        self.pairs_table.adicionarPar(self.current_table_index, global_table)
-        self.current_table_index = 0
-        
-    def remove_local_table(self):
-        if (self.current_table_index != 0) :
-            self.pairs_table.tabela.pop(self.current_table_index)
-            self.current_table_index = self.current_table_index - 1
-
-    ################################ Funções de erro ################################
-    
-    def is_int(self,token):
-        return "." not in token["lexeme"]
-    
+    #------------------------------ JG e Caleo -----------------------------------
 
     ################################ Funções de Adicionar na tabela ################################
 
@@ -347,7 +309,6 @@ analizador.create_global_table()
     
     ################################ Funções de Verificar na tabela ################################
 
-
     def validate_function_parameters(self, token_list):
         function_entry = self.find_table_entry(0, token_list[0])
 
@@ -407,7 +368,6 @@ analizador.create_global_table()
                 return
             i += 1
 
-    
     ################ Função para tratar o tipo do token ######################
     # Usei essa função pois, a categoria do token recebido não se encaixa com o token verificado
     def conversion(self, value):
@@ -429,7 +389,6 @@ analizador.create_global_table()
 
         # Caso não seja nenhum dos anteriores, manter como string
         return "string"
-
     
     #################### Função para validar o return (inteiro / identificador) ##################
     def validate_function_return(self, token_list):
