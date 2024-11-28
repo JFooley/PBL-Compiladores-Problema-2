@@ -204,6 +204,12 @@ class SemanticAnalyzer:
         
         return True
 
+    def non_declared_object(self, current_table_index, token):
+        object_entry = self.identify_var_kind(token)
+        if self.find_table_entry(current_table_index, object_entry) == None:
+            return False
+        else:
+            return True
     #------------------------------ JG e Caleo -----------------------------------
 
     ################################ Funções de Adicionar na tabela ################################
