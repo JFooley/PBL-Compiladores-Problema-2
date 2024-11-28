@@ -1,11 +1,11 @@
-from analisador_semantico.tables import TabelaPares, EntryRegistradores, EntryIdentificadores
+from analisador_semantico.tables import TabelaPares, EntryRegisters, EntryIdentificadores
 
 class SemanticAnalyzer:
     def __init__(self):
         self.current_table_index = -1
         
-        # Tabela de registradores
-        self.registers_type_table: list[EntryRegistradores] = []
+        # Tabela de registros
+        self.registers_type_table: list[EntryRegisters] = []
 
         # Tabela de pares
         self.pairs_table = TabelaPares()
@@ -41,7 +41,17 @@ class SemanticAnalyzer:
         if (throw_erro and selected_entry == None): self.throw_error(f"{token["lexeme"]} não existe nesse escopo.", token)
 
         return selected_entry
-
+    
+    def get_registers(self, token):
+        registers = []
+        for entry in self.registers_type_table:
+            if entry.nome == token["lexeme"]:
+                registers.append(entry)
+        
+        if len(registers) == 0:
+            return None
+        return registers
+    
     def create_local_table(self):
         local_table: list[EntryIdentificadores] = []
         self.pairs_table.adicionarPar(self.current_table_index, local_table)
@@ -92,12 +102,29 @@ class SemanticAnalyzer:
             
             #Se o tipo for um identificador, verificar se existe como registro
             #Declaração repetida entre 2 atributos dos registros;
-            register_entry = EntryRegistradores(nome, {atributo: {"tipo": tipo}})
+            register_entry = EntryRegisters(nome["lexeme"], {atributo["lexeme"]: {"tipo": tipo["lexeme"]}})
             temp.append(register_entry)
         
         if(size_error == len(self.error_list)):
             self.registers_type_table.append(temp)
-        
+
+    '''deve enviar a lista de tokens assim: Cadastro pessoa; ou Cadastro pessoa = pessoa1;
+      Para o caso de Cadastro pessoa = pessoa1 precisa criar outra função para verificar o pessoa1  
+    
+    def add_register_instance_to_table(self,token_list): 
+        register_type = token_list[0]
+        instance_name = token_list[1]
+        #Verificar o erro se existe o register criado
+        #Verificar se não existe variavel/funcao/register com o nome da instancia
+        instance_register = EntryIdentificadores(instance_name, register_type)
+        self.pairs_table.tabela[0]['tabela'].append(instance_register)
+        registers = self.get_registers(register_type)
+       
+        if (token_list[2] == "="):
+            #verificar se a instancia passada já existe e se é um register, se for: precisa preencher os valores
+            print(".")
+        print(self.pairs_table.tabela[0]['tabela'])
+    ''' 
     def add_constants_to_table(self,token_list):
         tipo = token_list[0]
         nome = token_list[1] 
@@ -111,8 +138,9 @@ class SemanticAnalyzer:
         #se list error size = list error size anterior pode adicionar
         #Se nenhum desses casos ser vdd, adicionar na tabela global
         if(size_error == len(self.error_list)):
-            constant_entry = EntryIdentificadores(nome, tipo, valor, None, None, 0, True)
+            constant_entry = EntryIdentificadores(nome["lexeme"], tipo["lexeme"], valor["lexeme"], None, None, 0, True)
             self.pairs_table.tabela[0]['tabela'].append(constant_entry)
+
     
     # Precisa analisar se já existe na tabela
     # Definir quando acaba o escopo da variável 
@@ -126,7 +154,7 @@ class SemanticAnalyzer:
         vector_length = 0
         for i in range(0, len(token_list)):
             token = token_list[i]
-            if token['category'] == 'KEYWORD':
+            if token['category'] == 'KEYWORD':  #obs: o tipo pode ser tbm identifier, que é o caso de ser um register
                 variable_type = token['lexeme']
             
             elif token['category'] == 'IDENTIFIER':
