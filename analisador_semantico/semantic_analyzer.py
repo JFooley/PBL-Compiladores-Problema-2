@@ -105,7 +105,11 @@ class SemanticAnalyzer:
                 return {"tipo":"EXPRESSION", "token": tokens}
     
     #------------------------------ JG e Caleo -----------------------------------
-    def wrong_type_assign(self, current_table_index, variable, value): ## Identifica em uma atribuição a = b se o tipo de a é diferente do tipo de b
+    def wrong_type_assign(self, current_table_index, variable, value): 
+        ## Identifica em uma atribuição variable = value se o tipo de a é diferente do tipo de b
+        ## variable: lista de tokens do objeto varible (ex: "identifier" ou "identifier" "." "identifier" ou "identifier" "[" "number" "]" e etc)
+        ## value: lista de tokens do objeto value (ex: "identifier" ou "identifier" "." "identifier" ou "identifier" "[" "number" "]" e "identnfier" "(" ")")
+
         variable_dict = self.identify_var_kind(variable)
         value_dict = self.identify_var_kind(value)
 
@@ -186,6 +190,9 @@ class SemanticAnalyzer:
         return True
 
     def repeated_statement(self, current_table_index, new_variable):
+        ## Verifica se a variável definida pelo token new_variable já foi declarada
+        ## new_variable: token do objeto que vai ser declarado
+
         ## Verifica se a variável existe no escopo
         if (self.find_table_entry(current_table_index, new_variable, throw_erro= False) == None):
             self.throw_error(f"{new_variable["lexeme"]} já existe neste escopo.", new_variable)
@@ -204,8 +211,10 @@ class SemanticAnalyzer:
         
         return True
 
-    def non_declared_object(self, current_table_index, token):
-        object_entry = self.identify_var_kind(token)
+    def non_declared_object(self, current_table_index, tokens):
+        ## Verifica se um objeto não existe
+        ## tokens: lista de tokens que definem o objeto (ex: "identifier" ou "identifier" "." "identifier" ou "identifier" "[" "number" "]" e etc)
+        object_entry = self.identify_var_kind(tokens)
         if self.find_table_entry(current_table_index, object_entry) == None:
             return False
         else:
