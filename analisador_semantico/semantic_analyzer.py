@@ -119,7 +119,7 @@ class SemanticAnalyzer:
     # Verificar se já existe variavel com mesmo nome na tabela de simbolos
     # verificar tipo e valor, quando tem atibuição;
     # Se for vetor, verificar se o tamanho é int(number ou identificador)
-     def add_variables_to_table(self, is_global, token_list):
+    def add_variables_to_table(self, is_global, token_list):
         variable_type = ""
         variable_name = ""
         variable_value = ""
