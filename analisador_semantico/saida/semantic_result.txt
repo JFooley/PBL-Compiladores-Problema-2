@@ -1,0 +1,6 @@
+{'position': 35, 'message': 'r.a não existe nesse escopo.'}
+{'position': 35, 'message': 'r.a não existe nesse escopo.'}
+{'position': 36, 'message': '1 não existe nesse escopo.'}
+{'position': 36, 'message': '1 não existe nesse escopo.'}
+{'position': 37, 'message': 'c não existe nesse escopo.'}
+{'position': 37, 'message': 'c não existe nesse escopo.'}

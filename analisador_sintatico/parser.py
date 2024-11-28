@@ -6,6 +6,7 @@ class Parser():
         self.validator = semantic_analyzer
         self.token_list = token_list
         self.error_list = []
+        self.token_accumulator_list = []
         self.index = 0
         
         self.valid_tokens = []  # Lista para acumular tokens válidos
@@ -90,7 +91,7 @@ class Parser():
         current_token = self.lookahead()
         if current_token['category'] != None and current_token['category'] in expected_token_category:
             self.index += 1
-            self.valid_tokens.append(current_token)  # Armazena o token válido
+            self.token_accumulator_list.append(current_token)
             return current_token
         else:
             self.error_recovery(current_token['line'], expected_token_category)
@@ -100,7 +101,7 @@ class Parser():
         current_token = self.lookahead()
         if current_token['lexeme'] != None and current_token['lexeme'] in expected_token_lexeme:
             self.index += 1
-            self.valid_tokens.append(current_token)  # Armazena o token válido
+            self.token_accumulator_list.append(current_token)
             return current_token
         else:
             self.error_recovery(current_token['line'], expected_token_lexeme)
@@ -133,7 +134,7 @@ class Parser():
             self.registers()
 
         self.constants()
-        self.variables() 
+        self.variables(True) 
         
         if self.lookahead()["lexeme"] == "function":
             self.functions() 
@@ -151,18 +152,17 @@ class Parser():
             self.registers()
 
     def register(self):
-        # Limpa a lista de tokens válidos ao iniciar a análise do bloco
-        self.valid_tokens.clear()
-        initial_error_count = len(self.error_list)  # Contagem de erros no início
-        
+        size_error = len(self.error_list)
         self.match_lexeme(["register"])
+        self.token_accumulator_list = []
         self.match_category(["IDENTIFIER"])
         self.match_lexeme(['{'])
         self.register_body()
         self.match_lexeme(['}']) 
         
-        # Consumir tokens acumulados e verificar erros
-        self.consumir_tokens(initial_error_count)
+        if (len(self.error_list) == size_error):
+            #self.validator.add_registers_to_table(self.token_accumulator_list)
+            pass
 
     def register_body(self):
         self.declaration()
@@ -194,11 +194,16 @@ class Parser():
             self.constants_declarations()
 
 #--------------------- Variaveis ---------------------
-    def variables(self):
+    def variables(self, is_global = False):
         self.match_lexeme(['variables'])
         self.match_lexeme(['{'])
+        self.token_accumulator_list = []
+        size_error = len(self.error_list)
         if self.lookahead()['category'] == 'IDENTIFIER' or self.lookahead()['lexeme'] in ['integer', 'float', 'boolean', 'string']:
             self.expression_variables()
+        
+        if (len(self.error_list) == size_error):
+            self.validator.add_variables_to_table(is_global, self.token_accumulator_list)
         self.match_lexeme(['}'])
 
     def expression_variables(self):
@@ -214,12 +219,15 @@ class Parser():
 
     def function(self):
         self.match_lexeme(["function"])
+        self.token_accumulator_list = [] # reseta a lista de tokens acumulados
         if self.lookahead()['lexeme'] == "empty": 
             self.match_lexeme(["empty"])
         else:
             self.type()
         self.match_category(["IDENTIFIER"])
         self.parameters()
+        if len(self.get_error_list()) == 0:
+            self.validator.add_function_to_table(self.token_accumulator_list) # adiciona na tabela de simbolos
         self.match_lexeme(["{"])
         self.statements()
         self.match_lexeme(["}"])
@@ -271,11 +279,16 @@ class Parser():
         self.match_lexeme([';']) 
 
     def assignment_declaration(self):
+        self.token_accumulator_list = []
+        size_erro = len(self.error_list)
         self.primitive_type()
         self.match_category(['IDENTIFIER']) 
         self.match_lexeme(['=']) 
         self.value() 
         self.match_lexeme([';']) 
+        if (len(self.error_list) == size_erro):  #Verificar se houve erros sintáticos
+            self.validator.add_constants_to_table(self.token_accumulator_list)
+
 
     def assignment(self):
         self.attribute()
@@ -454,8 +467,14 @@ class Parser():
 
 #--------------------- Chamada de função  ---------------------
     def function_call(self):
+        temp = self.token_accumulator_list
+        self.token_accumulator_list = [] # reseta a lista de tokens acumulados
         self.match_category(["IDENTIFIER"])
         self.arguments()
+        if len(self.get_error_list()) == 0:
+            self.validator.validate_function_parameters(self.token_accumulator_list) # verificar se o tipo dos parametros está correto
+        temp.append(self.token_accumulator_list[0])
+        self.token_accumulator_list = temp
 
     def arguments(self):
         self.match_lexeme(["("])
@@ -473,8 +492,10 @@ class Parser():
 
 #--------------------- statements ---------------------
     def statements(self):
+        self.validator.create_local_table() #cria a tabela local para o escopo da função/main
         self.variables()
         self.body()            
+        self.validator.remove_local_table()
 
 #--------------------- body ---------------------
     def body(self):         
