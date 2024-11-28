@@ -453,9 +453,19 @@ class SemanticAnalyzer:
                 self.throw_error("O valor de uma constante não pode ser alterado.", token)
 
     #--------------------------------------------------------
-   
 
     def error_function_call(self,token_list):
         #Verificar erro se a função existe
         #Verificar erro dos parametros
         return
+
+tokens = [
+    {"lexeme" : "integer", "category": "KEYWORD", "line": 1},
+    {"lexeme" : "integer", "category": "IDENTIFIER", "line": 1},
+    {"lexeme" : "integer", "category": "OPERATOR", "line": 1},
+    {"lexeme" : "10", "category": "NUMBER", "line": 1},
+    {"lexeme" : ";", "category": "NUMBER", "line": 1},
+    ]
+
+analizer = SemanticAnalyzer()
+analizer.add_variables_to_table()
