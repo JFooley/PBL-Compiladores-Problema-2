@@ -1,3 +1,2 @@
-{'position': 32, 'message': 'g não é uma função'}
 {'position': 35, 'message': 'r.a não existe nesse escopo.'}
 {'position': 35, 'message': 'r.a não existe nesse escopo.'}
