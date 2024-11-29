@@ -71,6 +71,47 @@ class SemanticAnalyzer:
     def is_int(self,token):
         return "." not in token["lexeme"]
     
+    def indetify_expression_return(self, current_scope_index, tokens):
+        ## Identifica se a expressão aritimética passada é do tipo aritimética (retorna apenas number) ou do tipo logica/relacional (retorna boolean)
+        ## A função da throw nos erros caso alguma das variáveis não existam ou sejam string e retorna None caso tenha falhado
+        ## Caso não tenha falhado, ela vai retornar o tipo do retorno da expressão (number ou boolean)
+        tipo = ["float", "integer"]
+
+        # Encontra o tipo da função
+        for token in tokens:
+            if token["category"] == "OPERATOR" and token["lexeme"] != "." and token["lexeme"] in ["&&", "||", '>', '<', '!=', '>=', '<=', '==']:
+                tipo = ["boolean"]
+                break
+        
+        # Valida os atributos (se existem e são diferentes de string)
+        variable_tokens = []
+        for token in tokens:
+            if token["category"] == "OPERATOR" and token["lexeme"] != ".":
+                variable = self.identify_var_kind(variable_tokens)
+
+                if variable["tipo"] == "IDENTIFIER" or variable["tipo"] == "REGISTER" or variable["tipo"] == "VECTOR":
+                    variable_entry: EntryIdentificadores = self.find_table_entry(current_scope_index, variable["token"])
+
+                    if variable_entry == None:
+                        return None
+
+                    if variable_entry.tipo not in ["integer", "float", "boolean"]:
+                        self.throw_error(f"O tipo {variable_entry.tipo} não pode ser operado em uma expressão", variable["token"])
+                        return None
+                    
+                elif variable["tipo"] == "FUNCTION CALL":
+                    variable_entry: EntryIdentificadores = self.find_table_entry(current_scope_index, variable["token"])
+
+                    if variable_entry == None:
+                        return None
+
+                    if variable_entry.tipoRetorno not in ["integer", "float", "boolean"]:
+                        self.throw_error(f"O tipo {variable_entry.tipoRetorno} não pode ser operado em uma expressão", variable["token"])
+                        return None
+
+        return tipo
+        
+
     def identify_var_kind(self, tokens): ## identifica qual tipo é a variável ou value passado e devolve o tipo e o token necessário
         if len(tokens) == 1:
             ## Identifier
@@ -81,6 +122,11 @@ class SemanticAnalyzer:
                 return {"tipo":"LITERAL", "token": tokens[0]}
             
         else:
+            ## Expresion
+            for token in tokens:
+                if token["category"] == "OPERATOR" and token["lexeme"] != ".":
+                    return {"tipo":"EXPRESSION", "token": tokens}
+
             ## Register
             if tokens[1]["lexeme"] == ".":
                 new_lexeme = ""
@@ -100,9 +146,6 @@ class SemanticAnalyzer:
             elif tokens[1]["lexeme"] == "[":
                 return {"tipo":"VECTOR", "token": tokens[0]}
             
-            ## Expresion
-            else:
-                return {"tipo":"EXPRESSION", "token": tokens}
     
     #------------------------------ JG e Caleo -----------------------------------
     def wrong_type_assign(self, current_table_index, variable, value): 
@@ -185,7 +228,14 @@ class SemanticAnalyzer:
                     return False
 
             case "EXPRESSION":
-                pass
+                value_type = self.indetify_expression_return(value)
+                
+                if value_type == None:
+                    return False
+
+                if value_type not in variable_entry.tipo:
+                    self.throw_error(f"{value_type} não pode ser convertido em {variable_entry.tipo}.", value)
+                    return False
 
         return True
 
