@@ -491,6 +491,18 @@ tokens = [
     ]
 
 analizer = SemanticAnalyzer()
-analizer.add_variables_to_table(True, tokens)
+entry = EntryIdentificadores(nome= "var", tipo= "integer", valor="10", tipoRetorno=None, parametros=None, tamanho=0, isConstant=False)
+analizer.pairs_table.tabela[0]["tabela"].append(EntryIdentificadores)
 
-print(analizer.non_declared_object(0, [{"lexeme" : "var", "category": "IDENTIFIER", "line": 1}]))
+print("Entradas na tabela global")
+print(len(analizer.pairs_table.tabela[0]["tabela"]))
+
+for entry_lista in analizer.pairs_table.tabela[0]["tabela"]:
+    print(entry_lista.nome)
+
+print("-------------------------")
+
+print("teste não declarado: " + str(analizer.non_declared_object(0, [{"lexeme" : "var", "category": "IDENTIFIER", "line": 1}])))
+print("teste declaração repetida: " + str(analizer.repeated_statement(0, {"lexeme" : "var", "category": "IDENTIFIER", "line": 1})))
+print("Lista de erros semanticos: ")
+print(analizer.get_error_list())
