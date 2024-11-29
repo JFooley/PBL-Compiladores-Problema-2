@@ -9,15 +9,18 @@ class EntryIdentificadores():
         self.isConstant = isConstant
     
     def __repr__(self):
-        pass
+        return (f"EntryIdentificadores(nome={self.nome!r}, tipo={self.tipo!r}, "
+                f"valor={self.valor!r}, tipoRetorno={self.tipoRetorno!r}, "
+                f"parametros={self.parametros!r}, tamanho={self.tamanho!r}, "
+                f"isConstant={self.isConstant!r})")
     
 class EntryRegisters():
     def __init__(self, nome, atributos):
         self.nome = nome #nome dos registro
-        self.atributos = atributos # {“nome atributo”: {tipo: “...”, “tamanho”: “...”} }
+        self.atributos = atributos # {“nome atributo”: {tipo: “...” }  #não estamos permitindo vetor em register kkkk
 
     def __repr__(self):
-            pass
+        return f"EntryRegisters(nome={self.nome!r}, atributos={self.atributos!r})"
 
 class TabelaPares():
     def __init__(self):
@@ -32,5 +35,5 @@ class TabelaPares():
         self.tabela.append(novoPar)
     
     def __repr__(self):
-            pass
+        return f"TabelaPares(tabela={self.tabela!r})"
         
