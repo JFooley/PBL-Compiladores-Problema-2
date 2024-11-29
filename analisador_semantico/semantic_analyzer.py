@@ -144,22 +144,22 @@ class SemanticAnalyzer:
                 match value["category"]:
                     case "NUMBER":
                         if (variable_entry.tipo != "float" and variable_entry.tipo != "integer" and ("." in value["lexeme"] and variable_entry.tipo == "integer")):
-                            self.throw_error(f"{value["category"]} não pode ser convertido em {variable_entry.tipo}.", value)
+                            self.throw_error(f"{value['category']} não pode ser convertido em {variable_entry.tipo}.", value)
                             return False
                     
                     case "STRING":
                         if (variable_entry.tipo != "string"):
-                            self.throw_error(f"{value["category"]} não pode ser convertido em {variable_entry.tipo}.", value)
+                            self.throw_error(f"{value['category']} não pode ser convertido em {variable_entry.tipo}.", value)
                             return False
 
                     case "CHARACTER":
                         if (variable_entry.tipo != "character"):
-                            self.throw_error(f"{value["category"]} não pode ser convertido em {variable_entry.tipo}.", value)
+                            self.throw_error(f"{value['category']} não pode ser convertido em {variable_entry.tipo}.", value)
                             return False
 
                     case "BOOLEAN":
                         if (variable_entry.tipo != "boolean"):
-                            self.throw_error(f"{value["category"]} não pode ser convertido em {variable_entry.tipo}.", value)    
+                            self.throw_error(f"{value['category']} não pode ser convertido em {variable_entry.tipo}.", value)    
                             return False
 
             case "REGISTER":
@@ -203,18 +203,18 @@ class SemanticAnalyzer:
 
         ## Verifica se a variável existe no escopo
         if (self.find_table_entry(current_table_index, new_variable, throw_erro= False) != None):
-            self.throw_error(f"{new_variable["lexeme"]} já existe neste escopo.", new_variable)
+            self.throw_error(f"{new_variable['lexeme']} já existe neste escopo.", new_variable)
             return False
 
         ## Verifica se ele não possui um nome igual a de um tipo primitivo
         if (new_variable["lexeme"] in ["float", "integer", "string", "character", "boolean"]):
-            self.throw_error(f"{new_variable["lexeme"]} não pode ter o nome de um tipo primitivo.")
+            self.throw_error(f"{new_variable['lexeme']} não pode ter o nome de um tipo primitivo.")
             return False
 
         ## Verifica se ele não possui um nome igual a de um tipo register
         for entry in self.registers_type_table:
             if entry.nome == new_variable["lexeme"]:
-                self.throw_error(f"{new_variable["lexeme"]} não pode ter o nome de um tipo de registro.")
+                self.throw_error(f"{new_variable['lexeme']} não pode ter o nome de um tipo de registro.")
                 return False
         
         return True
