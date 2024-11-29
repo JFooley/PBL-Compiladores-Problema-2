@@ -82,7 +82,6 @@ class Parser():
         
         if (len(self.error_list) == size_error):
             self.validator.add_registers_to_table(self.token_accumulator_list)
-            pass
 
     def register_body(self):
         self.declaration()
