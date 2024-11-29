@@ -116,7 +116,7 @@ class SemanticAnalyzer:
         variable = variable_dict["token"]
         value = value_dict["token"]
 
-        variable_entry: EntryIdentificadores = self.find_table_entry(current_table_index, variable["lexeme"])
+        variable_entry: EntryIdentificadores = self.find_table_entry(current_table_index, variable)
 
         if variable_entry == None:
             return False
