@@ -215,7 +215,7 @@ class SemanticAnalyzer:
         ## Verifica se um objeto não existe
         ## tokens: lista de tokens que definem o objeto (ex: "identifier" ou "identifier" "." "identifier" ou "identifier" "[" "number" "]" e etc)
         object_entry = self.identify_var_kind(tokens)
-        if self.find_table_entry(current_table_index, object_entry) == None:
+        if self.find_table_entry(current_table_index, object_entry["token"]) == None:
             return False
         else:
             return True
