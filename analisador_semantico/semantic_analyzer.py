@@ -99,6 +99,14 @@ class SemanticAnalyzer:
             ## Vector
             elif tokens[1]["lexeme"] == "[":
                 return {"tipo":"VECTOR", "token": tokens[0]}
+
+            # Identifier (Considero o ;)
+            elif tokens[1]["lexeme"] == ";" and tokens[0]["category"] == "IDENTIFIER":
+                return {"tipo":"IDENTIFIER", "token": tokens[0]}
+                
+            # Literal (Considero o ;)
+            elif tokens[1]["lexeme"] == ";":
+                return {"tipo":"LITERAL", "token": tokens[0]}
             
             ## Expresion
             else:
@@ -398,22 +406,14 @@ class SemanticAnalyzer:
             i += 1
 
     ################ Função para tratar o tipo do token ######################
-    # Usei essa função pois, a categoria do token recebido não se encaixa com o token verificado
+       # Usei essa função pois, a categoria do token recebido não se encaixa com o token verificado
     def conversion(self, value):
         # Tentar converter para int
-        try:
+        if value == "NUMBER":
             return "integer"
-        except ValueError:
-            pass
-
-        # Tentar converter para float
-        try:
-            return "float"
-        except ValueError:
-            pass
-
-        # Tentar converter para bool
-        if value.lower() in ("true", "false"):
+        if value == "STRING":
+            return "string"
+        if value == "BOOLEAN":
             return "boolean"
 
         # Caso não seja nenhum dos anteriores, manter como string
@@ -421,25 +421,54 @@ class SemanticAnalyzer:
     
     #################### Função para validar o return (inteiro / identificador) ##################
     def validate_function_return(self, token_list):
-        # Recebendo o tipo do que está sendo retornado
-        token = {"lexeme": None,"category": None,"line": None}
-        
-        if token_list[1]['lexeme'] == ';':
-            token = token_list[0]
-            
-        # Busca pelo identificador na tabela
-        function_entry = None
-        if token['category'] == "IDENTIFIER":
-            function_entry = self.find_table_entry(self.current_table_index, token=token)
-            
-        # busca o retorno da função a partir da tabela de símbolos
+        value_dict = self.identify_var_kind(token_list)
         return_entry = self.pairs_table.tabela[self.current_table_index]['tabela'][0]
         
-        if function_entry != None and function_entry.tipo != return_entry.tipoRetorno:
-            self.throw_error("O tipo de retorno não corresponde ao tipo da função", token)
-        elif function_entry == None and token['lexeme'] != None: # Verificar se o valor é igual ao tipo da função
-            if(self.conversion(token['lexeme']) != return_entry.tipoRetorno):
-                self.throw_error("O tipo de retorno não corresponde ao tipo da função", token)
+        match value_dict["tipo"]:
+            case "IDENTIFIER":
+                token = value_dict["token"]
+                function_entry: EntryIdentificadores = self.find_table_entry(self.current_table_index, token)
+                if (function_entry == None):
+                    return False
+                if function_entry.tipo != return_entry.tipoRetorno:
+                    self.throw_error("O tipo de retorno não corresponde ao tipo da função", token)
+            case "LITERAL":
+                token = value_dict["token"]
+                if self.conversion(token['category']) != return_entry.tipoRetorno:
+                    self.throw_error("O tipo de retorno não corresponde ao tipo da função", token)
+            
+            case "FUNCTION CALL":
+                token = value_dict["token"]
+                function_entry: EntryIdentificadores = self.find_table_entry(self.current_table_index, token)
+
+                if (function_entry == None):
+                    return False
+                
+                if function_entry.tipoRetorno != return_entry.tipoRetorno:
+                    self.throw_error("O tipo de retorno não corresponde ao tipo da função", token)
+
+            case "REGISTER":
+                token = value_dict["token"]
+                
+            case "VECTOR":
+                token = value_dict["token"]
+                function_entry: EntryIdentificadores = self.find_table_entry(self.current_table_index, token)
+
+                if (function_entry == None):
+                    return False
+                
+                if function_entry.tipoRetorno != return_entry.tipoRetorno:
+                    self.throw_error("O tipo de retorno não corresponde ao tipo da função", token)
+               
+            case "EXPRESSION":
+                token = value_dict["token"]
+                
+                print(token)
+
+
+        #print(self.error_list)
+                
+        
 
     #################### Função para validar o incremento ou decremento  ####################
     def validate_increment_decrement(self, token_list: list):
