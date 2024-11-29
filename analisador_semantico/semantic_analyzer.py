@@ -1,4 +1,4 @@
-from tables import TabelaPares, EntryRegisters, EntryIdentificadores
+from analisador_semantico.tables import TabelaPares, EntryRegisters, EntryIdentificadores
 
 class SemanticAnalyzer:
     def __init__(self):
@@ -194,7 +194,7 @@ class SemanticAnalyzer:
         ## new_variable: token do objeto que vai ser declarado
 
         ## Verifica se a variável existe no escopo
-        if (self.find_table_entry(current_table_index, new_variable, throw_erro= False) == None):
+        if (self.find_table_entry(current_table_index, new_variable, throw_erro= False) != None):
             self.throw_error(f"{new_variable["lexeme"]} já existe neste escopo.", new_variable)
             return False
 
@@ -482,27 +482,3 @@ class SemanticAnalyzer:
         #Verificar erro dos parametros
         return
 
-tokens = [
-    {"lexeme" : "integer", "category": "KEYWORD", "line": 1},
-    {"lexeme" : "var", "category": "IDENTIFIER", "line": 1},
-    {"lexeme" : "=", "category": "OPERATOR", "line": 1},
-    {"lexeme" : "10", "category": "NUMBER", "line": 1},
-    {"lexeme" : ";", "category": "NUMBER", "line": 1},
-    ]
-
-analizer = SemanticAnalyzer()
-entry = EntryIdentificadores(nome= "var", tipo= "integer", valor="10", tipoRetorno=None, parametros=None, tamanho=0, isConstant=False)
-analizer.pairs_table.tabela[0]["tabela"].append(EntryIdentificadores)
-
-print("Entradas na tabela global")
-print(len(analizer.pairs_table.tabela[0]["tabela"]))
-
-for entry_lista in analizer.pairs_table.tabela[0]["tabela"]:
-    print(entry_lista.nome)
-
-print("-------------------------")
-
-print("teste não declarado: " + str(analizer.non_declared_object(0, [{"lexeme" : "var", "category": "IDENTIFIER", "line": 1}])))
-print("teste declaração repetida: " + str(analizer.repeated_statement(0, {"lexeme" : "var", "category": "IDENTIFIER", "line": 1})))
-print("Lista de erros semanticos: ")
-print(analizer.get_error_list())
