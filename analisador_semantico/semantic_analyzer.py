@@ -194,7 +194,7 @@ class SemanticAnalyzer:
         ## new_variable: token do objeto que vai ser declarado
 
         ## Verifica se a variável existe no escopo
-        if (self.find_table_entry(current_table_index, new_variable, throw_erro= False) == None):
+        if (self.find_table_entry(current_table_index, new_variable, throw_erro= False) != None):
             self.throw_error(f"{new_variable["lexeme"]} já existe neste escopo.", new_variable)
             return False
 
