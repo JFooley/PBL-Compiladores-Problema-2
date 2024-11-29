@@ -144,22 +144,22 @@ class SemanticAnalyzer:
                 match value["category"]:
                     case "NUMBER":
                         if (variable_entry.tipo != "float" and variable_entry.tipo != "integer" and ("." in value["lexeme"] and variable_entry.tipo == "integer")):
-                            self.throw_error(f"{value["category"]} não pode ser convertido em {variable_entry.tipo}.", value)
+                            self.throw_error(f"{value['category']} não pode ser convertido em {variable_entry.tipo}.", value)
                             return False
                     
                     case "STRING":
                         if (variable_entry.tipo != "string"):
-                            self.throw_error(f"{value["category"]} não pode ser convertido em {variable_entry.tipo}.", value)
+                            self.throw_error(f"{value['category']} não pode ser convertido em {variable_entry.tipo}.", value)
                             return False
 
                     case "CHARACTER":
                         if (variable_entry.tipo != "character"):
-                            self.throw_error(f"{value["category"]} não pode ser convertido em {variable_entry.tipo}.", value)
+                            self.throw_error(f"{value['category']} não pode ser convertido em {variable_entry.tipo}.", value)
                             return False
 
                     case "BOOLEAN":
                         if (variable_entry.tipo != "boolean"):
-                            self.throw_error(f"{value["category"]} não pode ser convertido em {variable_entry.tipo}.", value)    
+                            self.throw_error(f"{value['category']} não pode ser convertido em {variable_entry.tipo}.", value)    
                             return False
 
             case "REGISTER":
@@ -203,18 +203,18 @@ class SemanticAnalyzer:
 
         ## Verifica se a variável existe no escopo
         if (self.find_table_entry(current_table_index, new_variable, throw_erro= False) != None):
-            self.throw_error(f"{new_variable["lexeme"]} já existe neste escopo.", new_variable)
+            self.throw_error(f"{new_variable['lexeme']} já existe neste escopo.", new_variable)
             return False
 
         ## Verifica se ele não possui um nome igual a de um tipo primitivo
         if (new_variable["lexeme"] in ["float", "integer", "string", "character", "boolean"]):
-            self.throw_error(f"{new_variable["lexeme"]} não pode ter o nome de um tipo primitivo.")
+            self.throw_error(f"{new_variable['lexeme']} não pode ter o nome de um tipo primitivo.")
             return False
 
         ## Verifica se ele não possui um nome igual a de um tipo register
         for entry in self.registers_type_table:
             if entry.nome == new_variable["lexeme"]:
-                self.throw_error(f"{new_variable["lexeme"]} não pode ter o nome de um tipo de registro.")
+                self.throw_error(f"{new_variable['lexeme']} não pode ter o nome de um tipo de registro.")
                 return False
         
         return True
@@ -261,8 +261,8 @@ class SemanticAnalyzer:
             register_entry = EntryRegisters(nome["lexeme"], {atributo["lexeme"]: {"tipo": tipo["lexeme"]}})
             temp.append(register_entry)
         
-        if(size_error == len(self.error_list)):
-            self.registers_type_table.append(temp)
+        if (size_error == len(self.error_list)):
+            self.registers_type_table.extend(temp)
 
     '''deve enviar a lista de tokens assim: Cadastro pessoa; ou Cadastro pessoa = pessoa1;
       Para o caso de Cadastro pessoa = pessoa1 precisa criar outra função para verificar o pessoa1  
@@ -310,7 +310,8 @@ class SemanticAnalyzer:
         vector_length = 0
         for i in range(0, len(token_list)):
             token = token_list[i]
-            if token['category'] == 'KEYWORD':  #obs: o tipo pode ser tbm identifier, que é o caso de ser um register
+
+            if token['category'] == 'KEYWORD' or self.get_registers(token):  #obs: o tipo pode ser tbm identifier, que é o caso de ser um register
                 variable_type = token['lexeme']
             
             elif token['category'] == 'IDENTIFIER':
@@ -511,3 +512,41 @@ class SemanticAnalyzer:
         #Verificar erro se a função existe
         #Verificar erro dos parametros
         return
+
+    def util_is_attribute(self, reg_entry, attr_key):
+        '''
+        Função auxiliar para checar se um atributo existe em uma entrada da tabela de registro
+        '''
+        for e in reg_entry:
+            if (attr_key in e.atributos): return True
+        return False
+
+    def util_is_register_access(self, prev_token, post_token):
+        '''
+        Função auxiliar usada para determinar se um
+        '''
+        entry = self.find_table_entry(self.current_table_index, prev_token)
+        if (entry):
+            reg_entry = self.get_registers(dict(lexeme=entry.tipo))
+            return bool(reg_entry) and bool(self.util_is_attribute(reg_entry, post_token['lexeme']))
+        return False
+
+    def validate_is_register_access(self, token_list):
+        '''
+        Verifica se a list de tokens acumaladas são usadas como parâmetros de accesso de um registro declarado. Usar essa função dentro de parser#register_position() e parser#register_access()
+        É esperedo uma token_list do tipo: [TOKEN_IDENTIFIER, TOKEN_DOT, TOKEN_IDENTIFIER_1, ..., TOKEN_DOT, TOKEN_IDENTIFIER_N] -> identificador_register.identificador_atributo_1,.., .identificador_atributo_N
+        '''
+
+        is_analysis_ok = False
+        try:
+            for i, curr_token in enumerate(token_list):
+                if "." in curr_token['lexeme']: 
+                    prev_token = token_list[i - 1]
+                    post_token = token_list[i + 1]
+                    
+                    is_analysis_ok = self.util_is_register_access(prev_token, post_token)
+        except:
+            is_analysis_ok = False
+
+        if not is_analysis_ok:
+            self.throw_error(f"Erro: Os tokens '{token_list}' não são tokens de acesso a um atributo de registro.", token_list[0])        

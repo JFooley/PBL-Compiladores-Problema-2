@@ -260,8 +260,14 @@ class Parser():
             self.vector_index()
             
     def register_position(self):
+        error_size = len(self.error_list)
+        self.token_accumulator_list = []
+        
         self.match_category(["IDENTIFIER"])
         self.register_access()
+        
+        if (error_size == len(self.error_list)):
+            self.validator.validate_is_register_access(self.token_accumulator_list)
     
     def register_access(self):
         self.match_lexeme(["."])
