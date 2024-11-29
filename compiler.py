@@ -41,7 +41,7 @@ def main():
 
 		analizer = SemanticAnalyzer()
 		entry1 = EntryIdentificadores(nome= "var1", tipo= "integer", valor="10", tipoRetorno=None, parametros=None, tamanho=0, isConstant=False)
-		entry2 = EntryIdentificadores(nome= "var2", tipo= "bool", valor="true", tipoRetorno=None, parametros=None, tamanho=0, isConstant=False)
+		entry2 = EntryIdentificadores(nome= "var.nome", tipo= "string", valor="true", tipoRetorno=None, parametros=None, tamanho=0, isConstant=False)
 		analizer.pairs_table.tabela[0]["tabela"].append(entry1)
 		analizer.pairs_table.tabela[0]["tabela"].append(entry2)
 
@@ -53,7 +53,9 @@ def main():
 
 		print("teste não declarado: " + str(analizer.non_declared_object(0, [{"lexeme" : "var1", "category": "IDENTIFIER", "line": 1}])))
 		print("teste declaração repetida: " + str(analizer.repeated_statement(0, {"lexeme" : "var_errada", "category": "IDENTIFIER", "line": 1})))
-		print("teste atribuição de tipo errado: " + str(analizer.wrong_type_assign(0, [{"lexeme" : "var1", "category": "IDENTIFIER", "line": 1}], [{"lexeme" : "true", "category": "BOOLEAN", "line": 1}])))
+		print("teste atribuição de tipo errado: " + str(analizer.wrong_type_assign(0, 
+				variable= [{"lexeme" : "var1", "category": "IDENTIFIER", "line": 1}], 
+				value= [{"lexeme" : "var", "category": "IDENTIFIER", "line": 1}, {"lexeme" : ".", "category": "OPERATOR", "line": 1}, {"lexeme" : "nome", "category": "IDENTIFIER", "line": 1}])))
 		print("Lista de erros semanticos: ")
 		print(analizer.get_error_list())
 

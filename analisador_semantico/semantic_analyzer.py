@@ -123,7 +123,7 @@ class SemanticAnalyzer:
 
         match value_dict["tipo"]:
             case "IDENTIFIER":
-                value_entry: EntryIdentificadores = self.find_table_entry(current_table_index, value["lexeme"])
+                value_entry: EntryIdentificadores = self.find_table_entry(current_table_index, value)
 
                 if (value_entry == None):
                     return False
@@ -155,7 +155,7 @@ class SemanticAnalyzer:
                             return False
 
             case "REGISTER":
-                value_entry: EntryIdentificadores = self.find_table_entry(current_table_index, value["lexeme"])
+                value_entry: EntryIdentificadores = self.find_table_entry(current_table_index, value)
             
                 if (value_entry == None):
                     return False
@@ -165,7 +165,7 @@ class SemanticAnalyzer:
                     return False
 
             case "VECTOR":                
-                value_entry: EntryIdentificadores = self.find_table_entry(current_table_index, value["lexeme"])
+                value_entry: EntryIdentificadores = self.find_table_entry(current_table_index, value)
 
                 if (value_entry == None):
                     return False
@@ -175,7 +175,7 @@ class SemanticAnalyzer:
                     return False
 
             case "FUNCTION CALL":
-                value_entry: EntryIdentificadores = self.find_table_entry(current_table_index, value["lexeme"])
+                value_entry: EntryIdentificadores = self.find_table_entry(current_table_index, value)
 
                 if (value_entry == None):
                     return False
