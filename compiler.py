@@ -38,6 +38,11 @@ def main():
 		parser = Parser(validator, tokens)
 		parser.run()  
 
+		print("\n--------------- tabela de registro ---------------")
+		print(validator.registers_type_table)
+		print("\n--------------- tabela global ---------------")
+		print(validator.pairs_table)
+
 		if parser.get_error_list(): 
 			print("Erros foram encontrados durante a análise sintática.")
 		else:
