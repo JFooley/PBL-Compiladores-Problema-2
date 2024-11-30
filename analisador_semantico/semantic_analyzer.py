@@ -41,9 +41,13 @@ class SemanticAnalyzer:
         if (throw_erro and selected_entry == None): self.throw_error(f"{token['lexeme']} não existe nesse escopo.", token)
 
         return selected_entry
-    
-    def get_registers(self, token):
-        return self.registers_type_table[token["lexeme"]]
+
+    def get_register(self, token, throw_erro = True):
+        if token["lexeme"] in self.registers_type_table:
+            return self.registers_type_table[token["lexeme"]]
+        else:
+            if throw_erro: self.throw_error(f"O register {token['lexeme']} não existe.", token)
+            return None
     
     def create_local_table(self):
         local_table: list[EntryIdentificadores] = []
@@ -201,14 +205,13 @@ class SemanticAnalyzer:
 
         ## Verifica se ele não possui um nome igual a de um tipo primitivo
         if (new_variable["lexeme"] in ["float", "integer", "string", "character", "boolean"]):
-            self.throw_error(f"{new_variable['lexeme']} não pode ter o nome de um tipo primitivo.")
+            self.throw_error(f"{new_variable['lexeme']} não pode ter o nome de um tipo primitivo.",new_variable)
             return False
 
         ## Verifica se ele não possui um nome igual a de um tipo register
-        for entry in self.registers_type_table:
-            if entry.nome == new_variable["lexeme"]:
-                self.throw_error(f"{new_variable['lexeme']} não pode ter o nome de um tipo de registro.")
-                return False
+        if self.get_register(new_variable,False) != None: ##ALTEREI PARA O NOVO JEITO, CONFERE SE É ISSO MSM, PQ TAVA ESTOURANDO ERRO AO COMPILAR
+            self.throw_error(f"{new_variable['lexeme']} não pode ter o nome de um tipo de registro.",new_variable)
+            return False
         
         return True
 
@@ -240,17 +243,26 @@ class SemanticAnalyzer:
         function_entry = EntryIdentificadores(function_name, 'function', None, return_type, parameters_type_list, 0)
         self.pairs_table.tabela[0]['tabela'].append(function_entry)
 
+    def error_attribute_register_duplicate(self,token,list_register):
+        if any(entry["nome_atributo"] == token["lexeme"] for entry in list_register):
+            self.throw_error(f"{token['lexeme']} já existe como atributo do registro.", token)
+
     def add_registers_to_table(self,token_list):
         size_error = len(self.error_list)
         name = token_list[0]
         temporary_list = []
-        #verificar se o nome do registro já não está na tabela de simbolos, ou como constants
+
+        if self.repeated_statement(self.current_table_index,name) == False:  #verificar se não existe variavel/funcao/register com o nome da instancia. se alterar o tipo de retorno da função tem que voltar para ajustar
+            return 
+
         for i in range(2, len(token_list) - 1, 3):
             type = token_list[i]
             attribute = token_list[i+1]
-            
-            #Se o tipo for um identificador, verificar se existe como registro
-            #Declaração repetida entre 2 atributos dos registros;
+
+            if(type["category"] == "IDENTIFIER"):
+                registers = self.get_register(type) #Verifica se existe o register criado
+        
+            self.error_attribute_register_duplicate(attribute,temporary_list) #Verifica Declaração repetida entre 2 atributos dos registros;
             register_entry = {"nome_atributo": attribute["lexeme"], "tipo": type["lexeme"]}
             temporary_list.append(register_entry)
         
@@ -262,8 +274,14 @@ class SemanticAnalyzer:
         register_type = token_list[0]
         instance_name = token_list[1]
         isIdentifier = False
-        #Verificar o erro se existe o register criado
-        #Verificar se não existe variavel/funcao/register com o nome da instancia
+
+        if self.repeated_statement(self.current_table_index,instance_name) == False:  #verificar se não existe variavel/funcao/register com o nome da instancia. se alterar o tipo de retorno da função tem que voltar para ajustar
+            return 
+        
+        registers = self.get_register(register_type) #Verifica se existe o register foi criado
+        if (registers == None):
+            return
+        
         if (len(token_list) > 4):
             if(token_list[2]["lexeme"] == "=" and (token_list[3]["category"] != "IDENTIFIER" or token_list[4]["lexeme"] != ";")):
                 self.throw_error("Associação inválida de register", token_list[3])
@@ -279,7 +297,7 @@ class SemanticAnalyzer:
         size_error = len(self.error_list)    
         instance_register = EntryIdentificadores(instance_name["lexeme"], register_type["lexeme"])
         self.pairs_table.tabela[self.current_table_index]['tabela'].append(instance_register)
-        registers = self.get_registers(register_type)
+       
         for register in registers:
             value = None
             attribute_name = instance_name["lexeme"]+"."+register["nome_atributo"]
@@ -302,12 +320,12 @@ class SemanticAnalyzer:
         for token in token_list[3:len(token_list) - 1]:
             value = value + " " + token["lexeme"]
         size_error = len(self.error_list)
-        #Verificar se o identificador ja não existe como constante ou variaveis na tabela de simbolos
-        #error_já_exite
-        #Verificar se o tipo primitivo é do mesmo valor adicionado
-        #erro_valor
-        #se list error size = list error size anterior pode adicionar
-        #Se nenhum desses casos ser vdd, adicionar na tabela global
+
+        if self.repeated_statement(self.current_table_index,name) == False: #Verifica se o identificador ja não existe como constante ou variaveis na tabela de simbolos
+            return 
+        
+        #TODO Verificar se o tipo primitivo é do mesmo valor adicionado
+        
         if(size_error == len(self.error_list)):
             constant_entry = EntryIdentificadores(name["lexeme"], type["lexeme"], value, None, None, 0, True)
             self.pairs_table.tabela[0]['tabela'].append(constant_entry)
@@ -542,7 +560,7 @@ class SemanticAnalyzer:
         '''
         entry = self.find_table_entry(self.current_table_index, prev_token)
         if (entry):
-            reg_entry = self.get_registers(dict(lexeme=entry.tipo))
+            reg_entry = self.get_register(dict(lexeme=entry.tipo))
             return bool(reg_entry) and bool(self.util_is_attribute(reg_entry, post_token['lexeme']))
         return False
 
