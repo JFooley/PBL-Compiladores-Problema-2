@@ -1,0 +1,31 @@
+register my_register {
+  integer a; 
+  integer b; 
+}
+
+constants {
+  integer c = 1;
+}
+
+variables {
+  integer g = 1;
+}
+
+function integer sum(integer a, integer b) {
+  variables {  
+  }
+  return a + b;
+}
+
+main() {
+  variables {
+    my_register register_instance;
+  }
+  register_instanceZ.b = 7; // Erro 1: acesso de registro não declarado
+
+  register_instance.z = 7; // Erro 2: acesso de atributo não declarado no registro
+}
+  
+
+  
+  
