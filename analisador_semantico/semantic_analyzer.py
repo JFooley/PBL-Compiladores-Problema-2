@@ -110,6 +110,9 @@ class SemanticAnalyzer:
                 return {"tipo":"EXPRESSION", "token": tokens}
     
     #------------------------------ JG e Caleo -----------------------------------
+
+    #UMA DÚVIDA: Não deveria receber o tipo da variavel? Pq nesse caso vcs tão considerando que a variavel existe, e para o caso que a gente ainda tá criando a variavel? teríamos um erro. 
+    #Pq antes de criar uma variavel: integer a = "string", precisamos verificar se o tipo ta correto com o valor, para depois adicionar na tabela de simbolos
     def wrong_type_assign(self, current_table_index, variable, value): 
         ## Identifica em uma atribuição variable = value se o tipo de a é diferente do tipo de b
         ## variable: lista de tokens do objeto varible (ex: "identifier" ou "identifier" "." "identifier" ou "identifier" "[" "number" "]" e etc)
