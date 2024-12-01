@@ -68,47 +68,6 @@ class SemanticAnalyzer:
     def is_int(self,token):
         return "." not in token["lexeme"]
     
-    def identify_var_kind(self, tokens): ## identifica qual tipo é a variável ou value passado e devolve o tipo e o token necessário
-        if len(tokens) == 1:
-            ## Identifier
-            if tokens[0]["category"] == "IDENTIFIER":
-                return {"tipo":"IDENTIFIER", "token": tokens[0]}
-            ## Literal
-            else:
-                return {"tipo":"LITERAL", "token": tokens[0]}
-            
-        else:
-            ## Register
-            if tokens[1]["lexeme"] == ".":
-                new_lexeme = ""
-                for token in tokens:
-                    if token["lexeme"] == "[":
-                        break
-                    new_lexeme += token["lexeme"]
-
-                new_token = {"lexeme": new_lexeme, "category": tokens[0]["category"], "line": tokens[0]["line"]}
-                return {"tipo":"REGISTER", "token": new_token}
-            
-            ## Function call
-            elif tokens[1]["lexeme"] == "(":
-                return {"tipo":"FUNCTION CALL", "token": tokens[0]}
-
-            ## Vector
-            elif tokens[1]["lexeme"] == "[":
-                return {"tipo":"VECTOR", "token": tokens[0]}
-
-            # Identifier (Considero o ;)
-            elif tokens[1]["lexeme"] == ";" and tokens[0]["category"] == "IDENTIFIER":
-                return {"tipo":"IDENTIFIER", "token": tokens[0]}
-                
-            # Literal (Considero o ;)
-            elif tokens[1]["lexeme"] == ";":
-                return {"tipo":"LITERAL", "token": tokens[0]}
-            
-            ## Expresion
-            else:
-                return {"tipo":"EXPRESSION", "token": tokens}
-    
     #------------------------------ JG e Caleo -----------------------------------
 
     def is_expresion(self, tokens):
