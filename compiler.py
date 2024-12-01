@@ -36,42 +36,39 @@ def main():
 	tokens = lexical_analise(TEST_FILE)
 	if tokens :
 		validator = SemanticAnalyzer()
-		parser = Parser(validator, tokens)
-		parser.run()  
 
 		analizer = SemanticAnalyzer()
-		entry1 = EntryIdentificadores(nome= "var1", tipo= "integer", valor="10", tipoRetorno=None, parametros=None, tamanho=0, isConstant=False)
-		entry2 = EntryIdentificadores(nome= "var.nome", tipo= "string", valor="true", tipoRetorno=None, parametros=None, tamanho=0, isConstant=False)
+		analizer.registers_type_table["documento"] = {"nome":"string","idade":"integer"}
+		entry1 = EntryIdentificadores(nome= "a", tipo= "float", valor="1,5", tipoRetorno=None, parametros=None, tamanho=0, isConstant=False)
+		entry2 = EntryIdentificadores(nome= "b", tipo= "documento", valor=None, tipoRetorno=None, parametros=None, tamanho=0, isConstant=False)
+		entry3 = EntryIdentificadores(nome= "b.nome", tipo= "string", valor="fulano", tipoRetorno=None, parametros=None, tamanho=0, isConstant=False)
+		entry4 = EntryIdentificadores(nome= "b.idade", tipo= "integer", valor="10", tipoRetorno=None, parametros=None, tamanho=0, isConstant=False)
+		entry5 = EntryIdentificadores(nome= "vetor", tipo= "integer", valor=None, tipoRetorno=None, parametros=None, tamanho=10, isConstant=False)
 		analizer.pairs_table.tabela[0]["tabela"].append(entry1)
 		analizer.pairs_table.tabela[0]["tabela"].append(entry2)
-
+		analizer.pairs_table.tabela[0]["tabela"].append(entry3)
+		analizer.pairs_table.tabela[0]["tabela"].append(entry4)
+		analizer.pairs_table.tabela[0]["tabela"].append(entry5)
 
 		print("Entradas na tabela global")
 		print(len(analizer.pairs_table.tabela[0]["tabela"]))
 
 		print("-------------------------")
-
-		print("teste não declarado: " + str(analizer.non_declared_object(0, [{"lexeme" : "var1", "category": "IDENTIFIER", "line": 1}])))
-		print("teste declaração repetida: " + str(analizer.repeated_statement(0, {"lexeme" : "var_errada", "category": "IDENTIFIER", "line": 1})))
 		print("teste atribuição de tipo errado: " + str(analizer.wrong_type_assign(0, 
-				variable= [{"lexeme" : "var1", "category": "IDENTIFIER", "line": 1}], 
-				value= [{"lexeme" : "var", "category": "IDENTIFIER", "line": 1}, {"lexeme" : ".", "category": "OPERATOR", "line": 1}, {"lexeme" : "nome", "category": "IDENTIFIER", "line": 1}])))
+				variable= [{"lexeme" : "a", "category": "IDENTIFIER", "line": 1}], 
+				value= [{"lexeme" : "1", "category": "NUMBER", "line": 1}, {"lexeme" : "+", "category": "OPERATOR", "line": 1}, {"lexeme" : "b", "category": "IDENTIFIER", "line": 1}, {"lexeme" : ".", "category": "OPERATOR", "line": 1}, {"lexeme" : "idade", "category": "IDENTIFIER", "line": 1}, {"lexeme" : "/", "category": "OPERATOR", "line": 1},  {"lexeme" : "1", "category": "NUMBER", "line": 1}],
+				variable_type= {"lexeme" : "float", "category": "IDENTIFIER", "line": 1})	
+			)
+		)
+
 		print("Lista de erros semanticos: ")
 		print(analizer.get_error_list())
 
-
-		if len(parser.get_error_list()) > 0: 
-			print("Erros foram encontrados durante a análise sintática.")
-		else:
-			print("A análise sintática foi realizada com sucesso.")
 
 		if len(validator.get_error_list()) > 0: 
 			print("Erros foram encontrados durante a análise semântica.")
 		else:
 			print("A análise semântica foi realizada com sucesso.")			
-
-		write_file("./analisador_sintatico/saida/parser_result.txt", parser.get_error_list(), "A análise sintática foi realizada com sucesso.")
-		write_file("./analisador_semantico/saida/semantic_result.txt", validator.get_error_list(), "A análise semantica foi realizada com sucesso.")
 
 	else:
 		print("Erro durante a análise léxica.")
