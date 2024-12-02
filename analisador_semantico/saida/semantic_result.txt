@@ -1,2 +1,1 @@
-{'position': 35, 'message': 'r.a não existe nesse escopo.'}
-{'position': 35, 'message': 'r.a não existe nesse escopo.'}
+A análise semantica foi realizada com sucesso.

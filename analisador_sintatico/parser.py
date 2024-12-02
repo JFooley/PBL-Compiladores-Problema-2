@@ -117,7 +117,9 @@ class Parser():
         self.match_lexeme(['}'])
 
     def expression_variables(self):
+        # limpa lista
         self.expression_declaration()
+        # chama função
         if self.lookahead()['category'] == 'IDENTIFIER' or self.lookahead()['lexeme'] in ['integer', 'float', 'boolean', 'string']:
             self.expression_variables()
 
@@ -260,14 +262,9 @@ class Parser():
             self.vector_index()
             
     def register_position(self):
-        error_size = len(self.error_list)
-        self.token_accumulator_list = []
-        
         self.match_category(["IDENTIFIER"])
         self.register_access()
         
-        if (error_size == len(self.error_list)):
-            self.validator.validate_is_register_access(self.token_accumulator_list)
     
     def register_access(self):
         self.match_lexeme(["."])
@@ -352,7 +349,6 @@ class Parser():
     def write(self):
         self.match_lexeme(["write"])
         self.match_lexeme(["("])
-        
         self.value()  
         while self.lookahead()["lexeme"] == ",":  
             self.match_lexeme([","])  
@@ -383,14 +379,8 @@ class Parser():
 
 #--------------------- Chamada de função  ---------------------
     def function_call(self):
-        temp = self.token_accumulator_list
-        self.token_accumulator_list = [] # reseta a lista de tokens acumulados
         self.match_category(["IDENTIFIER"])
         self.arguments()
-        if len(self.get_error_list()) == 0:
-            self.validator.validate_function_parameters(self.token_accumulator_list) # verificar se o tipo dos parametros está correto
-        temp.append(self.token_accumulator_list[0])
-        self.token_accumulator_list = temp
 
     def arguments(self):
         self.match_lexeme(["("])
@@ -410,11 +400,13 @@ class Parser():
     def statements(self):
         self.validator.create_local_table() #cria a tabela local para o escopo da função/main
         self.variables()
-        self.body()            
+        self.token_accumulator_list = []
+        self.body()
+        self.validator.validate_body(self.token_accumulator_list)  # alteração reunião  
         self.validator.remove_local_table()
 
 #--------------------- body ---------------------
-    def body(self):         
+    def body(self):
         if ((self.lookahead()["lexeme"] in ["for", "while", "if", "write", "read", "return"]) or (self.lookahead()["category"] == "IDENTIFIER" and self.lookahead(1)["lexeme"] == "(")):  
             self.commands()
         else:
