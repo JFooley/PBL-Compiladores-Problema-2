@@ -48,7 +48,7 @@ class Parser():
         self.start()
         return len(self.error_list) == 0
 
- #---------------------  ---------------------
+ #--------------------- Start ---------------------
     def start(self):
         if self.lookahead()["lexeme"] == "register": 
             self.registers()
@@ -201,6 +201,7 @@ class Parser():
         self.match_lexeme(['=']) 
         self.value() 
         self.match_lexeme([';']) 
+
         if (len(self.error_list) == size_erro):  #Verificar se houve erros sintáticos
             self.validator.add_constants_to_table(self.token_accumulator_list)
 
@@ -377,11 +378,11 @@ class Parser():
     def return_statement(self):
         
         self.match_lexeme(["return"])  
-        self.token_accumulator_list = []
+        #self.token_accumulator_list = []
         if self.lookahead()['lexeme'] not in [";"]:
             self.value()
         self.match_lexeme([";"])
-        self.validator.validate_function_return(self.token_accumulator_list)
+        #self.validator.validate_function_return(self.token_accumulator_list)
 
 #--------------------- Chamada de função  ---------------------
     def function_call(self):
@@ -407,8 +408,10 @@ class Parser():
         self.validator.create_local_table() #cria a tabela local para o escopo da função/main
         self.variables()
         self.token_accumulator_list = []
+        size_error = len(self.error_list)
         self.body()
-        self.validator.validate_body(self.token_accumulator_list)  # alteração reunião  
+        if (len(self.error_list) == size_error):
+            self.validator.validate_body(self.token_accumulator_list)  # alteração reunião  
         self.validator.remove_local_table()
 
 #--------------------- body ---------------------

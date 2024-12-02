@@ -189,7 +189,7 @@ class SemanticAnalyzer:
         if self.repeated_statement(self.current_table_index,name) == False: #Verifica se o identificador ja não existe como constante ou variaveis na tabela de simbolos
             return 
         
-        if self.wrong_type_assign(self.current_table_index,name,value_list,type) == False: #Verificar se o tipo primitivo é do mesmo valor adicionado
+        if self.wrong_type_assign(self.current_table_index,[name],value_list,type) == False: #Verificar se o tipo primitivo é do mesmo valor adicionado
             return 
         
         if(size_error == len(self.error_list)):
@@ -791,16 +791,12 @@ class SemanticAnalyzer:
                         # Usar o “.” e identificar que NÃO são registradores
                         # Usar [] em um identificador que não é vetor
                         pass
-                self.printar_linha(line)
                 line = []
             elif token['lexeme'] == '{':
                 self.create_local_table()
                 if line[0]['lexeme'] == 'for':
                     on_for = False
-                    # chamada de função de verificação
-                    # se vier sem integer tem que ser sido declarada antes e tem que ser do tipo inteiro
-                    # se vier com o integer nao pode ter sido declarada
-                    self.printar_linha(line)
+                    self.validate_for(line)
                 elif line[0]['lexeme'] in ['while', 'if']:
                     # o tipo tem que ser boolean
                     # chamada de função de verificação, Variável NÃO atribuída
@@ -813,3 +809,80 @@ class SemanticAnalyzer:
                 self.remove_local_table()
             else:
                 line.append(token)
+
+ #------------------------- Valida erro no for ------------------
+    def validate_for(self,token_list):
+        list_for = self.split_for(token_list)
+        size_error = len(self.error_list)
+        #Primeira parte do for
+        first_part = list_for[0]
+        if (first_part[2]["category"] == "KEYWORD"):
+            value_list = []
+            value = ""
+            type = first_part[2]
+            name = first_part[3]
+            self.repeated_statement(self.current_table_index,name) #Verifica se o identificador ja não existe como constante ou variaveis na tabela de simbolos
+            
+            for token in first_part[5:len(first_part)]:
+                value_list.append(token)
+                value = value + " " + token["lexeme"]
+            self.wrong_type_assign(self.current_table_index,[name],value_list,type) #Verificar se a igualdade é do tipo integer
+            
+            if(size_error == len(self.error_list)):
+                variable_entry = EntryIdentificadores(name["lexeme"], type["lexeme"], value)
+                self.pairs_table.tabela[self.current_table_index]['tabela'].append(variable_entry)
+        elif (first_part[2]["category"] == "IDENTIFIER"):
+            name = first_part[2]
+            self.error_conditional_for(name,first_part,4)
+
+        #Verifica segunda parte do for
+        second_parte = list_for[1]
+        if(size_error == len(self.error_list)):
+            name = second_parte[0]
+            self.error_conditional_for(name,second_parte,2)
+        
+        #Verifica terceira parte
+        if(size_error == len(self.error_list)):
+            self.validade_third_part(list_for[2][0])
+
+    def validade_third_part(self,token):
+        entry = self.find_table_entry(self.current_table_index,token)
+        if entry != None and entry.tipo != "integer":
+            self.throw_error(f"A váriavel {token["lexeme"]} não é do tipo integer.",token)
+    
+    #Verifica se a variavel existe, se é inteira e se o valor depois da igualdade é inteiro
+    def error_conditional_for(self,name_token,token_list,index):
+        if(len(token_list)>0):
+            value_list = []
+            entry = self.find_table_entry(self.current_table_index,name_token)
+            if entry == None:
+                return True
+            if entry.tipo != "integer":
+                self.throw_error(f"A váriavel {name_token["lexeme"]} não é do tipo integer.",name_token)
+                return True
+            for token in token_list[index:len(token_list)]:
+                value_list.append(token)
+
+            if self.wrong_type_assign(self.current_table_index,[name_token],value_list) == False:
+                return True
+            return False
+        else:
+            return False
+        
+    #Separa o for em partes
+    def split_for(self,token_list):
+        result = []
+        current_segment = []
+
+        for token in token_list:
+            if token['lexeme'] == ";":
+                result.append(current_segment)
+                current_segment = []
+            else:
+                current_segment.append(token)
+        
+        if current_segment:
+            result.append(current_segment)
+
+        return result
+
