@@ -233,7 +233,6 @@ class SemanticAnalyzer:
                     
             elif token['category'] == 'DELIMITER' and token['lexeme'] == ";":  # Encontrando o delimitador ';'
                 variables_entry = EntryIdentificadores(variable_name, variable_type, variable_value, None, None, vector_length)
-                # self.create_local_table()
                 self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
                 # Resetando as variáveis para a próxima variável
                 variable_type, variable_name, variable_value = "", "", ""
@@ -609,16 +608,19 @@ class SemanticAnalyzer:
             return "integer"
         if value == "STRING":
             return "string"
-        if value == "BOOLEAN":
+        if value == "BOOLEAN" or value == "true" or value == "false":
             return "boolean"
-
         # Caso não seja nenhum dos anteriores, manter como string
         return "string"
     
     #################### Função para validar o return (inteiro / identificador) ##################
     def validate_function_return(self, token_list):
-        value_dict = self.identify_var_kind(token_list)
         return_entry = self.pairs_table.tabela[self.current_table_index]['tabela'][0]
+        if len(token_list) == 1 :
+            if not return_entry.tipoRetorno == "empty":
+                self.throw_error("O retorno da função está vazio", token_list[0]['line'])   
+            return 
+        value_dict = self.identify_var_kind(token_list)
         
         match value_dict["tipo"]:
             case "IDENTIFIER":
@@ -645,6 +647,13 @@ class SemanticAnalyzer:
 
             case "REGISTER":
                 token = value_dict["token"]
+                function_entry: EntryIdentificadores = self.find_table_entry(self.current_table_index, token)
+
+                if (function_entry == None):
+                    return False
+                
+                if function_entry.tipoRetorno != return_entry.tipoRetorno:
+                    self.throw_error("O tipo de retorno não corresponde ao tipo da função", token)
                 
             case "VECTOR":
                 token = value_dict["token"]
@@ -658,6 +667,15 @@ class SemanticAnalyzer:
                
             case "EXPRESSION":
                 token = value_dict["token"]
+                type_expression = self.indetify_expression_return(self.current_table_index, token)
+                
+                if (type_expression == None):
+                    return False
+                
+                if return_entry.tipoRetorno in ["float", "integer", "boolean"]:
+                    if type_expression not in ["float", "integer", "boolean"]:
+                        self.throw_error("O tipo de retorno não corresponde ao tipo da função", token)
+                    
                 
                 #print(token)
 
