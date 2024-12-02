@@ -52,12 +52,15 @@ class Parser():
     def start(self):
         if self.lookahead()["lexeme"] == "register": 
             self.registers()
+            self.token_accumulator_list.clear()
 
         self.constants()
         self.variables(True) 
         
         if self.lookahead()["lexeme"] == "function":
-            self.functions() 
+            self.functions()            
+            # self.token_accumulator_list.clear()
+            
 
         self.main() 
 
@@ -372,10 +375,13 @@ class Parser():
 
 #--------------------- Return  ---------------------
     def return_statement(self):
+        
         self.match_lexeme(["return"])  
+        self.token_accumulator_list = []
         if self.lookahead()['lexeme'] not in [";"]:
             self.value()
         self.match_lexeme([";"])
+        self.validator.validate_function_return(self.token_accumulator_list)
 
 #--------------------- Chamada de função  ---------------------
     def function_call(self):
