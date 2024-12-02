@@ -24,40 +24,16 @@ variables {
   integer number = 3;
 }
 
+
+
 function integer compute_sum(int x, int y) {
   variables {
     integer x = 1;
     integer y = 2;  
   }
-  return x + y;
+  return my_array;
 }
 
-function empty functionEmpty(integer a){
-  variables {}
-  temperature = my_array[0];
-  num--;
-  flag = A_teste && my_register.reg2 || a <= b;
-  num = a == b;
-  num = c >=b;
-}
-
-function integer fact(inter number){
-    variables {}
-    if(number < 0) then {
-    return 1;
-  } else {
-      if(number == 0) then {
-    return 1;
-  } else {
-    return (number * fact(number-1));
-  }
-  }
-}
-
-function string example(){
-  variables {}
-  return "Hello World";
-}
 
 main() {
   variables {

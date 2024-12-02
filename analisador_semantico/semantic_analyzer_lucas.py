@@ -2,24 +2,24 @@ from analisador_semantico.tables import TabelaPares, EntryRegisters, EntryIdenti
 
 class SemanticAnalyzer:
     def __init__(self):
-        self.current_table_index = 0
+        self.current_table_index = -1
         
         # Tabela de registros
         self.registers_type_table: list[EntryRegisters] = []
 
         # Tabela de pares
         self.pairs_table = TabelaPares()
-        self.pairs_table.adicionarPar(-1, []) # Inicializa a tabela global
 
         # Lista de erros semânticos
         self.error_list = []
 
         self.tokens = []
+        self.create_global_table()
 
     ################################ Funções auxiliares ################################
     def get_error_list(self):
         return self.error_list
-    
+
     ## Gera um erro na lista de erros ## 
     def throw_error(self, message, token):
         self.error_list.append({"position": token["line"], "message": message})
@@ -38,7 +38,7 @@ class SemanticAnalyzer:
             selected_entry = self.find_table_entry(self.pairs_table.tabela[target_table_index]["pai"], token, throw_erro)
         
         # Causa erro se necessário
-        if (throw_erro and selected_entry == None): self.throw_error(f"{token["lexeme"]} não existe nesse escopo.", token)
+        if (throw_erro and selected_entry == None): self.throw_error(f"{token['lexeme']} não existe nesse escopo.", token)
 
         return selected_entry
     
@@ -64,10 +64,10 @@ class SemanticAnalyzer:
         
     def remove_local_table(self):
         if (self.current_table_index != 0) :
-            self.pairs_table.pop(self.current_table_index)
+            self.pairs_table.tabela.pop(self.current_table_index)
             self.current_table_index = self.current_table_index - 1
+
     ################################ Funções de erro ################################
-    
     def is_int(self,token):
         return "." not in token["lexeme"]
     

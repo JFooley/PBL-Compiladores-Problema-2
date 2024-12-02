@@ -8,7 +8,8 @@ class EntryIdentificadores():
         self.tamanho = tamanho # =1: variável, >1: vetor 
     
     def __repr__(self):
-        pass
+        return f"Entry(nome={self.nome}, tipo={self.tipo}, valor={self.valor}, tipoR={self.tipoRetorno} )"
+
     
 class EntryRegistradores():
     def __init__(self, nome, atributos):
@@ -16,7 +17,7 @@ class EntryRegistradores():
         self.atributos = atributos # {“nome atributo”: {tipo: “...”, “tamanho”: “...”} }
 
     def __repr__(self):
-            pass
+            return f"Entry(nome={self.nome}, tipo={self.atributos})"
 
 class TabelaPares():
     def __init__(self):
@@ -31,5 +32,10 @@ class TabelaPares():
         self.tabela.append(novoPar)
     
     def __repr__(self):
-            pass
+        linhas = ["Tabela de Pares:"]
+        for i, par in enumerate(self.tabela):
+            linhas.append(f"Par {i + 1}:")
+            linhas.append(f"  Pai: {par['pai']}")
+            linhas.append(f"  Tabela Identificadores: {par['tabela']}")
+        return "\n".join(linhas)
         
