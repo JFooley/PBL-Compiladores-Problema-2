@@ -76,6 +76,169 @@ class SemanticAnalyzer:
                 return True
         return False
 
+    def is_increment(self, token_list):
+        for token in token_list:
+            if token['lexeme'] in ['++', '--']:
+                return True
+        return False
+
+    def is_function(self, token_list):
+        return token_list[1]['lexeme'] == '('
+
+    def printar_linha(self, token_list):
+        for token in token_list:
+            print(token['lexeme'], end=' ')
+        print()
+
+################################ Funções de Adicionar na tabela ################################
+
+    # verificar se ja nao existe um id com o mesmo nome
+    # chamar função que verifica se a função retorna algo
+    def add_function_to_table(self, token_list):
+        if self.find_table_entry(0, token_list[1], False) != None:
+            self.throw_error(f"{token_list[1]['lexeme']} já foi declarada", token_list[1])
+            return
+
+        return_type = token_list[0]['lexeme']
+        function_name = token_list[1]['lexeme']
+        parameters_type_list = []
+        i = 3
+        while i < len(token_list):
+            parameters_type_list.append(token_list[i]['lexeme'])
+            i += 3
+        function_entry = EntryIdentificadores(function_name, 'function', None, return_type, parameters_type_list, 0)
+        self.pairs_table.tabela[0]['tabela'].append(function_entry)
+
+    def add_registers_to_table(self,token_list):
+        size_error = len(self.error_list)
+        name = token_list[0]
+        temporary_list = []
+
+        if self.repeated_statement(self.current_table_index,name) == False:  #verificar se não existe variavel/funcao/register com o nome da instancia. se alterar o tipo de retorno da função tem que voltar para ajustar
+            return 
+
+        for i in range(2, len(token_list) - 1, 3):
+            type = token_list[i]
+            attribute = token_list[i+1]
+
+            if(type["category"] == "IDENTIFIER"):
+                registers = self.get_register(type) #Verifica se existe o register criado
+        
+            self.error_attribute_register_duplicate(attribute,temporary_list) #Verifica Declaração repetida entre 2 atributos dos registros;
+            register_entry = {"nome_atributo": attribute["lexeme"], "tipo": type["lexeme"]}
+            temporary_list.append(register_entry)
+        
+        if (size_error == len(self.error_list)):
+            self.registers_type_table[name["lexeme"]] = temporary_list
+
+
+    def add_register_instance_to_table(self,token_list): 
+        register_type = token_list[0]
+        instance_name = token_list[1]
+        isIdentifier = False
+
+        if self.repeated_statement(self.current_table_index,instance_name) == False:  #verificar se não existe variavel/funcao/register com o nome da instancia. se alterar o tipo de retorno da função tem que voltar para ajustar
+            return 
+        
+        registers = self.get_register(register_type) #Verifica se existe o register foi criado
+        if (registers == None):
+            return
+        
+        if (len(token_list) > 4):
+            if(token_list[2]["lexeme"] == "=" and (token_list[3]["category"] != "IDENTIFIER" or token_list[4]["lexeme"] != ";")):
+                self.throw_error("Associação inválida de register", token_list[3])
+                return
+
+            if (token_list[3]["category"] == "IDENTIFIER" ):
+                isIdentifier = True
+                variable = self.find_table_entry(self.current_table_index,token_list[3])
+                if (variable != None and variable.tipo != register_type["lexeme"]):
+                    self.throw_error("Tipo de register incompatível",token_list[3])
+                    return
+        
+        size_error = len(self.error_list)    
+        instance_register = EntryIdentificadores(instance_name["lexeme"], register_type["lexeme"])
+        self.pairs_table.tabela[self.current_table_index]['tabela'].append(instance_register)
+       
+        for register in registers:
+            value = None
+            attribute_name = instance_name["lexeme"]+"."+register["nome_atributo"]
+            
+            if (isIdentifier):
+                name = token_list[3]["lexeme"]+"."+register["nome_atributo"]
+                new_token = { "lexeme": name,"category": "IDENTIFIER","line": token_list[3]["line"]}
+                line = self.find_table_entry(self.current_table_index,new_token)
+                if (line != None):
+                    value = line.valor
+
+            if(size_error == len(self.error_list)):
+                instance = EntryIdentificadores(attribute_name, register["tipo"], value, None, None, 0, False)
+                self.pairs_table.tabela[self.current_table_index]['tabela'].append(instance)      
+     
+    def add_constants_to_table(self,token_list):
+        type = token_list[0]
+        name = token_list[1]
+        value = ""
+        value_list = []
+        for token in token_list[3:len(token_list) - 1]:
+            value = value + " " + token["lexeme"]
+            value_list.append(token)
+
+        size_error = len(self.error_list)
+
+        if self.repeated_statement(self.current_table_index,name) == False: #Verifica se o identificador ja não existe como constante ou variaveis na tabela de simbolos
+            return 
+        
+        if self.wrong_type_assign(self.current_table_index,name,value_list,type) == False: #Verificar se o tipo primitivo é do mesmo valor adicionado
+            return 
+        
+        if(size_error == len(self.error_list)):
+            constant_entry = EntryIdentificadores(name["lexeme"], type["lexeme"], value, None, None, 0, True)
+            self.pairs_table.tabela[0]['tabela'].append(constant_entry)
+
+    
+    # Precisa analisar se já existe na tabela
+    # Definir quando acaba o escopo da variável 
+    # Verificar se já existe variavel com mesmo nome na tabela de simbolos
+    # verificar tipo e valor, quando tem atibuição;
+    # Se for vetor, verificar se o tamanho é int(number ou identificador)
+  # Precisa analisar se já existe na tabela
+    # Definir quando acaba o escopo da variável 
+    # verificar tipo e valor, quando tem atibuição;
+    # Se for vetor, verificar se o tamanho é int(number ou identificador)
+    def add_variables_to_table(self, is_global, token_list):
+        variable_type = ""
+        variable_name = ""
+        variable_value = ""
+        vector_length = []
+        for i in range(0, len(token_list)):
+            token = token_list[i]
+            if self.find_table_entry(0, token, False) != None:
+                self.throw_error(f"{token['lexeme']} já foi declarada", token)
+                return
+            if token['category'] == 'KEYWORD':  #obs: o tipo pode ser tbm identifier, que é o caso de ser um register
+                variable_type = token['lexeme']
+            
+            elif token['category'] == 'IDENTIFIER': # Falta verificar os registers
+                if token_list[1]['lexeme'] == ".":
+                    variable_type = token['lexeme']
+                else:
+                    variable_name = token['lexeme']
+            
+            elif token['category'] == 'OPERATOR' and token['lexeme'] == '=': # consumir tudo até o ;
+                variable_value = token_list[i + 1]['lexeme']
+            
+            elif token['category'] == 'DELIMITER' and token['lexeme'] == '[': # verificar se é um vector ou matriz
+                vector_length.append(token_list[i + 1]['lexeme'])
+                    
+            elif token['category'] == 'DELIMITER' and token['lexeme'] == ";":  # Encontrando o delimitador ';'
+                variables_entry = EntryIdentificadores(variable_name, variable_type, variable_value, None, None, vector_length)
+                self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
+                # Resetando as variáveis para a próxima variável
+                variable_type, variable_name, variable_value = "", "", ""
+                vector_length = []
+        # print(self.pairs_table.tabela)
+
     def indetify_expression_return(self, current_scope_index, tokens):
         ## Identifica se a expressão aritimética passada é do tipo aritimética (retorna apenas number) ou do tipo logica/relacional (retorna boolean)
         ## A função da throw nos erros caso alguma das variáveis não existam ou sejam string e retorna None caso tenha falhado
@@ -223,7 +386,7 @@ class SemanticAnalyzer:
                     if (value_entry == None):
                         return False
 
-                    if (variable_entry.tipo != value_entry.tipo):
+                    if (variable_entry.tipo != value_entry.tipo or variable_entry.tamanho == 0):
                         self.throw_error(f"{value_entry.tipo} não pode ser convertido em {variable_entry.tipo}.", value)
                         return False
 
@@ -233,7 +396,7 @@ class SemanticAnalyzer:
                     if (value_entry == None):
                         return False
 
-                    if (variable_entry.tipo != value_entry.tipoRetorno):
+                    if (variable_entry.tipo != value_entry.tipoRetorno or variable_entry.tamanho != value_entry.tamanho):                        
                         self.throw_error(f"{value_entry.tipoRetorno} não pode ser convertido em {variable_entry.tipo}.", value)
                         return False
 
@@ -357,144 +520,9 @@ class SemanticAnalyzer:
             return True
     #------------------------------ JG e Caleo -----------------------------------
 
-    ################################ Funções de Adicionar na tabela ################################
-
-    # verificar se ja nao existe um id com o mesmo nome
-    def add_function_to_table(self, token_list):
-        if self.find_table_entry(0, token_list[1], False) != None:
-            self.throw_error(f"{token_list[1]['lexeme']} já foi declarada", token_list[1])
-            return
-
-        return_type = token_list[0]['lexeme']
-        function_name = token_list[1]['lexeme']
-        parameters_type_list = []
-        i = 3
-        while i < len(token_list):
-            parameters_type_list.append(token_list[i]['lexeme'])
-            i += 3
-        function_entry = EntryIdentificadores(function_name, 'function', None, return_type, parameters_type_list, 0)
-        self.pairs_table.tabela[0]['tabela'].append(function_entry)
-
     def error_attribute_register_duplicate(self,token,list_register):
         if any(entry["nome_atributo"] == token["lexeme"] for entry in list_register):
             self.throw_error(f"{token['lexeme']} já existe como atributo do registro.", token)
-
-    def add_registers_to_table(self,token_list):
-        size_error = len(self.error_list)
-        name = token_list[0]
-        temporary_list = []
-
-        if self.repeated_statement(self.current_table_index,name) == False:  #verificar se não existe variavel/funcao/register com o nome da instancia. se alterar o tipo de retorno da função tem que voltar para ajustar
-            return 
-
-        for i in range(2, len(token_list) - 1, 3):
-            type = token_list[i]
-            attribute = token_list[i+1]
-
-            if(type["category"] == "IDENTIFIER"):
-                registers = self.get_register(type) #Verifica se existe o register criado
-        
-            self.error_attribute_register_duplicate(attribute,temporary_list) #Verifica Declaração repetida entre 2 atributos dos registros;
-            register_entry = {"nome_atributo": attribute["lexeme"], "tipo": type["lexeme"]}
-            temporary_list.append(register_entry)
-        
-        if (size_error == len(self.error_list)):
-            self.registers_type_table[name["lexeme"]] = temporary_list
-
-
-    def add_register_instance_to_table(self,token_list): 
-        register_type = token_list[0]
-        instance_name = token_list[1]
-        isIdentifier = False
-
-        if self.repeated_statement(self.current_table_index,instance_name) == False:  #verificar se não existe variavel/funcao/register com o nome da instancia. se alterar o tipo de retorno da função tem que voltar para ajustar
-            return 
-        
-        registers = self.get_register(register_type) #Verifica se existe o register foi criado
-        if (registers == None):
-            return
-        
-        if (len(token_list) > 4):
-            if(token_list[2]["lexeme"] == "=" and (token_list[3]["category"] != "IDENTIFIER" or token_list[4]["lexeme"] != ";")):
-                self.throw_error("Associação inválida de register", token_list[3])
-                return
-
-            if (token_list[3]["category"] == "IDENTIFIER" ):
-                isIdentifier = True
-                variable = self.find_table_entry(self.current_table_index,token_list[3])
-                if (variable != None and variable.tipo != register_type["lexeme"]):
-                    self.throw_error("Tipo de register incompatível",token_list[3])
-                    return
-        
-        size_error = len(self.error_list)    
-        instance_register = EntryIdentificadores(instance_name["lexeme"], register_type["lexeme"])
-        self.pairs_table.tabela[self.current_table_index]['tabela'].append(instance_register)
-       
-        for register in registers:
-            value = None
-            attribute_name = instance_name["lexeme"]+"."+register["nome_atributo"]
-            
-            if (isIdentifier):
-                name = token_list[3]["lexeme"]+"."+register["nome_atributo"]
-                new_token = { "lexeme": name,"category": "IDENTIFIER","line": token_list[3]["line"]}
-                line = self.find_table_entry(self.current_table_index,new_token)
-                if (line != None):
-                    value = line.valor
-
-            if(size_error == len(self.error_list)):
-                instance = EntryIdentificadores(attribute_name, register["tipo"], value, None, None, 0, False)
-                self.pairs_table.tabela[self.current_table_index]['tabela'].append(instance)      
-     
-    def add_constants_to_table(self,token_list):
-        type = token_list[0]
-        name = token_list[1]
-        value = ""
-        for token in token_list[3:len(token_list) - 1]:
-            value = value + " " + token["lexeme"]
-        size_error = len(self.error_list)
-
-        if self.repeated_statement(self.current_table_index,name) == False: #Verifica se o identificador ja não existe como constante ou variaveis na tabela de simbolos
-            return 
-        
-        #TODO Verificar se o tipo primitivo é do mesmo valor adicionado
-        
-        if(size_error == len(self.error_list)):
-            constant_entry = EntryIdentificadores(name["lexeme"], type["lexeme"], value, None, None, 0, True)
-            self.pairs_table.tabela[0]['tabela'].append(constant_entry)
-
-    
-    # Precisa analisar se já existe na tabela
-    # Definir quando acaba o escopo da variável 
-    # Verificar se já existe variavel com mesmo nome na tabela de simbolos
-    # verificar tipo e valor, quando tem atibuição;
-    # Se for vetor, verificar se o tamanho é int(number ou identificador)
-    def add_variables_to_table(self, is_global, token_list):
-        variable_type = ""
-        variable_name = ""
-        variable_value = ""
-        vector_length = 0
-        for i in range(0, len(token_list)):
-            token = token_list[i]
-
-            if token['category'] == 'KEYWORD':  #obs: o tipo pode ser tbm identifier, que é o caso de ser um register
-                variable_type = token['lexeme']
-            
-            elif token['category'] == 'IDENTIFIER':
-                variable_name = token['lexeme']
-            
-            elif token['category'] == 'OPERATOR' and token['lexeme'] == '=':
-                variable_value = token_list[i + 1]['lexeme']
-            
-            elif token['category'] == 'DELIMITER' and token['lexeme'] == '[':
-                vector_length =  token_list[i + 1]['lexeme']
-                    
-            elif token['category'] == 'DELIMITER' and token['lexeme'] == ";":  # Encontrando o delimitador ';'
-                variables_entry = EntryIdentificadores(variable_name, variable_type, variable_value, None, None, vector_length)
-                # self.create_local_table()
-                self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
-                # Resetando as variáveis para a próxima variável
-                variable_type, variable_name, variable_value = "", "", ""
-                vector_length = []
     
     ################################ Funções de Verificar na tabela ################################
 
@@ -539,6 +567,7 @@ class SemanticAnalyzer:
                 while j < len(function_call_arguments[i]):
                     name['lexeme'] += '.' + function_call_arguments[i][j]['lexeme']
                     j += 1
+                print(name)
                 entry = self.find_table_entry(self.current_table_index, name)
                 if entry == None:
                     return
@@ -579,16 +608,19 @@ class SemanticAnalyzer:
             return "integer"
         if value == "STRING":
             return "string"
-        if value == "BOOLEAN":
+        if value == "BOOLEAN" or value == "true" or value == "false":
             return "boolean"
-
         # Caso não seja nenhum dos anteriores, manter como string
         return "string"
     
     #################### Função para validar o return (inteiro / identificador) ##################
     def validate_function_return(self, token_list):
-        value_dict = self.identify_var_kind(token_list)
         return_entry = self.pairs_table.tabela[self.current_table_index]['tabela'][0]
+        if len(token_list) == 1 :
+            if not return_entry.tipoRetorno == "empty":
+                self.throw_error("O retorno da função está vazio", token_list[0]['line'])   
+            return 
+        value_dict = self.identify_var_kind(token_list)
         
         match value_dict["tipo"]:
             case "IDENTIFIER":
@@ -615,6 +647,13 @@ class SemanticAnalyzer:
 
             case "REGISTER":
                 token = value_dict["token"]
+                function_entry: EntryIdentificadores = self.find_table_entry(self.current_table_index, token)
+
+                if (function_entry == None):
+                    return False
+                
+                if function_entry.tipoRetorno != return_entry.tipoRetorno:
+                    self.throw_error("O tipo de retorno não corresponde ao tipo da função", token)
                 
             case "VECTOR":
                 token = value_dict["token"]
@@ -628,6 +667,15 @@ class SemanticAnalyzer:
                
             case "EXPRESSION":
                 token = value_dict["token"]
+                type_expression = self.indetify_expression_return(self.current_table_index, token)
+                
+                if (type_expression == None):
+                    return False
+                
+                if return_entry.tipoRetorno in ["float", "integer", "boolean"]:
+                    if type_expression not in ["float", "integer", "boolean"]:
+                        self.throw_error("O tipo de retorno não corresponde ao tipo da função", token)
+                    
                 
                 #print(token)
 
@@ -715,3 +763,53 @@ class SemanticAnalyzer:
 
         if not is_analysis_ok:
             self.throw_error(f"Erro: Os tokens '{token_list}' não são tokens de acesso a um atributo de registro.", token_list[0])        
+
+    def validate_body(self, token_list):
+        #print(token_list)
+        line = []
+        on_for = False
+        for token in token_list:
+            if token['lexeme'] == 'for':
+                on_for = True
+            if token['lexeme'] == ';' and not on_for: 
+                if line[0]['lexeme'] == 'write':
+                    # verificar se existe
+                    pass
+                elif line[0]['lexeme'] == 'read':
+                    # verificar se existe
+                    pass
+                else:
+                    if self.is_increment(line):
+                        # Variável NÃO atribuída
+                        # self.validate_increment_decrement(line)
+                        pass
+                    elif self.is_function(line):
+                        self.validate_function_parameters(line)
+                    else:
+                        # existe, mesmo tipo, Variável NÃO atribuída em expressões
+                        # Chamada de função com identificador que não é uma função
+                        # Usar o “.” e identificar que NÃO são registradores
+                        # Usar [] em um identificador que não é vetor
+                        pass
+                self.printar_linha(line)
+                line = []
+            elif token['lexeme'] == '{':
+                self.create_local_table()
+                if line[0]['lexeme'] == 'for':
+                    on_for = False
+                    # chamada de função de verificação
+                    # se vier sem integer tem que ser sido declarada antes e tem que ser do tipo inteiro
+                    # se vier com o integer nao pode ter sido declarada
+                    self.printar_linha(line)
+                elif line[0]['lexeme'] in ['while', 'if']:
+                    # o tipo tem que ser boolean
+                    # chamada de função de verificação, Variável NÃO atribuída
+                    # Chamada de função com identificador que não é uma função
+                    # Usar o “.” e identificar que NÃO são registradores
+                    # Usar [] em um identificador que não é vetor
+                    self.printar_linha(line)
+                line = []
+            elif token['lexeme'] == '}':
+                self.remove_local_table()
+            else:
+                line.append(token)
