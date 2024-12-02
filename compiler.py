@@ -56,7 +56,7 @@ def main():
 		print("-------------------------")
 		print("teste atribuição de tipo errado: " + str(analizer.wrong_type_assign(0, 
 				variable= [{"lexeme" : "a", "category": "IDENTIFIER", "line": 1}], 
-				value= [{"lexeme" : "1", "category": "NUMBER", "line": 1}, {"lexeme" : "+", "category": "OPERATOR", "line": 1}, {"lexeme" : "b", "category": "IDENTIFIER", "line": 1}, {"lexeme" : ".", "category": "OPERATOR", "line": 1}, {"lexeme" : "idade", "category": "IDENTIFIER", "line": 1}, {"lexeme" : "/", "category": "OPERATOR", "line": 1},  {"lexeme" : "1", "category": "NUMBER", "line": 1}],
+				value= [{"lexeme" : "1", "category": "NUMBER", "line": 1}, {"lexeme" : "+", "category": "OPERATOR", "line": 1}, {"lexeme" : "b", "category": "IDENTIFIER", "line": 1}, {"lexeme" : ".", "category": "OPERATOR", "line": 1}, {"lexeme" : "nome", "category": "IDENTIFIER", "line": 1}, {"lexeme" : "/", "category": "OPERATOR", "line": 1},  {"lexeme" : "1", "category": "NUMBER", "line": 1}],
 				variable_type= {"lexeme" : "float", "category": "IDENTIFIER", "line": 1})	
 			)
 		)
