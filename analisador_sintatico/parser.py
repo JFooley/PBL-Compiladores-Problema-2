@@ -55,9 +55,7 @@ class Parser():
             self.token_accumulator_list.clear()
 
         self.constants()
-        self.token_accumulator_list.clear()
-        
-        self.variables(is_global = True) 
+        self.variables(True) 
         
         if self.lookahead()["lexeme"] == "function":
             self.functions()            
@@ -77,11 +75,16 @@ class Parser():
             self.registers()
 
     def register(self):
+        size_error = len(self.error_list)
         self.match_lexeme(["register"])
+        self.token_accumulator_list = []
         self.match_category(["IDENTIFIER"])
         self.match_lexeme(['{'])
         self.register_body()
         self.match_lexeme(['}']) 
+        
+        if (len(self.error_list) == size_error):
+            self.validator.add_registers_to_table(self.token_accumulator_list)
 
     def register_body(self):
         self.declaration()
@@ -104,17 +107,22 @@ class Parser():
             self.constants_declarations()
 
 #--------------------- Variaveis ---------------------
-    def variables(self):
+    def variables(self, is_global = False):
         self.match_lexeme(['variables'])
         self.match_lexeme(['{'])
         self.token_accumulator_list = []
+        size_error = len(self.error_list)
         if self.lookahead()['category'] == 'IDENTIFIER' or self.lookahead()['lexeme'] in ['integer', 'float', 'boolean', 'string']:
             self.expression_variables()
-        self.validator.add_variables_to_table(is_global, self.token_accumulator_list)
+        
+        if (len(self.error_list) == size_error):
+            self.validator.add_variables_to_table(is_global, self.token_accumulator_list)
         self.match_lexeme(['}'])
 
     def expression_variables(self):
+        # limpa lista
         self.expression_declaration()
+        # chama função
         if self.lookahead()['category'] == 'IDENTIFIER' or self.lookahead()['lexeme'] in ['integer', 'float', 'boolean', 'string']:
             self.expression_variables()
 
@@ -133,7 +141,8 @@ class Parser():
             self.type()
         self.match_category(["IDENTIFIER"])
         self.parameters()
-        self.validator.add_function_to_table(self.token_accumulator_list) # adiciona na tabela de simbolos
+        if len(self.get_error_list()) == 0:
+            self.validator.add_function_to_table(self.token_accumulator_list) # adiciona na tabela de simbolos
         self.match_lexeme(["{"])
         self.statements()
         self.match_lexeme(["}"])
@@ -185,11 +194,16 @@ class Parser():
         self.match_lexeme([';']) 
 
     def assignment_declaration(self):
+        self.token_accumulator_list = []
+        size_erro = len(self.error_list)
         self.primitive_type()
         self.match_category(['IDENTIFIER']) 
         self.match_lexeme(['=']) 
         self.value() 
         self.match_lexeme([';']) 
+        if (len(self.error_list) == size_erro):  #Verificar se houve erros sintáticos
+            self.validator.add_constants_to_table(self.token_accumulator_list)
+
 
     def assignment(self):
         self.attribute()
@@ -253,6 +267,7 @@ class Parser():
     def register_position(self):
         self.match_category(["IDENTIFIER"])
         self.register_access()
+        
     
     def register_access(self):
         self.match_lexeme(["."])
@@ -337,7 +352,6 @@ class Parser():
     def write(self):
         self.match_lexeme(["write"])
         self.match_lexeme(["("])
-        
         self.value()  
         while self.lookahead()["lexeme"] == ",":  
             self.match_lexeme([","])  
@@ -371,7 +385,6 @@ class Parser():
 
 #--------------------- Chamada de função  ---------------------
     def function_call(self):
-        self.token_accumulator_list = [] # reseta a lista de tokens acumulados
         self.match_category(["IDENTIFIER"])
         self.arguments()
 
@@ -391,11 +404,15 @@ class Parser():
 
 #--------------------- statements ---------------------
     def statements(self):
+        self.validator.create_local_table() #cria a tabela local para o escopo da função/main
         self.variables()
-        self.body()            
+        self.token_accumulator_list = []
+        self.body()
+        self.validator.validate_body(self.token_accumulator_list)  # alteração reunião  
+        self.validator.remove_local_table()
 
 #--------------------- body ---------------------
-    def body(self):         
+    def body(self):
         if ((self.lookahead()["lexeme"] in ["for", "while", "if", "write", "read", "return"]) or (self.lookahead()["category"] == "IDENTIFIER" and self.lookahead(1)["lexeme"] == "(")):  
             self.commands()
         else:

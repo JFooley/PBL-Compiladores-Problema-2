@@ -1,7 +1,16 @@
+register r {
+  integer a; 
+  integer b; 
+}
+
 constants {
+  integer c = 1;
 }
 
 variables {
+  integer g = 1;
+  integer v_g[2];
+  integer m_g[1][2];
 }
 
 function integer sum(integer a, integer b) {
@@ -10,16 +19,50 @@ function integer sum(integer a, integer b) {
   return a + b;
 }
 
+function string sum1(integer a, integer b) {
+  variables {  
+  }
+  return "a + b";
+}
+
 main() {
   variables {
-    integer a;
-    integer b;
+    integer a = 1;
+    integer b = 1;
+    integer v[2];
+    integer m[1][2];
     integer result;
+    integer n1;
+    integer n2;
+    r r1;
   }
-  read(a);
-  read(b);
+  v[0] = 1;
+  v[1] = 1;
+  m[0][0] = 1;
+  m[0][1] = 1;
   result = sum(a, b);
-  write(result);
+  result = sum(v[0], v[1]);
+  result = sum(m[0][0], m[0][1]);
+  result = sum(r1.a, r1.b);
+  sum(1, 2);
+  result = sum(c, g);
+  result = sum(sum1(n1, n2), sum(a, b));
+  n1.a = 0;
+  
+  for (integer n = 10; n>0; n--){
+    a = n * 8 + 4;
+  }
+
+  while ((a && b) || a != c){
+    if (c && b) then {
+      num++;
+    } else {
+      num--;
+    }
+  }
+  
+  write(4+5, num, v[0], m[0][0], a||b, a<=b);
+  read(num, v[0], m[0][0]);
 }
   
 
