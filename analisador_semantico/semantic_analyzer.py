@@ -179,14 +179,18 @@ class SemanticAnalyzer:
         type = token_list[0]
         name = token_list[1]
         value = ""
+        value_list = []
         for token in token_list[3:len(token_list) - 1]:
             value = value + " " + token["lexeme"]
+            value_list.append(token)
+
         size_error = len(self.error_list)
 
         if self.repeated_statement(self.current_table_index,name) == False: #Verifica se o identificador ja não existe como constante ou variaveis na tabela de simbolos
             return 
         
-        #TODO Verificar se o tipo primitivo é do mesmo valor adicionado
+        if self.wrong_type_assign(self.current_table_index,name,value_list,type) == False: #Verificar se o tipo primitivo é do mesmo valor adicionado
+            return 
         
         if(size_error == len(self.error_list)):
             constant_entry = EntryIdentificadores(name["lexeme"], type["lexeme"], value, None, None, 0, True)
