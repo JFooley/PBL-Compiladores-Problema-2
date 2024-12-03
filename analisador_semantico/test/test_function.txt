@@ -15,8 +15,9 @@ variables {
 
 function integer sum(integer a, integer b) {
   variables {  
+    integer g2 = 1
   }
-  return a + b;
+  g2 = 1 + 2;
 }
 
 function string sum1(integer a, integer b) {

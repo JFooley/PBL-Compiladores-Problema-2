@@ -1,1 +1,1 @@
-A análise sintática foi realizada com sucesso.
+{'position': 19, 'expected': [';'], 'received': []}
