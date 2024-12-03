@@ -63,13 +63,10 @@ class SemanticAnalyzer:
         if (self.current_table_index != 0) :
             self.pairs_table.tabela.pop(self.current_table_index)
             self.current_table_index = self.current_table_index - 1
-
-    ################################ Funções de erro ################################
+    
     def is_int(self,token):
         return "." not in token["lexeme"]
     
-    #------------------------------ JG e Caleo -----------------------------------
-
     def is_expresion(self, tokens):
         for token in tokens:
             if token["category"] == "OPERATOR" and token["lexeme"] != ".":
@@ -89,6 +86,45 @@ class SemanticAnalyzer:
         for token in token_list:
             print(token['lexeme'], end=' ')
         print()
+    
+    #Separa a lista de token em partes
+    def split_list_token(self,token_list,delimiter):
+        result = []
+        current_segment = []
+
+        for token in token_list:
+            if token['lexeme'] == delimiter:
+                result.append(current_segment)
+                current_segment = []
+            else:
+                current_segment.append(token)
+        
+        if current_segment:
+            result.append(current_segment)
+
+        return result
+
+    def split_list_token_write(self,token_list,delimiter):
+        result = []
+        current_segment = []
+        open_parentheses = False
+
+        for token in token_list:
+            if token['lexeme'] == "(":
+                open_parentheses = True
+            elif token['lexeme'] == ")":
+                open_parentheses = False
+
+            if token['lexeme'] == delimiter and not open_parentheses:
+                result.append(current_segment)
+                current_segment = []
+            else:
+                current_segment.append(token)
+        
+        if current_segment:
+            result.append(current_segment)
+
+        return result
 
 ################################ Funções de Adicionar na tabela ################################
 
@@ -239,7 +275,9 @@ class SemanticAnalyzer:
                 vector_length = []
         # print(self.pairs_table.tabela)
 
-    def indetify_expression_return(self, current_scope_index, tokens):
+    ################################ Funções de erro ################################
+
+    def identify_expression_return(self, current_scope_index, tokens):
         ## Identifica se a expressão aritimética passada é do tipo aritimética (retorna apenas number) ou do tipo logica/relacional (retorna boolean)
         ## A função da throw nos erros caso alguma das variáveis não existam ou sejam string e retorna None caso tenha falhado
         ## Caso não tenha falhado, ela vai retornar o tipo do retorno da expressão (number ou boolean)
@@ -310,7 +348,7 @@ class SemanticAnalyzer:
             
             ## Function call
             elif tokens[1]["lexeme"] == "(":
-                return {"tipo":"FUNCTION CALL", "token": tokens[0]}
+                return {"tipo":"FUNCTION CALL", "token": tokens[0]}  #TODO NÃO DEVERIA RETORNAR TODOS OS TOKENS PARA PODER VALIDAR OS PARAMETROS?
 
             ## Vector
             elif tokens[1]["lexeme"] == "[":
@@ -402,7 +440,7 @@ class SemanticAnalyzer:
                         return False
 
                 case "EXPRESSION":
-                    value_type = self.indetify_expression_return(self.current_table_index, value)
+                    value_type = self.identify_expression_return(self.current_table_index, value)
                     
                     if value_type == None:
                         return False
@@ -477,7 +515,7 @@ class SemanticAnalyzer:
                         return False
 
                 case "EXPRESSION":
-                    value_type = self.indetify_expression_return(self.current_table_index, value)
+                    value_type = self.identify_expression_return(self.current_table_index, value)
                     
                     if value_type == None:
                         return False
@@ -575,7 +613,7 @@ class SemanticAnalyzer:
                 else:
                     arguments_types.append(entry.tipoRetorno)
             elif function_call_arguments[i]['category'] == 'NUMBER':
-                if '.' in function_call_arguments[i]['lexeme']:
+                if '.' in function_call_arguments[i]['lexeme']: #TODO Já existe a função is_int
                     arguments_types.append('float')
                 else:
                     arguments_types.append('integer')
@@ -668,7 +706,7 @@ class SemanticAnalyzer:
                
             case "EXPRESSION":
                 token = value_dict["token"]
-                type_expression = self.indetify_expression_return(self.current_table_index, token)
+                type_expression = self.identify_expression_return(self.current_table_index, token)
                 
                 if (type_expression == None):
                     return False
@@ -774,8 +812,7 @@ class SemanticAnalyzer:
                 on_for = True
             if token['lexeme'] == ';' and not on_for: 
                 if line[0]['lexeme'] == 'write':
-                    # verificar se existe
-                    pass
+                    self.validate_write(line[2:-1])
                 elif line[0]['lexeme'] == 'read':
                     self.validate_read(line[2:-1])
                 else:
@@ -868,24 +905,7 @@ class SemanticAnalyzer:
             return False
         else:
             return False
-        
-    #Separa a lista de token em partes
-    def split_list_token(self,token_list,delimiter):
-        result = []
-        current_segment = []
-
-        for token in token_list:
-            if token['lexeme'] == delimiter:
-                result.append(current_segment)
-                current_segment = []
-            else:
-                current_segment.append(token)
-        
-        if current_segment:
-            result.append(current_segment)
-
-        return result
-
+    
     #----------------------- Valida read ----------------------------
     def validate_read(self,token_list):
         list_parameters = self.split_list_token(token_list,",")
@@ -896,3 +916,19 @@ class SemanticAnalyzer:
                 if (token["tipo"] == "VECTOR" and entry != None):
                     if (len(entry.tamanho) == 0 and entry.tamanho == 0):
                         self.throw_error(f"A variável {entry.nome} não é um vetor",entry)
+    
+    #----------------------- Valida Write ----------------------------
+    def validate_write(self,token_list):
+        list_parameters = self.split_list_token_write(token_list,",")
+        if (len(list_parameters)>0):
+            for parameters in list_parameters:
+                token = self.identify_var_kind(parameters)
+                if (token["tipo"] == "EXPRESSION"):
+                    self.identify_expression_return(self.current_table_index,token["token"])
+                elif (token["tipo"] == "FUNCTION CALL"):
+                    self.validate_function_parameters(parameters)
+                elif (token["tipo"] != "LITERAL"):
+                    entry = self.find_table_entry(self.current_table_index,token["token"])
+                    if (token["tipo"] == "VECTOR" and entry != None):
+                        if (len(entry.tamanho) == 0 and entry.tamanho == 0):
+                            self.throw_error(f"A variável {entry.nome} não é um vetor",entry)
