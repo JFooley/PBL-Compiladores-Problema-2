@@ -282,6 +282,7 @@ class SemanticAnalyzer:
                 variable_tokens.append(token)
         return tipo
         
+    #SE QUISER DESCOBRIR O TIPO DE UM IDENTIFICADOR, TEM QUE PASSAR APENAS ELE. NÃO PODE ADD TOKENS NO INICIO DA LISTA
     def identify_var_kind(self, tokens): ## identifica qual tipo é a variável ou value passado e devolve o tipo e o token necessário
         if len(tokens) == 1:
             ## Identifier
@@ -776,8 +777,7 @@ class SemanticAnalyzer:
                     # verificar se existe
                     pass
                 elif line[0]['lexeme'] == 'read':
-                    # verificar se existe
-                    pass
+                    self.validate_read(line[2:-1])
                 else:
                     if self.is_increment(line):
                         # Variável NÃO atribuída
@@ -812,7 +812,7 @@ class SemanticAnalyzer:
 
  #------------------------- Valida erro no for ------------------
     def validate_for(self,token_list):
-        list_for = self.split_for(token_list)
+        list_for = self.split_list_token(token_list,";")
         size_error = len(self.error_list)
         #Primeira parte do for
         first_part = list_for[0]
@@ -869,13 +869,13 @@ class SemanticAnalyzer:
         else:
             return False
         
-    #Separa o for em partes
-    def split_for(self,token_list):
+    #Separa a lista de token em partes
+    def split_list_token(self,token_list,delimiter):
         result = []
         current_segment = []
 
         for token in token_list:
-            if token['lexeme'] == ";":
+            if token['lexeme'] == delimiter:
                 result.append(current_segment)
                 current_segment = []
             else:
@@ -886,3 +886,13 @@ class SemanticAnalyzer:
 
         return result
 
+    #----------------------- Valida read ----------------------------
+    def validate_read(self,token_list):
+        list_parameters = self.split_list_token(token_list,",")
+        if (len(list_parameters)>0):
+            for parameters in list_parameters:
+                token = self.identify_var_kind(parameters)
+                entry = self.find_table_entry(self.current_table_index,token["token"])
+                if (token["tipo"] == "VECTOR" and entry != None):
+                    if (len(entry.tamanho) == 0 and entry.tamanho == 0):
+                        self.throw_error(f"A variável {entry.nome} não é um vetor",entry)
