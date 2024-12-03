@@ -10,9 +10,9 @@ def lexical_analise(file_name=None):
 		finiteAutomaton = LexicalFiniteAutomaton()
 		finiteAutomaton.recognize_tokens(file)
 		file.close()
-
-		#write_file("tokens_list.txt", finiteAutomaton.show_token_list(), "Nenhum Token foi encontrado.")
-		#write_file("./saida-lexico/error_token_list.txt", finiteAutomaton.show_error_list(), "Sucesso. Nenhum erro foi encontrado.")
+		write_file("./saidas/lexical_result.txt", finiteAutomaton.show_error_list(), "Sucesso. Nenhum erro foi encontrado.")
+		if finiteAutomaton.show_error_list():
+			print("Erros foram encontrados durante a análise léxica")
 		return finiteAutomaton.show_token_list()
 	return None
 
