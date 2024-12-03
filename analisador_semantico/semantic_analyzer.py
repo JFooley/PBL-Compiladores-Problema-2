@@ -233,48 +233,117 @@ class SemanticAnalyzer:
             self.pairs_table.tabela[0]['tabela'].append(constant_entry)
 
     
-    # Precisa analisar se já existe na tabela
     # Definir quando acaba o escopo da variável 
-    # Verificar se já existe variavel com mesmo nome na tabela de simbolos
-    # verificar tipo e valor, quando tem atibuição;
-    # Se for vetor, verificar se o tamanho é int(number ou identificador)
-  # Precisa analisar se já existe na tabela
-    # Definir quando acaba o escopo da variável 
-    # verificar tipo e valor, quando tem atibuição;
     # Se for vetor, verificar se o tamanho é int(number ou identificador)
     def add_variables_to_table(self, is_global, token_list):
         variable_type = ""
         variable_name = ""
-        variable_value = ""
         vector_length = []
+        value_list = []
         for i in range(0, len(token_list)):
             token = token_list[i]
             if self.find_table_entry(0, token, False) != None:
-                self.throw_error(f"{token['lexeme']} já foi declarada", token)
+                self.throw_error(f"A variável '{token['lexeme']}' já foi declarada", token)
                 return
             if token['category'] == 'KEYWORD':  #obs: o tipo pode ser tbm identifier, que é o caso de ser um register
-                variable_type = token['lexeme']
+                variable_type = token
             
             elif token['category'] == 'IDENTIFIER': # Falta verificar os registers
                 if token_list[1]['lexeme'] == ".":
-                    variable_type = token['lexeme']
+                    variable_type = token
                 else:
-                    variable_name = token['lexeme']
+                    variable_name = token
+                    
             
             elif token['category'] == 'OPERATOR' and token['lexeme'] == '=': # consumir tudo até o ;
-                variable_value = token_list[i + 1]['lexeme']
+                aux_counter = i + 1
+                current_token = token_list[aux_counter]
+                while current_token['lexeme'] != ";":
+                    value_list.append(current_token)
+                    aux_counter += 1
+                    current_token = token_list[aux_counter]
+                i = aux_counter + 1
+                
             
             elif token['category'] == 'DELIMITER' and token['lexeme'] == '[': # verificar se é um vector ou matriz
                 vector_length.append(token_list[i + 1]['lexeme'])
+                
                     
             elif token['category'] == 'DELIMITER' and token['lexeme'] == ";":  # Encontrando o delimitador ';'
-                variables_entry = EntryIdentificadores(variable_name, variable_type, variable_value, None, None, vector_length)
-                self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
-                # Resetando as variáveis para a próxima variável
-                variable_type, variable_name, variable_value = "", "", ""
-                vector_length = []
-        # print(self.pairs_table.tabela)
 
+                # Atribuição de valor
+                if not len(value_list) == 0:
+                    return_value = self.identify_var_kind(value_list)
+                    value_dict = return_value
+                    
+                    match value_dict["tipo"]:
+                        case "IDENTIFIER":
+                            value_entry: EntryIdentificadores = self.find_table_entry(self.current_table_index, value_dict['token'])
+                            if (value_entry == None):
+                                return
+                            
+                            if (variable_type['lexeme'] != value_entry.tipo):
+                                self.throw_error(f"{value_entry.tipo} não pode ser convertido em {variable_type['lexeme']}.", value_dict['token'])
+ 
+
+                        case "LITERAL": 
+                            if self.conversion(value_list[0]['category']) != variable_type['lexeme']:
+                                self.throw_error(f"{self.conversion(token['lexeme'])} não pode ser convertido em {variable_type['lexeme']}.", value_dict['token'])
+                            
+                                    
+                        case "REGISTER":        
+                            variable_entry: EntryIdentificadores = self.find_table_entry(self.current_table_index, value_dict['token'])     
+                            if (variables_entry == None):
+                                return
+                
+                            if (variables_entry.tipoRetorno != variable_type['lexeme']):
+                                self.throw_error(f"{variable_entry.tipoRetorno} não pode ser convertido em {variable_type['lexeme']}.", value_dict['token'])
+                                            
+
+                        case "VECTOR":                
+                            variable_entry: EntryIdentificadores = self.find_table_entry(self.current_table_index, value_dict['token'])
+
+                            if (variable_entry == None):
+                                return
+                            
+                            if variable_entry.tipoRetorno != variable_type['lexeme']:
+                                self.throw_error(f"{variable_entry.tipoRetorno} não pode ser convertido em {variable_type['lexeme']}.", value_dict['token'])
+                                
+                                
+                        case "FUNCTION CALL":                        
+                            variable_entry: EntryIdentificadores = self.find_table_entry(self.current_table_index, value_dict['token'])
+
+                            if (variable_entry == None):
+                                return
+                            
+                            if variable_entry.tipoRetorno != variable_name:
+                                self.throw_error(f"{variable_entry.tipoRetorno} não pode ser convertido em {variable_type['lexeme']}.", value_dict['token'])
+                                
+
+
+                        case "EXPRESSION":
+                            result_expression = self.identify_expression_return(self.current_table_index, value_dict['token'])
+                            if (variable_type['lexeme'] != result_expression):
+                                self.throw_error(f"{result_expression} não pode ser convertido em {variable_type['lexeme']}.", value_dict['token'])
+                                print(self.error_list)
+                    
+                    variables_entry = EntryIdentificadores(variable_name['lexeme'], variable_type['lexeme'], value_dict['token']['lexeme'], None, None, vector_length)
+                    self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
+                    # Resetando as variáveis para a próxima variável
+                    variable_type, variable_name, variable_value = "", "", ""
+                    vector_length = []
+                    value_list = []
+                    
+                # Declaração de variável
+                else:
+                    if variable_type != "":
+                        variables_entry = EntryIdentificadores(variable_name['lexeme'], variable_type['lexeme'], None , None, None, vector_length)
+                        self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
+                        variable_type, variable_name, variable_value = "", "", ""
+                        vector_length = []
+                        value_list = []
+                
+                
     ################################ Funções de erro ################################
 
     #TODO: renomear variaves para ingles
