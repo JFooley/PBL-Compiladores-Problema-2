@@ -1,7 +1,14 @@
-{'position': 50, 'message': 'sum não existe nesse escopo.'}
-{'position': 74, 'message': 'num não existe nesse escopo.'}
-{'position': 74, 'message': 'num não existe nesse escopo.'}
-{'position': 75, 'message': 'num não existe nesse escopo.'}
-{'position': 75, 'message': 'num não existe nesse escopo.'}
-{'position': 75, 'message': 'r.a não existe nesse escopo.'}
-{'position': 75, 'message': 'r.a não existe nesse escopo.'}
+{'position': 68, 'message': 'O num não existe nesse escopo.'}
+{'position': 68, 'message': 'O num não existe nesse escopo.'}
+{'position': 68, 'message': 'O num não existe nesse escopo.'}
+{'position': 68, 'message': 'O num não existe nesse escopo.'}
+{'position': 70, 'message': 'O num não existe nesse escopo.'}
+{'position': 70, 'message': 'O num não existe nesse escopo.'}
+{'position': 70, 'message': 'O num não existe nesse escopo.'}
+{'position': 70, 'message': 'O num não existe nesse escopo.'}
+{'position': 74, 'message': 'O num não existe nesse escopo.'}
+{'position': 74, 'message': 'O num não existe nesse escopo.'}
+{'position': 75, 'message': 'O num não existe nesse escopo.'}
+{'position': 75, 'message': 'O num não existe nesse escopo.'}
+{'position': 75, 'message': 'O r.a não existe nesse escopo.'}
+{'position': 75, 'message': 'O r.a não existe nesse escopo.'}

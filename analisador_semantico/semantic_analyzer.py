@@ -289,21 +289,21 @@ class SemanticAnalyzer:
                     
                     match value_dict["tipo"]:
                         case "IDENTIFIER":
-                            value_entry: EntryIdentificadores = self.find_table_entry(self.current_table_index, value_dict['token'])
+                            value_entry: EntryIdentificadores = self.find_table_entry(self.current_table_index, value_dict['token'][0])
                             if (value_entry == None):
                                 return
                             
                             if (variable_type['lexeme'] != value_entry.tipo):
-                                self.throw_error(f"{value_entry.tipo} não pode ser convertido em {variable_type['lexeme']}.", value_dict['token'])
+                                self.throw_error(f"{value_entry.tipo} não pode ser convertido em {variable_type['lexeme']}.", value_dict['token'][0])
  
 
                         case "LITERAL": 
                             if self.conversion(value_list[0]['category']) != variable_type['lexeme']:
-                                self.throw_error(f"{self.conversion(token['lexeme'])} não pode ser convertido em {variable_type['lexeme']}.", value_dict['token'])
+                                self.throw_error(f"{self.conversion(token['lexeme'])} não pode ser convertido em {variable_type['lexeme']}.", value_dict['token'][0])
                             
                                     
                         case "REGISTER":        
-                            variable_entry: EntryIdentificadores = self.find_table_entry(self.current_table_index, value_dict['token'])     
+                            variable_entry: EntryIdentificadores = self.find_table_entry(self.current_table_index, value_dict['token'][0])     
                             if (variables_entry == None):
                                 return
                 
@@ -337,7 +337,7 @@ class SemanticAnalyzer:
                             if (variable_type['lexeme'] != result_expression):
                                 self.throw_error(f"{result_expression} não pode ser convertido em {variable_type['lexeme']}.", value_dict['token'][0])
                                 
-                    variables_entry = EntryIdentificadores(variable_name['lexeme'], variable_type['lexeme'], value_dict['token']['lexeme'], None, None, vector_length if vector_length != [] else 0)
+                    variables_entry = EntryIdentificadores(variable_name['lexeme'], variable_type['lexeme'], value_dict['token'][0]['lexeme'], None, None, vector_length if vector_length != [] else 0)
                     self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
                     # Resetando as variáveis para a próxima variável
                     variable_type, variable_name, variable_value = "", "", ""
@@ -395,7 +395,7 @@ class SemanticAnalyzer:
                     return None
 
                 if variable["tipo"] == "IDENTIFIER" or variable["tipo"] == "REGISTER" or variable["tipo"] == "VECTOR":
-                    variable_entry: EntryIdentificadores = self.find_table_entry(current_scope_index, variable["token"])
+                    variable_entry: EntryIdentificadores = self.find_table_entry(current_scope_index, variable["token"][0])
 
                     if variable_entry == None:
                         return None
@@ -456,10 +456,10 @@ class SemanticAnalyzer:
         if len(tokens) == 1:
             ## Identifier
             if tokens[0]["category"] == "IDENTIFIER":
-                return {"tipo":"IDENTIFIER", "token": tokens[0]}
+                return {"tipo":"IDENTIFIER", "token": tokens}
             ## Literal
             else:
-                return {"tipo":"LITERAL", "token": tokens[0]}
+                return {"tipo":"LITERAL", "token": tokens}
             
         else:
             ## Expresion
@@ -474,8 +474,8 @@ class SemanticAnalyzer:
                         break
                     new_lexeme += token["lexeme"]
 
-                new_token = {"lexeme": new_lexeme, "category": tokens[0]["category"], "line": tokens[0]["line"]}
-                return {"tipo":"REGISTER", "token": new_token}
+                new_tokens = [{"lexeme": new_lexeme, "category": tokens[0]["category"], "line": tokens[0]["line"]}]
+                return {"tipo":"REGISTER", "token": new_tokens}
             
             ## Function call
             elif tokens[1]["lexeme"] == "(":   #TODO is_function
@@ -498,56 +498,56 @@ class SemanticAnalyzer:
 
         ## Não é declaração
         if variable_type == None: 
-            variable_entry: EntryIdentificadores = self.find_table_entry(current_table_index, variable)
+            variable_entry: EntryIdentificadores = self.find_table_entry(current_table_index, variable[0])
 
             if variable_entry == None:
                 return False
         
             if variable_entry.isConstant:
-                self.throw_error(f"{variable["lexeme"]} é uma constante, não pode ter seu valor alterado.", variable)
+                self.throw_error(f"{variable["lexeme"]} é uma constante, não pode ter seu valor alterado.", variable[0])
                 return False
 
             match value_dict["tipo"]:
                 case "IDENTIFIER":
-                    value_entry: EntryIdentificadores = self.find_table_entry(current_table_index, value)
+                    value_entry: EntryIdentificadores = self.find_table_entry(current_table_index, value[0])
 
                     if (value_entry == None):
                         return False
                     
                     if (variable_entry.tipo != value_entry.tipo):
-                        self.throw_error(f"{value_entry.tipo} não pode ser convertido em {variable_entry.tipo}.", value)
+                        self.throw_error(f"{value_entry.tipo} não pode ser convertido em {variable_entry.tipo}.", value[0])
                         return False
 
                 case "LITERAL":
-                    match value["category"]:
+                    match value[0]["category"]:
                         case "NUMBER":
                             if (variable_entry.tipo != "float" and variable_entry.tipo != "integer" and ("." in value["lexeme"] and variable_entry.tipo == "integer")):
-                                self.throw_error(f"{value["category"]} não pode ser convertido em {variable_entry.tipo}.", value)
+                                self.throw_error(f"{value["category"]} não pode ser convertido em {variable_entry.tipo}.", value[0])
                                 return False
                         
                         case "STRING":
                             if (variable_entry.tipo != "string"):
-                                self.throw_error(f"{value["category"]} não pode ser convertido em {variable_entry.tipo}.", value)
+                                self.throw_error(f"{value["category"]} não pode ser convertido em {variable_entry.tipo}.", value[0])
                                 return False
 
                         case "CHARACTER":
                             if (variable_entry.tipo != "character"):
-                                self.throw_error(f"{value["category"]} não pode ser convertido em {variable_entry.tipo}.", value)
+                                self.throw_error(f"{value["category"]} não pode ser convertido em {variable_entry.tipo}.", value[0])
                                 return False
 
                         case "BOOLEAN":
                             if (variable_entry.tipo != "boolean"):
-                                self.throw_error(f"{value["category"]} não pode ser convertido em {variable_entry.tipo}.", value)    
+                                self.throw_error(f"{value["category"]} não pode ser convertido em {variable_entry.tipo}.", value[0])    
                                 return False
 
                 case "REGISTER":
-                    value_entry: EntryIdentificadores = self.find_table_entry(current_table_index, value)
+                    value_entry: EntryIdentificadores = self.find_table_entry(current_table_index, value[0])
                 
                     if (value_entry == None):
                         return False
 
                     if (variable_entry.tipo != value_entry.tipo):
-                        self.throw_error(f"{value_entry.tipo} não pode ser convertido em {variable_entry.tipo}.", value)
+                        self.throw_error(f"{value_entry.tipo} não pode ser convertido em {variable_entry.tipo}.", value[0])
                         return False
 
                 case "VECTOR":         
@@ -602,39 +602,39 @@ class SemanticAnalyzer:
         else:
              match value_dict["tipo"]:
                 case "IDENTIFIER":
-                    value_entry: EntryIdentificadores = self.find_table_entry(current_table_index, value)
+                    value_entry: EntryIdentificadores = self.find_table_entry(current_table_index, value[0])
 
                     if (value_entry == None):
                         return False
                     
                     if (variable_type["lexeme"] != value_entry.tipo):
-                        self.throw_error(f"{value_entry.tipo} não pode ser convertido em {variable_entry.tipo}.", value)
+                        self.throw_error(f"{value_entry.tipo} não pode ser convertido em {variable_entry.tipo}.", value[0])
                         return False
 
                 case "LITERAL":
-                    match value["category"]:
+                    match value[0]["category"]:
                         case "NUMBER":
-                            if (variable_type["lexeme"] != "float" and variable_type["lexeme"] != "integer" and ("." in value["lexeme"] and variable_type["lexeme"] == "integer")):
-                                self.throw_error(f"{value["category"]} não pode ser convertido em {variable_type["lexeme"]}.", value)
+                            if (variable_type["lexeme"] != "float" and variable_type["lexeme"] != "integer" and ("." in value[0]["lexeme"] and variable_type["lexeme"] == "integer")):
+                                self.throw_error(f"{value[0]["category"]} não pode ser convertido em {variable_type["lexeme"]}.", value[0])
                                 return False
                         
                         case "STRING":
                             if (variable_type["lexeme"] != "string"):
-                                self.throw_error(f"{value["category"]} não pode ser convertido em {variable_type["lexeme"]}.", value)
+                                self.throw_error(f"{value[0]["category"]} não pode ser convertido em {variable_type["lexeme"]}.", value[0])
                                 return False
 
                         case "CHARACTER":
                             if (variable_type["lexeme"] != "character"):
-                                self.throw_error(f"{value["category"]} não pode ser convertido em {variable_type["lexeme"]}.", value)
+                                self.throw_error(f"{value[0]["category"]} não pode ser convertido em {variable_type["lexeme"]}.", value[0])
                                 return False
 
                         case "BOOLEAN":
                             if (variable_type["lexeme"] != "boolean"):
-                                self.throw_error(f"{value["category"]} não pode ser convertido em {variable_type["lexeme"]}.", value)    
+                                self.throw_error(f"{value[0]["category"]} não pode ser convertido em {variable_type["lexeme"]}.", value[0])    
                                 return False
 
                 case "REGISTER":
-                    value_entry: EntryIdentificadores = self.find_table_entry(current_table_index, value)
+                    value_entry: EntryIdentificadores = self.find_table_entry(current_table_index, value[0])
                 
                     if (value_entry == None):
                         return False
@@ -831,16 +831,16 @@ class SemanticAnalyzer:
             match value_dict["tipo"]:
                 case "IDENTIFIER":
                     token = value_dict["token"]
-                    function_entry: EntryIdentificadores = self.find_table_entry(self.current_table_index, token)
+                    function_entry: EntryIdentificadores = self.find_table_entry(self.current_table_index, token[0])
                     if (function_entry == None):
                         return
                     if function_entry.tipo != return_entry.tipoRetorno:
-                        self.throw_error("O tipo de retorno não corresponde ao tipo da função", token)
+                        self.throw_error("O tipo de retorno não corresponde ao tipo da função", token[0])
                         return
                 case "LITERAL":
                     token = value_dict["token"]
                     if self.conversion(token['category']) != return_entry.tipoRetorno:
-                        self.throw_error("O tipo de retorno não corresponde ao tipo da função", token)
+                        self.throw_error("O tipo de retorno não corresponde ao tipo da função", token[0])
                         return
                 
                 case "FUNCTION CALL":
@@ -856,13 +856,13 @@ class SemanticAnalyzer:
 
                 case "REGISTER":
                     token = value_dict["token"]
-                    function_entry: EntryIdentificadores = self.find_table_entry(self.current_table_index, token)
+                    function_entry: EntryIdentificadores = self.find_table_entry(self.current_table_index, token[0])
 
                     if (function_entry == None):
                         return
                     
                     if function_entry.tipoRetorno != return_entry.tipoRetorno:
-                        self.throw_error("O tipo de retorno não corresponde ao tipo da função", token)
+                        self.throw_error("O tipo de retorno não corresponde ao tipo da função", token[0])
                         return
                     
                 case "VECTOR":
@@ -885,7 +885,7 @@ class SemanticAnalyzer:
                     
                     if return_entry.tipoRetorno in ["float", "integer", "boolean"]:
                         if type_expression not in ["float", "integer", "boolean"]:
-                            self.throw_error(f"O tipo de retorno {type_expression} não corresponde ao tipo da função {return_entry.tipoRetorno}", token)
+                            self.throw_error(f"O tipo de retorno {type_expression} não corresponde ao tipo da função {return_entry.tipoRetorno}", token[0])
                             return
                         
                     
@@ -935,14 +935,14 @@ class SemanticAnalyzer:
                 identifier.append(token) 
         
             variable = self.identify_var_kind(identifier)
-            token_entry = self.find_table_entry(self.current_table_index, variable["token"])
+            token_entry = self.find_table_entry(self.current_table_index, variable["token"][0])
             if token_entry == None:
                 return
             
             if variable["tipo"] == "VECTOR":
                 if (token_entry.tamanho == [] or token_entry.tamanho == 0): # Usar [] em um identificador que não é vetor
                     print("entrei")
-                    self.throw_error(f"A variável {token_entry.nome} não é um vetor",variable["token"])
+                    self.throw_error(f"A variável {token_entry.nome} não é um vetor",variable["token"][0])
                     return      
                 #Verifica se o vetor tem index correto
                 index_list = self.get_index_vector(identifier)
@@ -953,10 +953,10 @@ class SemanticAnalyzer:
                         return 
             elif variable["tipo"] == "IDENTIFIER" or variable["tipo"] == "REGISTER":
                 if token_entry.valor == None: #variavel não inicializada
-                    self.throw_error(f"A variável {token_entry.nome} não foi inicializada", variable["token"])
+                    self.throw_error(f"A variável {token_entry.nome} não foi inicializada", variable["token"][0])
                     return
                 if token_entry.tipo != "integer": # Para variável, register e vetor, deve ser do tipo inteiro
-                    self.throw_error(f"A variável {token_entry.nome} não é do tipo inteiro", variable["token"])
+                    self.throw_error(f"A variável {token_entry.nome} não é do tipo inteiro", variable["token"][0])
                     return
             
         
@@ -1170,10 +1170,10 @@ class SemanticAnalyzer:
         if (len(list_parameters)>0):
             for parameters in list_parameters:
                 token = self.identify_var_kind(parameters)
-                entry = self.find_table_entry(self.current_table_index,token["token"])
+                entry = self.find_table_entry(self.current_table_index,token["token"][0])
                 if (token["tipo"] == "VECTOR" and entry != None):
                     if (entry.tamanho == [] or entry.tamanho == 0):
-                        self.throw_error(f"A variável {entry.nome} não é um vetor",token["token"])
+                        self.throw_error(f"A variável {entry.nome} não é um vetor",token["token"][0])
     
     #----------------------- Valida Write ----------------------------
     def validate_write(self,token_list):
@@ -1186,7 +1186,7 @@ class SemanticAnalyzer:
                 elif (token["tipo"] == "FUNCTION CALL"):
                     self.validate_function_parameters(parameters)
                 elif (token["tipo"] != "LITERAL"):
-                    entry = self.find_table_entry(self.current_table_index,token["token"])
+                    entry = self.find_table_entry(self.current_table_index,token["token"][0])
                     if (token["tipo"] == "VECTOR" and entry != None):
                         if (entry.tamanho == [] or entry.tamanho == 0):
-                            self.throw_error(f"A variável {entry.nome} não é um vetor",token["token"])
+                            self.throw_error(f"A variável {entry.nome} não é um vetor",token["token"][0])
