@@ -1,6 +1,6 @@
 register r {
   integer a; 
-  integer b; 
+  integer b;
 }
 
 constants {
@@ -8,6 +8,7 @@ constants {
 }
 
 variables {
+  string z = "teste string";
   integer g = 1;
   integer v_g[2];
   integer m_g[1][2];
@@ -27,7 +28,8 @@ function string sum1(integer a, integer b) {
 
 main() {
   variables {
-    integer a = 1;
+    string teste = "aaa";
+    integer a = 5;
     integer b = 1;
     integer v[2];
     integer m[1][2];
@@ -36,6 +38,7 @@ main() {
     integer n2;
     r r1;
   }
+
   v[0] = 1;
   v[1] = 1;
   m[0][0] = 1;
@@ -49,8 +52,15 @@ main() {
   result = sum(sum1(n1, n2), sum(a, b));
   n1.a = 0;
   
-  for (integer n = 10; n>0; n--){
+  for (integer n = 4; n>20; n--){
     a = n * 8 + 4;
+    for(integer x = 5; x>20; x--){
+      n = 8;
+    }
+  }
+  
+  for (a = 0; a>5; a++){
+    b = 5;
   }
 
   while ((a && b) || a != c){
@@ -62,7 +72,7 @@ main() {
   }
   
   write(4+5, num, v[0], m[0][0], a||b, a<=b);
-  read(num, v[0], m[0][0]);
+  read(num, v[0], m[0][0],r.a, a);
 }
   
 
