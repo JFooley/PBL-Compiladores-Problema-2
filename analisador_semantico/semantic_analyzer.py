@@ -157,6 +157,9 @@ class SemanticAnalyzer:
         
         size_error = len(self.error_list)    
         instance_register = EntryIdentificadores(instance_name["lexeme"], register_type["lexeme"])
+        print('isntan')
+        
+        print(instance_register)
         self.pairs_table.tabela[self.current_table_index]['tabela'].append(instance_register)
        
         for register in registers:
@@ -206,14 +209,12 @@ class SemanticAnalyzer:
         value_list = []
         for i in range(0, len(token_list)):
             token = token_list[i]
-            if self.find_table_entry(0, token, False) != None:
-                self.throw_error(f"A variável '{token['lexeme']}' já foi declarada", token)
-                return
+            
             if token['category'] == 'KEYWORD':  #obs: o tipo pode ser tbm identifier, que é o caso de ser um register
                 variable_type = token
             
             elif token['category'] == 'IDENTIFIER': # Falta verificar os registers
-                if token_list[1]['lexeme'] == ".":
+                if token_list[i + 1]['category'] == "IDENTIFIER":
                     variable_type = token
                 else:
                     variable_name = token
@@ -230,15 +231,20 @@ class SemanticAnalyzer:
                 
             
             elif token['category'] == 'DELIMITER' and token['lexeme'] == '[': # verificar se é um vector ou matriz
-                vector_length.append(token_list[i + 1]['lexeme'])
+                vector_length.append(token_list[i + 1])
                 
                     
             elif token['category'] == 'DELIMITER' and token['lexeme'] == ";":  # Encontrando o delimitador ';'
-
+                
                 # Atribuição de valor
                 if not len(value_list) == 0:
                     return_value = self.identify_var_kind(value_list)
                     value_dict = return_value
+                    if value_dict['tipo'] != "VECTOR":
+                        if self.find_table_entry(0, variable_name, False) != None:
+                            self.throw_error(f"A variável '{variable_name['lexeme']}' já foi declarada", variable_name)
+                            return
+                        
                     
                     match value_dict["tipo"]:
                         case "IDENTIFIER":
@@ -289,9 +295,8 @@ class SemanticAnalyzer:
                             result_expression = self.identify_expression_return(self.current_table_index, value_dict['token'])
                             if (variable_type['lexeme'] != result_expression):
                                 self.throw_error(f"{result_expression} não pode ser convertido em {variable_type['lexeme']}.", value_dict['token'])
-                                print(self.error_list)
-                    
-                    variables_entry = EntryIdentificadores(variable_name['lexeme'], variable_type['lexeme'], value_dict['token']['lexeme'], None, None, vector_length)
+                                
+                    variables_entry = EntryIdentificadores(variable_name['lexeme'], variable_type['lexeme'], value_dict['token']['lexeme'], None, None, vector_length if vector_length != [] else 0)
                     self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
                     # Resetando as variáveis para a próxima variável
                     variable_type, variable_name, variable_value = "", "", ""
@@ -300,12 +305,27 @@ class SemanticAnalyzer:
                     
                 # Declaração de variável
                 else:
+                    error_size = len(self.error_list)
+                    vector_size = []
+                    if (vector_length != []): # No caso é um vetor 
+                        for index in vector_length:
+                            self.error_vector_size(index) # Verifica se o indice do vetor é int ou identifier
+                        if(error_size == len(self.error_list)):
+                            for item in vector_length:
+                                vector_size.append(item['lexeme'])
+                        else: 
+                            return
+                    elif (variable_name['category']== "IDENTIFIER" and variable_type['category'] == "IDENTIFIER"):
+                        print([variable_type, variable_name])
+                        self.add_register_instance_to_table([variable_type, variable_name])
+                    
                     if variable_type != "":
-                        variables_entry = EntryIdentificadores(variable_name['lexeme'], variable_type['lexeme'], None , None, None, vector_length)
+                        variables_entry = EntryIdentificadores(variable_name['lexeme'], variable_type['lexeme'], None , None, None, vector_size if vector_size != [] else 0)
                         self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
                         variable_type, variable_name, variable_value = "", "", ""
                         vector_length = []
                         value_list = []
+                        
                 
                 
                             

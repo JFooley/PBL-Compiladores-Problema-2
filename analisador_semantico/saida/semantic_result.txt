@@ -1,2 +1,1 @@
-{'position': 20, 'message': 'A função = não possui retorno'}
-{'position': 40, 'message': 'A função [ não possui retorno'}
+{'position': 44, 'message': 'A função [ não possui retorno'}

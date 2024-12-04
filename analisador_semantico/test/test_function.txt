@@ -9,15 +9,18 @@ constants {
 
 variables {
   integer g = 1;
-  integer v_g[2];
+  integer v_g[1];
   integer m_g[1][2];
+
+
 }
 
 function integer sum(integer a, integer b) {
   variables {  
-    integer g2 = 1
+  r r2;
+
   }
-  g2 = 1 + 2;
+  return a + b;
 }
 
 function string sum1(integer a, integer b) {
@@ -36,6 +39,7 @@ main() {
     integer n1;
     integer n2;
     r r1;
+    
   }
   v[0] = 1;
   v[1] = 1;
