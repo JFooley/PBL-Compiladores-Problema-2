@@ -44,7 +44,7 @@ def main():
 		entry3 = EntryIdentificadores(nome= "b.nome", tipo= "string", valor="fulano", tipoRetorno=None, parametros=None, tamanho=0, isConstant=False)
 		entry4 = EntryIdentificadores(nome= "b.idade", tipo= "integer", valor="10", tipoRetorno=None, parametros=None, tamanho=0, isConstant=False)
 		entry5 = EntryIdentificadores(nome= "vetor", tipo= "integer", valor=None, tipoRetorno=None, parametros=None, tamanho=10, isConstant=False)
-		entry6 = EntryIdentificadores(nome= "sum", tipo= "function", valor=None, tipoRetorno="integer", parametros=["integer", "integer"], tamanho=0, isConstant=False)
+		entry6 = EntryIdentificadores(nome= "sum", tipo= "function", valor=None, tipoRetorno="float", parametros=["integer", "integer"], tamanho=0, isConstant=False)
 		
 		analizer.pairs_table.tabela[0]["tabela"].append(entry1)
 		analizer.pairs_table.tabela[0]["tabela"].append(entry2)
