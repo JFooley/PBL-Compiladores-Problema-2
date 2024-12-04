@@ -1,0 +1,23 @@
+{'position': 56, 'message': "A Variável não é do tipo inteiro. A variável 'v' é um vetor ou matriz"}
+{'position': 57, 'message': "A Variável não é do tipo inteiro. A variável 'm' é um vetor ou matriz"}
+{'position': 58, 'message': 'O indíce do vetor deve ser inteiro'}
+{'position': 59, 'message': 'O indíce do vetor deve ser inteiro'}
+{'position': 60, 'message': 'A variável c é uma constante. Não é possível alterar o valor de constantes.'}
+{'position': 61, 'message': 'A variável teste não é do tipo inteiro'}
+{'position': 62, 'message': 'A variável n1 não foi inicializada'}
+{'position': 63, 'message': 'O x não existe nesse escopo.'}
+{'position': 63, 'message': 'O x não existe nesse escopo.'}
+{'position': 78, 'message': 'O num não existe nesse escopo.'}
+{'position': 78, 'message': 'O num não existe nesse escopo.'}
+{'position': 78, 'message': 'O num não existe nesse escopo.'}
+{'position': 78, 'message': 'O num não existe nesse escopo.'}
+{'position': 80, 'message': 'O num não existe nesse escopo.'}
+{'position': 80, 'message': 'O num não existe nesse escopo.'}
+{'position': 80, 'message': 'O num não existe nesse escopo.'}
+{'position': 80, 'message': 'O num não existe nesse escopo.'}
+{'position': 84, 'message': 'O num não existe nesse escopo.'}
+{'position': 84, 'message': 'O num não existe nesse escopo.'}
+{'position': 85, 'message': 'O num não existe nesse escopo.'}
+{'position': 85, 'message': 'O num não existe nesse escopo.'}
+{'position': 85, 'message': 'O r.a não existe nesse escopo.'}
+{'position': 85, 'message': 'O r.a não existe nesse escopo.'}

@@ -56,8 +56,8 @@ def main():
 		else:
 			print("A análise semântica foi realizada com sucesso.")			
 
-		write_file("./analisador_sintatico/saida/parser_result.txt", parser.get_error_list(), "A análise sintática foi realizada com sucesso.")
-		write_file("./analisador_semantico/saida/semantic_result.txt", validator.get_error_list(), "A análise semantica foi realizada com sucesso.")
+		write_file("./saidas/parser_result.txt", parser.get_error_list(), "A análise sintática foi realizada com sucesso.")
+		write_file("./saidas/semantic_result.txt", validator.get_error_list(), "A análise semantica foi realizada com sucesso.")
 
 	else:
 		print("Erro durante a análise léxica.")
