@@ -44,11 +44,15 @@ def main():
 		entry3 = EntryIdentificadores(nome= "b.nome", tipo= "string", valor="fulano", tipoRetorno=None, parametros=None, tamanho=0, isConstant=False)
 		entry4 = EntryIdentificadores(nome= "b.idade", tipo= "integer", valor="10", tipoRetorno=None, parametros=None, tamanho=0, isConstant=False)
 		entry5 = EntryIdentificadores(nome= "vetor", tipo= "integer", valor=None, tipoRetorno=None, parametros=None, tamanho=10, isConstant=False)
+		entry6 = EntryIdentificadores(nome= "sum", tipo= "function", valor=None, tipoRetorno="integer", parametros=["integer", "integer"], tamanho=0, isConstant=False)
+		
 		analizer.pairs_table.tabela[0]["tabela"].append(entry1)
 		analizer.pairs_table.tabela[0]["tabela"].append(entry2)
 		analizer.pairs_table.tabela[0]["tabela"].append(entry3)
 		analizer.pairs_table.tabela[0]["tabela"].append(entry4)
 		analizer.pairs_table.tabela[0]["tabela"].append(entry5)
+		analizer.pairs_table.tabela[0]["tabela"].append(entry6)
+
 
 		print("Entradas na tabela global")
 		print(len(analizer.pairs_table.tabela[0]["tabela"]))
@@ -56,8 +60,32 @@ def main():
 		print("-------------------------")
 		print("teste atribuição de tipo errado: " + str(analizer.wrong_type_assign(0, 
 				variable= [{"lexeme" : "a", "category": "IDENTIFIER", "line": 1}], 
-				value= [{"lexeme" : "1", "category": "NUMBER", "line": 1}, {"lexeme" : "+", "category": "OPERATOR", "line": 1}, {"lexeme" : "b", "category": "IDENTIFIER", "line": 1}, {"lexeme" : ".", "category": "OPERATOR", "line": 1}, {"lexeme" : "nome", "category": "IDENTIFIER", "line": 1}, {"lexeme" : "/", "category": "OPERATOR", "line": 1},  {"lexeme" : "1", "category": "NUMBER", "line": 1}],
-				variable_type= {"lexeme" : "float", "category": "IDENTIFIER", "line": 1})	
+				value= [
+					{"lexeme" : "sum", "category": "IDENTIFIER", "line": 1},
+					{"lexeme" : "(", "category": "DELIMITER", "line": 1}, 
+					{"lexeme" : "1", "category": "NUMBER", "line": 1}, 
+					{"lexeme" : ",", "category": "DELIMITER", "line": 1}, 
+					{"lexeme" : "5", "category": "NUMBER", "line": 1}, 
+					{"lexeme" : ")", "category": "DELIMITER", "line": 1}, 
+					# {"lexeme" : "1", "category": "NUMBER", "line": 1}, 
+					# {"lexeme" : "+", "category": "OPERATOR", "line": 1},
+					# {"lexeme" : "(", "category": "DELIMITER", "line": 1},
+					# {"lexeme" : "b", "category": "IDENTIFIER", "line": 1}, 
+					# {"lexeme" : ".", "category": "OPERATOR", "line": 1}, 
+					# {"lexeme" : "idade", "category": "IDENTIFIER", "line": 1}, 
+					# {"lexeme" : "/", "category": "OPERATOR", "line": 1},  
+					# {"lexeme" : "sum", "category": "IDENTIFIER", "line": 1},
+					# {"lexeme" : "(", "category": "DELIMITER", "line": 1}, 
+					# {"lexeme" : "1", "category": "NUMBER", "line": 1}, 
+					# {"lexeme" : ",", "category": "DELIMITER", "line": 1}, 
+					# {"lexeme" : "b", "category": "IDENTIFIER", "line": 1}, 
+					# {"lexeme" : ".", "category": "OPERATOR", "line": 1}, 
+					# {"lexeme" : "idade", "category": "IDENTIFIER", "line": 1}, 
+					# {"lexeme" : ")", "category": "DELIMITER", "line": 1}, 
+					# {"lexeme" : ")", "category": "DELIMITER", "line": 1}
+					],
+				variable_type= None
+				)
 			)
 		)
 
