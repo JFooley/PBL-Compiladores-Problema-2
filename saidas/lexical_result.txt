@@ -1,1 +1,1 @@
-Lexeme: "'teste string" | Category: ERROR | Line: 11
+Sucesso. Nenhum erro foi encontrado.

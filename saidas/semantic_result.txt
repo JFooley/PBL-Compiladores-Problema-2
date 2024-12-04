@@ -1,7 +1,22 @@
-{'position': 50, 'message': 'sum não existe nesse escopo.'}
-{'position': 74, 'message': 'num não existe nesse escopo.'}
-{'position': 74, 'message': 'num não existe nesse escopo.'}
-{'position': 75, 'message': 'num não existe nesse escopo.'}
-{'position': 75, 'message': 'num não existe nesse escopo.'}
-{'position': 75, 'message': 'r.a não existe nesse escopo.'}
-{'position': 75, 'message': 'r.a não existe nesse escopo.'}
+{'position': 58, 'message': "Esse tipo de operação não é permitida. A variável 'v' deve ser do tipo inteiro"}
+{'position': 59, 'message': "Esse tipo de operação não é permitida. A variável 'm' deve ser do tipo inteiro"}
+{'position': 60, 'message': "O índice de 'v' deve ser do tipo inteiro"}
+{'position': 61, 'message': "O índice de 'm' deve ser do tipo inteiro"}
+{'position': 61, 'message': "O índice de 'm' deve ser do tipo inteiro"}
+{'position': 62, 'message': 'Não é possível alterar o valor de uma constante: c'}
+{'position': 63, 'message': 'A variável n1 não foi inicializada'}
+{'position': 64, 'message': 'A variável deve ser do tipo inteiro'}
+{'position': 79, 'message': 'O num não existe nesse escopo.'}
+{'position': 79, 'message': 'O num não existe nesse escopo.'}
+{'position': 79, 'message': 'O num não existe nesse escopo.'}
+{'position': 79, 'message': 'O num não existe nesse escopo.'}
+{'position': 81, 'message': 'O num não existe nesse escopo.'}
+{'position': 81, 'message': 'O num não existe nesse escopo.'}
+{'position': 81, 'message': 'O num não existe nesse escopo.'}
+{'position': 81, 'message': 'O num não existe nesse escopo.'}
+{'position': 85, 'message': 'O num não existe nesse escopo.'}
+{'position': 85, 'message': 'O num não existe nesse escopo.'}
+{'position': 86, 'message': 'O num não existe nesse escopo.'}
+{'position': 86, 'message': 'O num não existe nesse escopo.'}
+{'position': 86, 'message': 'O r.a não existe nesse escopo.'}
+{'position': 86, 'message': 'O r.a não existe nesse escopo.'}

@@ -820,14 +820,75 @@ class SemanticAnalyzer:
 
     #################### Função para validar o incremento ou decremento  ####################
     def validate_increment_decrement(self, token_list: list):
-        token = token_list[0]  # Identificador deve ser o primeiro da lista de tokens
-        token_entry = self.find_table_entry(self.current_table_index, token)  # Busca a variável nas tabelas - Se não encontrou o elemento nas tabelas o erro é contabilizado pela propria função
-        if token_entry != None:  # Se encontrou o identificador na tabela
-            if (token_entry.tipoRetorno != None and (token_entry.tipoRetorno != "integer")):  # Para registrador
-                self.throw_error("A variável deve ser do tipo inteiro", token)
-            elif (token_entry.tipo != "integer"): # Para variável ou vetor
-                self.throw_error("A variável deve ser do tipo inteiro", token) 
+        # retorna o token do tipo 
+        tokens = []     # Armazena os tokens de antes do lexema de incremento/decremento
+        token = None    # Armazena o token formado pelo conjunto de tokens antes do operador de incremento/decremento
+        for index, current_token in enumerate(token_list): # Busca o tokens antes dos simbolos de incremento/decremento
+            if current_token["lexeme"] in ["++", "--"]:
+                tokens = token_list[:index]     # Armazena os tokens de antes do lexema de incremento/decremento
+                token = self.identify_var_kind(tokens)  # Retorna o token de acordo com o seu tipo: chamada de função, variável, literal...
+                break
+        
+        #token = {"tipo": "R", "token": Token}
+        if token["tipo"] not in ["LITERAL", "FUNCTION CALL", "EXPRESSION"]: # VETOR, IDENTIFICADOR, REGISTER 
+            token_entry = self.find_table_entry(self.current_table_index, token["token"])   # Verifica se o token existe
+            print(f"token_entry {token_entry}")
+            if (token_entry != None): # Se encontrou o token na tabela de simbolos - se não encontrou o erro já foi registrado na função "find_table_entry"
+                # Caso: vetor ou matriz sem indice: vetor++ ou matriz--
+                if ((token_entry.tamanho != [] and token_entry.tamanho != 0) and token["tipo"] == "IDENTIFIER"): # incremento direto na matriz ou vetor
+                    self.throw_error(f"Esse tipo de operação não é permitida. A variável '{token["token"]["lexeme"]}' deve ser do tipo inteiro", token["token"])  # matriz ou vetor sem [] ou [][]
+                    return
 
+                # Caso: vetor ou matriz com indice inválido (não inteiro) e do tipo diferente de inteiro
+                if ((token_entry.tamanho != [] and token_entry.tamanho != 0) and token["tipo"] == "VECTOR"): # Se for uma matriz ou vetor
+                    result = self.__validate_index_vector_matrix(tokens)
+                    pass # chama a função para validar passando os tokens
+
+                    # Caso: vetor ou matriz diferente de inteiro
+                    if (token_entry.tipo != "integer" and result):
+                        self.throw_error(f"O tipo de '{token["token"]["lexeme"]}' deve ser inteiro", token["token"])
+
+                if (token_entry.tipo == "integer" and token_entry.isConstant):  # Caso: incremento/decremento de constantes
+                    self.throw_error(f"Não é possível alterar o valor de uma constante: {token["token"]["lexeme"]}", token["token"])
+                    return
+
+                if (token_entry.tipo == "integer" and token_entry.valor == None and (token_entry.tamanho == [] or token_entry.tamanho == 0)): # Caso: identificador não inicializado
+                    self.throw_error(f"A variável '{token["token"]["lexeme"]}' não foi inicializada", token["token"])
+                    return
+
+                if (token_entry.tipo != "integer"): # Se a matriz ou vetor não for do tipo inteiro
+                    self.throw_error("A variável deve ser do tipo inteiro", token["token"])
+                    return
+        else:
+            self.throw_error("A variável deve ser do tipo inteiro", token["token"])
+
+    #TODO: Validar se a variável é uma matriz ou vetor. Se for matriz, exigir o segundo índice. Se for vetor, exigir o apenas um índice.
+    def __validate_index_vector_matrix(self, token_list: list) -> bool:
+        ''' Retorna: False se o erro encontrado for relacionado a estrutura da matriz ou vetor (mais indices que o aceito);
+            Retorna: True se não houver erros relacioandos a estrtura da matriz.
+            Se houver erro de indice do tipo não inteiro, a função indica o erro internamente.
+        '''
+        # estrutura 1: identificador[variavel] - > [identificador, [, variavel, ]]
+        # estrutura 2: identificador[variavel][variavel] --> [identificador, [, variavel, ], [, identificador, ]]
+        # estrutura 3: identificador[1]
+        # estrutura 4: identificador[1][2]
+        # considerando que só pode ter matriz[i][j] e vetor[i] (ou seja, não pode elemento[i][j][k])
+        if (len(token_list) > 7):   # Verifica se há mais indices do que o aceito. Ex.: identificador[i][j][k]
+            self.throw_error("A matriz/vetor tem mais parâmetros do que o permitido", token_list[0])
+            return False # Retorna para informar que o erro foi relacionado a estrutura da matriz ou vetor (mais indices do que o aceito)
+        
+        for i in range(2, len(token_list), 3):  # Inicia em dois e vai até o final da lista, incrementando em 3
+            if (token_list[i]["category"] == "NUMBER"): # Se for um número (literal)
+                if (not self.is_int(token_list[i])):  # Verifica se não é inteiro
+                    self.throw_error(f"O índice de '{token_list[0]["lexeme"]}' deve ser do tipo inteiro", token_list[i])
+            elif (token_list[i]["category"] == "IDENTIFIER"):
+                token_entry = self.find_table_entry(self.current_table_index, token_list[i])
+                if (token_entry != None and token_entry.tipo != "integer"): # Considerando que só é permitido chamar variáveis como indice de vetor/matriz
+                    self.throw_error(f"O índice de '{token_list[0]["lexeme"]}' deve ser do tipo inteiro", token_list[i])
+            else:
+                self.throw_error(f"O índice de '{token_list[0]["lexeme"]}' deve ser do tipo inteiro", token_list[i])
+        
+        return True # Indica que não há erros associados a estrutura do vetor/matriz
     #------------------------------ Metas Estéfane e felipe -----------------------------------
     #TODO: USAR EM VARIABLE
     def error_vector_size(self,token):
@@ -921,8 +982,8 @@ class SemanticAnalyzer:
                 else:
                     if self.is_increment(line):
                         # Variável NÃO atribuída
-                        # self.validate_increment_decrement(line)
-                        pass
+                        self.validate_increment_decrement(line)
+                        #pass
                     elif self.is_function(line):
                         self.validate_function_parameters(line)
                     else:

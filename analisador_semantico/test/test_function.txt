@@ -12,6 +12,7 @@ variables {
   integer g = 1;
   integer v_g[2];
   integer m_g[1][2];
+  integer h;
 }
 
 function integer sum(integer a, integer b) {
@@ -37,7 +38,9 @@ main() {
     integer n1;
     integer n2;
     r r1;
+    integer gg[2];
   }
+
 
   v[0] = 1;
   v[1] = 1;
@@ -52,6 +55,14 @@ main() {
   result = sum(sum1(n1, n2), sum(a, b));
   n1.a = 0;
   
+  v++;
+  m--;
+  v[2.3]--;
+  m[3.1][3.4]++;
+  c++;
+  n1--;
+  teste++;
+
   for (integer n = 4; n>20; n--){
     a = n * 8 + 4;
     for(integer x = 5; x>20; x--){
