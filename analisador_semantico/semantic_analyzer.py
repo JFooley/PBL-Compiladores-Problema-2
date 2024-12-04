@@ -125,6 +125,13 @@ class SemanticAnalyzer:
             result.append(current_segment)
 
         return result
+    
+    def get_index_vector(self, token_list): #deve passar a[5][5] por exemplo
+        result = []
+        for i in range(len(token_list) - 1):
+                if token_list[i]['lexeme'] == "[":
+                    result.append(token_list[i+1])
+        return result
 
 ################################ Funções de Adicionar na tabela ################################
 
@@ -234,7 +241,7 @@ class SemanticAnalyzer:
 
     
     # Definir quando acaba o escopo da variável 
-    # Se for vetor, verificar se o tamanho é int(number ou identificador)
+    # Se for vetor, verificar se o tamanho é int(number ou identificador) e se foi inicializado
     def add_variables_to_table(self, is_global, token_list):
         variable_type = ""
         variable_name = ""
@@ -353,7 +360,7 @@ class SemanticAnalyzer:
         ## A função da throw nos erros caso alguma das variáveis não existam ou sejam string e retorna None caso tenha falhado
         ## Caso não tenha falhado, ela vai retornar o tipo do retorno da expressão (number ou boolean)
         tipo = ["float", "integer"]
-
+        
         # Encontra o tipo da função
         for token in tokens:
             if token["category"] == "OPERATOR" and token["lexeme"] != "." and token["lexeme"] in ["&&", "||", '>', '<', '!=', '>=', '<=', '==']:
@@ -365,13 +372,30 @@ class SemanticAnalyzer:
         for token in tokens:
             if token["category"] == "OPERATOR" and token["lexeme"] != ".":
                 variable = self.identify_var_kind(variable_tokens)
+                
+                if variable == None: #PRECISA REMOVER DPS Q ACHAR O PROBLEMA
+                    return None
 
                 if variable["tipo"] == "IDENTIFIER" or variable["tipo"] == "REGISTER" or variable["tipo"] == "VECTOR":
                     variable_entry: EntryIdentificadores = self.find_table_entry(current_scope_index, variable["token"])
 
                     if variable_entry == None:
                         return None
-
+                    
+                    if variable["tipo"] == "VECTOR":  # Usar [] em um identificador que não é vetor
+                        if (variable_entry.tamanho == [] or variable_entry.tamanho == 0):
+                            self.throw_error(f"A variável {variable_entry.nome} não é um vetor",variable["token"])
+                            return None
+                        
+                        #Verifica se o vetor tem index correto
+                        index_list = self.get_index_vector(variable_tokens)
+                        if index_list == None:
+                            return None
+                        
+                        for index in index_list:
+                            if self.error_vector_size(index):
+                                return None
+                    
                     if variable_entry.tipo not in ["integer", "float", "boolean"]:
                         self.throw_error(f"O tipo {variable_entry.tipo} não pode ser operado em uma expressão", variable["token"])
                         return None
@@ -382,13 +406,20 @@ class SemanticAnalyzer:
                     
                 elif variable["tipo"] == "FUNCTION CALL":
                     variable_entry: EntryIdentificadores = self.find_table_entry(current_scope_index, variable["token"])
-
+                
                     if variable_entry == None:
+                        return None
+                    
+                    if variable_entry.tipo != "function": #Verifica se chamada de função está com identificador que não é uma função
+                        self.throw_error(f"{variable_entry.nome} não é uma função", variable["token"])
                         return None
 
                     if variable_entry.tipoRetorno not in ["integer", "float", "boolean"]:
                         self.throw_error(f"O tipo {variable_entry.tipoRetorno} não pode ser operado em uma expressão", variable["token"])
                         return None
+                
+                    self.validate_function_parameters(variable_tokens)  #valida os parametros
+                
                 variable_tokens.clear()
 
             else:
@@ -798,7 +829,7 @@ class SemanticAnalyzer:
                 
                 case "EXPRESSION":
                     token = value_dict["token"]
-                    type_expression = self.indetify_expression_return(self.current_table_index, token)
+                    type_expression = self.identify_expression_return(self.current_table_index, token)
                     
                     if (type_expression == None):
                         return
@@ -837,14 +868,18 @@ class SemanticAnalyzer:
                 self.throw_error("A variável deve ser do tipo inteiro", token) 
 
     #------------------------------ Metas Estéfane e felipe -----------------------------------
-    #TODO: USAR EM VARIABLE
     def error_vector_size(self,token):
         if (token["category"] == "NUMBER" and not self.is_int(token)):
             self.throw_error("O indíce do vetor deve ser inteiro", token)
+            return True
         elif (token["category"] == "IDENTIFIER"):
             object = self.find_table_entry(self.current_table_index,token)
-            if(object != None and not object.tipo == "int"):
+            if (object == None):
+                return True
+            if (object != None and not object.tipo == "int"):
                 self.throw_error("O indíce do vetor deve ser inteiro", token)   
+                return True
+        return False
 
 
     def error_has_value(self,token):
@@ -934,6 +969,7 @@ class SemanticAnalyzer:
                     elif self.is_function(line):
                         self.validate_function_parameters(line)
                     else:
+                        #validar os parametros de função
                         # existe, mesmo tipo, Variável NÃO atribuída em expressões(error_has_value)
                         # Chamada de função com identificador que não é uma função
                         # Usar o “.” e identificar que NÃO são registradores
@@ -946,22 +982,35 @@ class SemanticAnalyzer:
                 if line[0]['lexeme'] == 'for':
                     on_for = False
                     self.validate_for(line)
-                elif line[0]['lexeme'] in ['while', 'if']:
-                    # o tipo tem que ser boolean
-                    # chamada de função de verificação, Variável NÃO atribuída (error_has_value)
-                    # Chamada de função com identificador que não é uma função
-                    # Usar o “.” e identificar que NÃO são registradores
-                    # Usar [] em um identificador que não é vetor (em declaração (2 lados da igualdade), em expressoes aritméticas)
-                    #Verificar se o identificador passado como index do vetor é inteiro (error_vector_size)
+                elif line[0]['lexeme'] == 'while':
                     self.printar_linha(line)
+                    self.validate_conditional(line[2:-1])
+                elif line[0]['lexeme'] == 'if':
+                    self.printar_linha(line)
+                    self.validate_conditional(line[2:-2])
                 line = []
             elif token['lexeme'] == '}':
                 self.remove_local_table()
             else:
                 line.append(token)
 
+ #----------------------- Valida o while e if ----------------------------
+    def validate_conditional(self,token_list):
+        # verifica se o tipo tem que ser boolean
+        type = self.identify_expression_return(self.current_table_index, token_list)
+        if type != None and "boolean" not in type:
+            self.throw_error(f"O resultado da expressão não é do tipo boolean",token_list[0])
+                    
+        # chamada de função de verificação, Variável NÃO atribuída (error_has_value) (ok)
+        # Chamada de função com identificador que não é uma função (ok)
+        # Usar o “.” e identificar que NÃO são registradores (ok)
+        # Usar [] em um identificador que não é vetor (em declaração (2 lados da igualdade), em expressoes aritméticas) (ok)
+        #Verificar se o identificador passado como index do vetor é inteiro (error_vector_size) (ok)
+        #validar os parametros da função (ok)
+        
  #---------------------- Valida assignment ------------------------------
     def validate_assignment(self,token_list):
+        
         pass
 
  #------------------------- Valida erro no for ------------------
