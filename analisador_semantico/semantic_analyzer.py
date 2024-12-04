@@ -920,12 +920,19 @@ class SemanticAnalyzer:
             token = token_list[0]
             if token_entry == None:
                 return
-            if token_entry.valor == None: #variavel não inicializada
+            if token_entry.valor == None and (token_entry.tamanho == [] or token_entry.tamanho == 0): #variavel não inicializada
                 self.throw_error(f"A variável {token_entry.nome} não foi inicializada", token)
                 return
             if token_entry.tipo != "integer": # Para variável, register e vetor, deve ser do tipo inteiro
                 self.throw_error(f"A variável {token_entry.nome} não é do tipo inteiro", token)
                 return
+            if token_entry.isConstant:  # Não pode ser uma constante
+                self.throw_error(f"A variável {token_entry.nome} é uma constante. Não é possível alterar o valor de constantes.", token)
+                return
+            if ((token_entry.tamanho != [] and token_entry.tamanho != 0)): # incremento direto na matriz ou vetor
+                    self.throw_error(f"A Variável não é do tipo inteiro. A variável '{token_entry.nome}' é um vetor ou matriz", token)  # matriz ou vetor sem [] ou [][]
+                    return
+
 
         else:
             identifier = []
@@ -970,7 +977,7 @@ class SemanticAnalyzer:
             object = self.find_table_entry(self.current_table_index,token)
             if (object == None):
                 return True
-            if (object != None and not object.tipo == "int"):
+            if (object != None and not object.tipo == "integer"):
                 self.throw_error("O indíce do vetor deve ser inteiro", token)   
                 return True
         return False
