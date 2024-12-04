@@ -850,14 +850,59 @@ class SemanticAnalyzer:
         
 
     #################### Função para validar o incremento ou decremento  ####################
+     #AJUSTES NECESSÁRIO:
+    #precisa verifica se variável não foi inicializada
+    #Precisa verificar se a variavel existe (falta testar)
+    #Se a variavel for um vetor sem passar as posições é erro: por exemplo, vetor v, não pode fazer v++
+    #Se a varivel for um vetor, pode fazer incremento, desde que o vetor seja inteiro
+
+    #PRECISA ACUMULAR TODOS OS TOKENS ATÉ ENCONTRAR O "++" ou "--"
     def validate_increment_decrement(self, token_list: list):
-        token = token_list[0]  # Identificador deve ser o primeiro da lista de tokens
-        token_entry = self.find_table_entry(self.current_table_index, token)  # Busca a variável nas tabelas - Se não encontrou o elemento nas tabelas o erro é contabilizado pela propria função
-        if token_entry != None:  # Se encontrou o identificador na tabela
-            if (token_entry.tipoRetorno != None and (token_entry.tipoRetorno != "integer")):  # Para registrador
-                self.throw_error("A variável deve ser do tipo inteiro", token)
-            elif (token_entry.tipo != "integer"): # Para variável ou vetor
-                self.throw_error("A variável deve ser do tipo inteiro", token) 
+        if (token_list[0]["category"] == "IDENTIFIER" and  token_list[1]['lexeme'] in ['++', '--']):
+            token_entry = self.find_table_entry(self.current_table_index, token_list[0])
+            token = token_list[0]
+            if token_entry == None:
+                return
+            if token_entry.valor == None: #variavel não inicializada
+                self.throw_error(f"A variável {token_entry.nome} não foi inicializada", token)
+                return
+            if token_entry.tipo != "integer": # Para variável, register e vetor, deve ser do tipo inteiro
+                self.throw_error(f"A variável {token_entry.nome} não é do tipo inteiro", token)
+                return
+
+        else:
+            identifier = []
+            for token in token_list:
+                if token['lexeme'] in ["++", "--"]: 
+                    break  
+                identifier.append(token) 
+        
+            variable = self.identify_var_kind(identifier)
+            token_entry = self.find_table_entry(self.current_table_index, variable["token"])
+            if token_entry == None:
+                return
+            
+            if variable["tipo"] == "VECTOR":
+                if (token_entry.tamanho == [] or token_entry.tamanho == 0): # Usar [] em um identificador que não é vetor
+                    print("entrei")
+                    self.throw_error(f"A variável {token_entry.nome} não é um vetor",variable["token"])
+                    return      
+                #Verifica se o vetor tem index correto
+                index_list = self.get_index_vector(identifier)
+                if index_list == None:
+                    return 
+                for index in index_list:
+                    if self.error_vector_size(index):
+                        return 
+            elif variable["tipo"] == "IDENTIFIER" or variable["tipo"] == "REGISTER":
+                if token_entry.valor == None: #variavel não inicializada
+                    self.throw_error(f"A variável {token_entry.nome} não foi inicializada", variable["token"])
+                    return
+                if token_entry.tipo != "integer": # Para variável, register e vetor, deve ser do tipo inteiro
+                    self.throw_error(f"A variável {token_entry.nome} não é do tipo inteiro", variable["token"])
+                    return
+            
+        
 
     #------------------------------ Metas Estéfane e felipe -----------------------------------
     def error_vector_size(self,token):
@@ -955,9 +1000,7 @@ class SemanticAnalyzer:
                     self.validate_read(line[2:-1])
                 else:
                     if self.is_increment(line):
-                        # Variável NÃO atribuída
-                        # self.validate_increment_decrement(line)
-                        pass
+                        self.validate_increment_decrement(line)
                     elif self.is_function(line):
                         self.validate_function_parameters(line)
                     else:
