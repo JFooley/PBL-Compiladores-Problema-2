@@ -18,17 +18,29 @@ variables {
 
 function integer sum(integer a, integer b) {
   variables {  
+  }
+  return 1;
+}
+
+function integer sum1(integer a, integer b) {
+  variables { 
   r r2;
-
   }
-  return a + b;
+  r2.a = 3;
+  sum(1,2);
+  return;
 }
 
-function string sum1(integer a, integer b) {
-  variables {  
+
+function integer sum12(integer a, integer b) {
+  variables { 
+  r r2;
   }
-  return "a + b";
+  r2.a = 3;
+  return 2;
 }
+
+
 
 main() {
   variables {
