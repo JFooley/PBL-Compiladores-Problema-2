@@ -784,7 +784,7 @@ class SemanticAnalyzer:
                 value_list.append(token)
      
         size_error = len(self.error_list)
-        if(self.last_function_type['lexeme'] == "empty" and len(value_list) > 0):
+        if(self.last_function_type != None and self.last_function_type['lexeme'] == "empty" and len(value_list) > 0):
             self.throw_error("A função deve retornar vazio", token_list[0])
         else:
             if(size_error == len(self.error_list)):
