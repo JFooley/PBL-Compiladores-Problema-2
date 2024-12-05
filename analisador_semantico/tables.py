@@ -27,5 +27,19 @@ class TabelaPares():
         self.tabela.append(novoPar)
     
     def __repr__(self):
-        return f"\nTabelaPares(tabela={self.tabela!r})"
-        
+        pares_formatados = "\n\n".join(
+            f"Pai: {par['pai']}, Tabela: {par['tabela']!r}" for par in self.tabela
+        )
+        return f"TabelaPares(\n{pares_formatados}\n)"
+    
+    def alterar_caracteristica_identificador(self, pai, nome_identificador, atributo, valor):
+        variavel = None
+        # Busca no escopo atual
+        for identificador in self.tabela[pai]["tabela"]:
+            if identificador.nome == nome_identificador:
+                if hasattr(identificador, atributo):
+                    setattr(identificador, atributo, valor)
+                    return
+        # Busca recursivamente no escopo pai até chegar na global, caso não tenha achado
+        if variavel == None and pai> 0:
+            self.alterar_caracteristica_identificador(self.tabela[pai]["pai"], nome_identificador, atributo, valor)

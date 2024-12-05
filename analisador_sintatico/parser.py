@@ -376,13 +376,10 @@ class Parser():
 
 #--------------------- Return  ---------------------
     def return_statement(self):
-        
-        self.match_lexeme(["return"])  
-        #self.token_accumulator_list = []
+        self.match_lexeme(["return"]) 
         if self.lookahead()['lexeme'] not in [";"]:
             self.value()
         self.match_lexeme([";"])
-        #self.validator.validate_function_return(self.token_accumulator_list)
 
 #--------------------- Chamada de função  ---------------------
     def function_call(self):
@@ -405,13 +402,13 @@ class Parser():
 
 #--------------------- statements ---------------------
     def statements(self):
-        self.validator.create_local_table() #cria a tabela local para o escopo da função/main
+        self.validator.create_local_table() 
         self.variables()
         self.token_accumulator_list = []
         size_error = len(self.error_list)
         self.body()
         if (len(self.error_list) == size_error):
-            self.validator.validate_body(self.token_accumulator_list)  # alteração reunião  
+            self.validator.validate_body(self.token_accumulator_list) 
         self.validator.remove_local_table()
 
 #--------------------- body ---------------------
