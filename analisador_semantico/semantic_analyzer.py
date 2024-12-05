@@ -773,10 +773,8 @@ class SemanticAnalyzer:
         if len(token_list) == 1:
             if self.last_function_type['lexeme'].lower() != "empty":
                 self.throw_error("O retorno da função está vazio", token_list[0])
-                self.last_function_type = None
                 return
             else:
-                self.last_function_type = None
                 return
         else:
             for token in token_list[1:len(token_list)]:
@@ -784,14 +782,13 @@ class SemanticAnalyzer:
                 value_list.append(token)
      
         size_error = len(self.error_list)
-        if(self.last_function_type != None and self.last_function_type['lexeme'] == "empty" and len(value_list) > 0):
+        if(self.last_function_type != None and self.last_function_type['lexeme'] == "empty" and len(value_list) > 0): # verifica se tem empty e recebe return + alguma coisa
             self.throw_error("A função deve retornar vazio", token_list[0])
         else:
             if(size_error == len(self.error_list)):
                 return_entry = self.wrong_type_assign(self.current_table_index,[{"lexeme":"valid", "category":"STRING", "line":value_list[0]["line"]}],value_list,self.last_function_type)
                 if return_entry == False:
                     return
-        self.last_function_type = None
         
     # Chamada dentro ou após a adição da função na tabela
     def validate_consistent_return(self, token_list):
@@ -944,7 +941,7 @@ class SemanticAnalyzer:
             else:                
                 line.append(token)
         if(on_return == False):
-            self.throw_error(f"A função exige um retorno",{"line":123})
+            self.throw_error(f"A função exige um retorno",self.last_function_type)
             
         print("\n--------------- tabelas locais e global---------------")
         print(self.pairs_table)
