@@ -765,83 +765,34 @@ class SemanticAnalyzer:
         # Caso não seja nenhum dos anteriores, manter como string
         return "string"
     
-     #################### Função para validar o return (inteiro / identificador) ##################
-    # Verificar erro na lista
-    # Usar self.last_function_type
-    # Usar o wrong type
-
+    #################### Função para validar o return (inteiro / identificador) ##################
     def validate_function_return(self, token_list): 
-
-        if len(self.pairs_table.tabela[self.current_table_index]['tabela']) != 0:
-            return_entry = self.pairs_table.tabela[self.current_table_index]['tabela'][0]
-            if len(token_list) == 1 :
-                if not return_entry.tipoRetorno == "empty":
-                    self.throw_error(f"A função {return_entry.nome} tem o retorno vazio", token_list[0]['line'])   
-                return 
-            value_dict = self.get_variable_type(token_list)
-            
-            match value_dict["tipo"]:
-                case "IDENTIFIER":
-                    token = value_dict["token"]
-                    function_entry: EntryIdentificadores = self.find_table_entry(self.current_table_index, token[0])
-                    if (function_entry == None):
-                        return
-                    if function_entry.tipo != return_entry.tipoRetorno:
-                        self.throw_error("O tipo de retorno não corresponde ao tipo da função", token[0])
-                        return
-                case "LITERAL":
-                    token = value_dict["token"]
-                    if self.conversion(token['category']) != return_entry.tipoRetorno:
-                        self.throw_error("O tipo de retorno não corresponde ao tipo da função", token[0])
-                        return
-                
-                case "FUNCTION CALL":
-                    token = value_dict["token"]
-                    function_entry: EntryIdentificadores = self.find_table_entry(self.current_table_index, token[0])
-
-                    if (function_entry == None):
-                        return
-                    
-                    if function_entry.tipoRetorno != return_entry.tipoRetorno:
-                        self.throw_error("O tipo de retorno não corresponde ao tipo da função", token[0])
-                        return
-
-                case "REGISTER":
-                    token = value_dict["token"]
-                    function_entry: EntryIdentificadores = self.find_table_entry(self.current_table_index, token[0])
-
-                    if (function_entry == None):
-                        return
-                    
-                    if function_entry.tipoRetorno != return_entry.tipoRetorno:
-                        self.throw_error("O tipo de retorno não corresponde ao tipo da função", token[0])
-                        return
-                    
-                case "VECTOR":
-                    token = value_dict["token"]
-                    function_entry: EntryIdentificadores = self.find_table_entry(self.current_table_index, token[0])
-
-                    if (function_entry == None):
-                        return
-                    
-                    if function_entry.tipoRetorno != return_entry.tipoRetorno:
-                        self.throw_error("O tipo de retorno não corresponde ao tipo da função", token[0])
-                        return
-                
-                case "EXPRESSION":
-                    token = value_dict["token"]
-                    type_expression = self.identify_expression_return(self.current_table_index, token)
-                    
-                    if (type_expression == None):
-                        return
-                    
-                    if return_entry.tipoRetorno in ["float", "integer", "boolean"]:
-                        if type_expression not in ["float", "integer", "boolean"]:
-                            self.throw_error(f"O tipo de retorno {type_expression} não corresponde ao tipo da função {return_entry.tipoRetorno}", token[0])
-                            return
-        else: 
-            self.throw_error("Não existe tabela definida para o escopo")   
-
+        value = ""
+        value_list = []
+        # Verificar se só tem apenas o return na lista
+        if len(token_list) == 1:
+            if self.last_function_type['lexeme'].lower() != "empty":
+                self.throw_error("O retorno da função está vazio", token_list[0])
+                self.last_function_type = None
+                return
+            else:
+                self.last_function_type = None
+                return
+        else:
+            for token in token_list[1:len(token_list)]:
+                value = value + " " + token["lexeme"]
+                value_list.append(token)
+     
+        size_error = len(self.error_list)
+        if(self.last_function_type['lexeme'] == "empty" and len(value_list) > 0):
+            self.throw_error("A função deve retornar vazio", token_list[0])
+        else:
+            if(size_error == len(self.error_list)):
+                return_entry = self.wrong_type_assign(self.current_table_index,[{"lexeme":"valid", "category":"STRING", "line":value_list[0]["line"]}],value_list,self.last_function_type)
+                if return_entry == False:
+                    return
+        self.last_function_type = None
+        
     # Chamada dentro ou após a adição da função na tabela
     def validate_consistent_return(self, token_list):
         function_name = token_list[1]['lexeme']
