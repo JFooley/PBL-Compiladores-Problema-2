@@ -894,6 +894,7 @@ class SemanticAnalyzer:
     def validate_body(self, token_list): 
         line = []
         on_for = False
+        on_return = False
         for token in token_list:
             if token['lexeme'] == 'for':
                 on_for = True
@@ -903,31 +904,48 @@ class SemanticAnalyzer:
                 elif line[0]['lexeme'] == 'read':
                     self.validate_read(line[2:-1])
                 elif line[0]['lexeme'] == 'return':
-                   # self.validate_function_return(line) # line linha escrita return, sem ;
-                   pass
+                    on_return = True
+                    self.validate_function_return(line) # line linha escrita return, sem ;
+            
                 else:
                     if self.is_increment(line):
                         self.validate_increment_decrement(line)
                     elif self.is_function(line):
+                        
                         self.validate_function_parameters(line)
+                        on_return = False
                     else:
                         self.validate_assignment(line)
+                        #validar os parametros de função
+                        # existe, mesmo tipo, Variável NÃO atribuída em expressões(error_has_value)
+                        # Chamada de função com identificador que não é uma função
+                        # Usar o “.” e identificar que NÃO são registradores
+                        # Usar [] em um identificador que não é vetor(em declaração (2 lados da igualdade), em expressoes aritméticas)
+                        #Verificar se o identificador passado como index do vetor é inteiro (error_vector_size)
                 line = []
+                # on_return = False
+            
             elif token['lexeme'] == '{':
                 self.create_local_table()
+                
                 if line[0]['lexeme'] == 'for':
                     on_for = False
                     self.validate_for(line)
                 elif line[0]['lexeme'] == 'while':
                     self.validate_conditional(line[2:-1])
                 elif line[0]['lexeme'] == 'if':
-                    self.validate_conditional(line[2:-2])
-                line = []
-            elif token['lexeme'] == '}':
-                self.remove_local_table()
-            else:
-                line.append(token)
+                    self.validate_conditional(line[2:-2])    
 
+                line = []               
+                
+            
+            elif token['lexeme'] == '}':                
+                self.remove_local_table()
+            else:                
+                line.append(token)
+        if(on_return == False):
+            self.throw_error(f"A função exige um retorno",{"line":123})
+            
         print("\n--------------- tabelas locais e global---------------")
         print(self.pairs_table)
         
