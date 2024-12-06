@@ -150,7 +150,7 @@ class SemanticAnalyzer:
             return
 
         return_type = token_list[0]['lexeme']
-        self.last_function_type = return_type
+        self.last_function_type = token_list[0]
         function_name = token_list[1]['lexeme']
         parameters_type_list = []
         i = 3
@@ -330,7 +330,7 @@ class SemanticAnalyzer:
                 
     ################################ Funções de erro ################################
 
-    def identify_expression_return(self, current_scope_index, tokens):
+    def identify_expression_return(self, current_scope_index, tokens: list):
         ## Identifica se a expressão aritimética passada é do tipo aritimética (retorna apenas number) ou do tipo logica/relacional (retorna boolean)
         ## A função da throw nos erros caso alguma das variáveis não existam ou sejam string e retorna None caso tenha falhado
         ## Caso não tenha falhado, ela vai retornar o tipo do retorno da expressão (number ou boolean)
@@ -341,15 +341,14 @@ class SemanticAnalyzer:
             if token["category"] == "OPERATOR" and token["lexeme"] != "." and token["lexeme"] in ["&&", "||", '>', '<', '!=', '>=', '<=', '==']:
                 type = ["boolean"]
                 break
-        
+
         # Valida os atributos (se existem, se foi inicializado e são diferentes de string)
         variable_tokens = []
         for token in tokens:
-            if token["category"] == "OPERATOR" and token["lexeme"] != ".":
-                variable = self.get_variable_type(variable_tokens)
+            if (token["category"] == "OPERATOR" and token["lexeme"] != ".") or token == tokens[-1]:
+                if (token == tokens[-1]): variable_tokens.append(token) # Caso do ultimo token
 
-                if variable == None: #PRECISA REMOVER DPS Q ACHAR O PROBLEMA
-                    return None
+                variable = self.get_variable_type(variable_tokens)
 
                 if variable["tipo"] == "IDENTIFIER" or variable["tipo"] == "REGISTER" or variable["tipo"] == "VECTOR":
                     variable_entry: EntryIdentificadores = self.find_table_entry(current_scope_index, variable["token"][0])
@@ -395,6 +394,11 @@ class SemanticAnalyzer:
                 
                     self.validate_function_parameters(variable_tokens)  #valida os parametros
                 
+                elif variable["tipo"] == "LITERAL":
+                    if variable["token"][0]["category"] == "STRING":
+                        self.throw_error("String não pode compor expressão.", variable["token"][0])
+                        return None
+
                 variable_tokens.clear()
 
             else:
@@ -478,13 +482,12 @@ class SemanticAnalyzer:
                         self.throw_error(f"{value_entry.tipo} não pode ser convertido em {variable_entry.tipo}.", value[0])
                         return False
 
-                case "LITERAL": #TODO verificar se acessar value["category"] no erro ta correto
+                case "LITERAL": 
                     print("entrei ---")
                     match value[0]["category"]:
                         case "NUMBER":
-                            #TODO: Essa verificação não tá entrando: testei teste = 3.5; e não deu erro: sendo que teste é string essa verificação faz o que: and ("." in value[0]["lexeme"] and variable_entry.tipo == "integer")
-                            if (variable_entry.tipo != "float" and variable_entry.tipo != "integer" and ("." in value[0]["lexeme"] and variable_entry.tipo == "integer")):
-                                self.throw_error(f"{value["category"]} não pode ser convertido em {variable_entry.tipo}.", value[0])
+                            if (variable_entry.tipo != "float" and variable_entry.tipo != "integer"):
+                                self.throw_error(f"{value[0]["category"]} não pode ser convertido em {variable_entry.tipo}.", value[0])
                                 return False
                         
                         case "STRING":
@@ -576,7 +579,7 @@ class SemanticAnalyzer:
                 case "LITERAL":
                     match value[0]["category"]:
                         case "NUMBER":
-                            if (variable_type["lexeme"] != "float" and variable_type["lexeme"] != "integer" and ("." in value[0]["lexeme"] and variable_type["lexeme"] == "integer")):
+                            if (variable_type["lexeme"] != "float" and variable_type["lexeme"] != "integer"):
                                 self.throw_error(f"{value[0]["category"]} não pode ser convertido em {variable_type["lexeme"]}.", value[0])
                                 return False
                         
@@ -771,7 +774,7 @@ class SemanticAnalyzer:
         value_list = []
         # Verificar se só tem apenas o return na lista
         if len(token_list) == 1:
-            if self.last_function_type['lexeme'].lower() != "empty":
+            if self.last_function_type != None self.last_function_type['lexeme'].lower() != "empty":
                 self.throw_error("O retorno da função está vazio", token_list[0])
                 return
             else:
@@ -940,9 +943,10 @@ class SemanticAnalyzer:
                 self.remove_local_table()
             else:                
                 line.append(token)
-        if(on_return == False):
-            self.throw_error(f"A função exige um retorno",self.last_function_type)
-            
+        if(self.last_function_type != None):
+            if(on_return == False and self.last_function_type['lexeme'] != "empty"):
+                self.throw_error(f"A função exige um retorno",self.last_function_type)
+
         print("\n--------------- tabelas locais e global---------------")
         print(self.pairs_table)
         

@@ -18,7 +18,6 @@ Georgenes Caleo Silva Pinheiro
 from analisador_lexico.lexicalAnalyzer import lexical_analise
 from analisador_sintatico.parser import Parser
 from analisador_semantico.semantic_analyzer import SemanticAnalyzer
-from analisador_semantico.tables import EntryIdentificadores
 
 def write_file(file_name, list, message):
 	with open(file_name, "w", encoding="utf-8") as file:
@@ -36,59 +35,29 @@ def main():
 	tokens = lexical_analise(TEST_FILE)
 	if tokens :
 		validator = SemanticAnalyzer()
-
-		analizer = SemanticAnalyzer()
-		analizer.registers_type_table["documento"] = {"nome":"string","idade":"integer"}
-		entry1 = EntryIdentificadores(nome= "a", tipo= "float", valor="1,5", tipoRetorno=None, parametros=None, tamanho=0, isConstant=False)
-		entry2 = EntryIdentificadores(nome= "b", tipo= "documento", valor=None, tipoRetorno=None, parametros=None, tamanho=0, isConstant=False)
-		entry3 = EntryIdentificadores(nome= "b.nome", tipo= "string", valor="fulano", tipoRetorno=None, parametros=None, tamanho=0, isConstant=False)
-		entry4 = EntryIdentificadores(nome= "b.idade", tipo= "integer", valor="10", tipoRetorno=None, parametros=None, tamanho=0, isConstant=False)
-		entry5 = EntryIdentificadores(nome= "vetor", tipo= "integer", valor=None, tipoRetorno=None, parametros=None, tamanho=10, isConstant=False)
-		entry6 = EntryIdentificadores(nome= "sum", tipo= "function", valor=None, tipoRetorno="float", parametros=["integer", "integer"], tamanho=0, isConstant=False)
+		parser = Parser(validator, tokens)
+		parser.run()  
 		
-		analizer.pairs_table.tabela[0]["tabela"].append(entry1)
-		analizer.pairs_table.tabela[0]["tabela"].append(entry2)
-		analizer.pairs_table.tabela[0]["tabela"].append(entry3)
-		analizer.pairs_table.tabela[0]["tabela"].append(entry4)
-		analizer.pairs_table.tabela[0]["tabela"].append(entry5)
-		analizer.pairs_table.tabela[0]["tabela"].append(entry6)
 
+		# for item in parser.validator.pairs_table.tabela[0]['tabela']:print(item.nome)
 
-		print("Entradas na tabela global")
-		print(len(analizer.pairs_table.tabela[0]["tabela"]))
+		print("\n--------------- tabela de registro ---------------")
+		print(validator.registers_type_table)
+		print("\n--------------- tabela global ---------------")
+		print(validator.pairs_table)
 
-		print("-------------------------")
-		print("teste atribuição de tipo errado: " + str(analizer.wrong_type_assign(0, 
-				variable= [{"lexeme" : "a", "category": "IDENTIFIER", "line": 1}], 
-				value= [
-					{"lexeme" : "sum", "category": "IDENTIFIER", "line": 1},
-					{"lexeme" : "(", "category": "DELIMITER", "line": 1}, 
-					{"lexeme" : "1", "category": "NUMBER", "line": 1}, 
-					{"lexeme" : ",", "category": "DELIMITER", "line": 1}, 
-					{"lexeme" : "5", "category": "NUMBER", "line": 1}, 
-					{"lexeme" : ")", "category": "DELIMITER", "line": 1}, 
-					{"lexeme" : "+", "category": "OPERATOR", "line": 1},
-					{"lexeme" : "(", "category": "DELIMITER", "line": 1},
-					{"lexeme" : "b", "category": "IDENTIFIER", "line": 1}, 
-					{"lexeme" : ".", "category": "OPERATOR", "line": 1}, 
-					{"lexeme" : "idade", "category": "IDENTIFIER", "line": 1}, 
-					{"lexeme" : "/", "category": "OPERATOR", "line": 1},  
-					{"lexeme" : "1", "category": "NUMBER", "line": 1}, 
-					{"lexeme" : ")", "category": "DELIMITER", "line": 1}
-					],
-				variable_type= None
-				)
-			)
-		)
+		if parser.get_error_list(): 
+			print("Erros foram encontrados durante a análise sintática.")
+		else:
+			print("A análise sintática foi realizada com sucesso.")
 
-		print("Lista de erros semanticos: ")
-		print(analizer.get_error_list())
-
-
-		if len(validator.get_error_list()) > 0: 
+		if validator.get_error_list(): 
 			print("Erros foram encontrados durante a análise semântica.")
 		else:
 			print("A análise semântica foi realizada com sucesso.")			
+
+		write_file("./saidas/parser_result.txt", parser.get_error_list(), "A análise sintática foi realizada com sucesso.")
+		write_file("./saidas/semantic_result.txt", validator.get_error_list(), "A análise semantica foi realizada com sucesso.")
 
 	else:
 		print("Erro durante a análise léxica.")
@@ -96,5 +65,3 @@ def main():
 		
 if __name__ == "__main__":
     main()
-
-
