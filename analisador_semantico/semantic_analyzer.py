@@ -483,7 +483,6 @@ class SemanticAnalyzer:
                         return False
 
                 case "LITERAL": 
-                    print("entrei ---")
                     match value[0]["category"]:
                         case "NUMBER":
                             if (variable_entry.tipo != "float" and variable_entry.tipo != "integer"):
