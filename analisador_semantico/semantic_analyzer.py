@@ -150,7 +150,7 @@ class SemanticAnalyzer:
             return
 
         return_type = token_list[0]['lexeme']
-        self.last_function_type = return_type
+        self.last_function_type = token_list[0]
         function_name = token_list[1]['lexeme']
         parameters_type_list = []
         i = 3
@@ -939,9 +939,9 @@ class SemanticAnalyzer:
                 self.remove_local_table()
             else:                
                 line.append(token)
-        if(on_return == False):
-            self.throw_error(f"A função exige um retorno",self.last_function_type)
-            
+        if(on_return == False and self.last_function_type['lexeme'] != "empty"):
+            self.throw_error(f"A função exige um retorno",token_list[0])
+
         print("\n--------------- tabelas locais e global---------------")
         print(self.pairs_table)
         
