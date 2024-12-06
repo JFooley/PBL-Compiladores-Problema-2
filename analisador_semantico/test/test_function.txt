@@ -52,6 +52,16 @@ main() {
   result = sum(sum1(n1, n2), sum(a, b));
   n1.a = 0;
   
+  /* Teste do incremento e decremento */
+  v++;            /* erro: incrementar vetor - ok*/
+  m--;            /* erro: decrementar matriz - ok */
+  v[teste]--;     /* erro: indice não inteiro (variavel) - ok */
+  m[3.1][3.4]++;  /* erro: indice não inteiro - ok */
+  c++;            /* erro: incremento de constante - ok */
+  teste++;        /* erro: variavel não inteira - ok */
+  n1--;           /* erro: variavel não inicializada  - ok */
+  x++;            /* erro: variavel não existe no escopo - ok */
+
   for (integer n = 4; n>20; n--){
     a = n * 8 + 4;
     for(integer x = 5; x>20; x--){
