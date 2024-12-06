@@ -367,9 +367,113 @@ class SemanticAnalyzer:
                         vector_length = []
                         value_list = []
                         
-                
-                
+    ######################## Funções validate individuais ###########################
+
+    def validade_identifier(self, current_scope_index, tokens, expected_types):
+        value_entry: EntryIdentificadores = self.find_table_entry(current_scope_index, tokens[0])
+
+        if (value_entry == None):
+            return False
+        
+        if (expected_types != value_entry.tipo):
+            self.throw_error(f"{value_entry.tipo} não pode ser convertido em {expected_types}.", tokens[0])
+            return False
+
+    def validade_literal(self, current_scope_index, tokens, expected_types):
+        match tokens[0]["category"]:
+            case "NUMBER":
+                if (expected_types != "float" and expected_types != "integer" and ("." in tokens[0]["lexeme"] and expected_types == "integer")):
+                    self.throw_error(f"{tokens[0]["category"]} não pode ser convertido em {expected_types}.", tokens[0])
+                    return False
+            
+            case "STRING":
+                if (expected_types != "string"):
+                    self.throw_error(f"{tokens[0]["category"]} não pode ser convertido em {expected_types}.", tokens[0])
+                    return False
+
+            case "CHARACTER":
+                if (expected_types != "character"):
+                    self.throw_error(f"{tokens[0]["category"]} não pode ser convertido em {expected_types}.", tokens[0])
+                    return False
+
+            case "BOOLEAN":
+                if (expected_types != "boolean"):
+                    self.throw_error(f"{tokens[0]["category"]} não pode ser convertido em {expected_types}.", tokens[0])    
+                    return False
+
+    def validade_register(self, current_scope_index, tokens, expected_types):
+        value_entry: EntryIdentificadores = self.find_table_entry(current_scope_index, tokens[0])
+    
+        if (value_entry == None):
+            return False
+
+        if (expected_types != value_entry.tipo):
+            self.throw_error(f"{value_entry.tipo} não pode ser convertido em {expected_types}.", tokens[0])
+            return False
+
+    def validade_vector(self, current_scope_index, tokens, expected_types):
+        index_list = self.get_index_vector(tokens)
+
+        if index_list == None:
+            return None
+        
+        for index in index_list:
+            if self.error_vector_size(index):
+                return None
+        
+        tokens_entry: EntryIdentificadores = self.find_table_entry(current_scope_index, tokens[0])
+
+        if (tokens_entry == None):
+            return False
+        
+        if (tokens_entry.tamanho == 0):
+            self.throw_error(f"{tokens[0]["lexeme"]} não é um vator e por isso não pode posições acessadas.", tokens[0])
+            return False
+
+
+        if (expected_types != tokens_entry.tipo):
+            self.throw_error(f"{tokens_entry.tipo} não pode ser convertido em {expected_types}.", tokens[0])
+            return False
+
+    def validade_function_call(self, current_scope_index, tokens, expected_types):
+        pass
+         
     ################################ Funções de erro ################################
+
+    def validate_expression(self, current_scope_index, tokens):
+        expression_type = None
+
+        variable_tokens = []
+        for i in range(0, len(tokens)):
+            token = tokens[i]
+
+            if (token["category"] == "OPERATOR" and token["lexeme"] != ".") or i == len(tokens)-1: ## se achar um delimitador ou terminar a lista
+                
+                if (token["lexeme"] in ["+", "-", '*', '/'] and expression_type != ["boolean"]):
+                    expression_type = ["float", "integer"]
+                elif (token["lexeme"] in ["&&", "||", '>', '<', '!=', '>=', '<=', '==']):
+                    expression_type = ["boolean"]
+                
+                var_dict = self.identify_var_kind(current_scope_index, variable_tokens, ["float", "integer", "boolean"])
+ 
+                match var_dict["tipo"]:
+                    case "IDENTIFIER":
+                        self.validade_identifier(current_scope_index, variable_tokens, ["float", "integer", "boolean"])
+
+                    case "LITERAL":
+                        self.validade_literal(current_scope_index, variable_tokens, ["float", "integer", "boolean"])
+
+                    case "REGISTER":
+                        self.validade_register(current_scope_index, variable_tokens, ["float", "integer", "boolean"])
+
+                    case "VECTOR":
+                        self.validade_vector(current_scope_index, variable_tokens, ["float", "integer", "boolean"])
+
+                    case "FUNCTION CALL":
+                        self.validade_function_call(current_scope_index, variable_tokens, ["float", "integer", "boolean"])
+            else:
+                variable_tokens.append(token)
+
 
     #TODO: renomear variaves para ingles
     #TODO ESSA FUNÇÃO FAZ ALÉM DE IDENTIFICAR O TIPO DE RETORNO, SERIA MELHOR: VALIDATE_EXPRESSION_AND_TYPE
@@ -390,9 +494,6 @@ class SemanticAnalyzer:
         for token in tokens:
             if token["category"] == "OPERATOR" and token["lexeme"] != ".":
                 variable = self.identify_var_kind(variable_tokens)
-                
-                if variable == None: #PRECISA REMOVER DPS Q ACHAR O PROBLEMA
-                    return None
 
                 if variable["tipo"] == "IDENTIFIER" or variable["tipo"] == "REGISTER" or variable["tipo"] == "VECTOR":
                     variable_entry: EntryIdentificadores = self.find_table_entry(current_scope_index, variable["token"][0])
