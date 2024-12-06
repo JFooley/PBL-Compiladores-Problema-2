@@ -478,13 +478,12 @@ class SemanticAnalyzer:
                         self.throw_error(f"{value_entry.tipo} não pode ser convertido em {variable_entry.tipo}.", value[0])
                         return False
 
-                case "LITERAL": #TODO verificar se acessar value["category"] no erro ta correto
+                case "LITERAL": 
                     print("entrei ---")
                     match value[0]["category"]:
                         case "NUMBER":
-                            #TODO: Essa verificação não tá entrando: testei teste = 3.5; e não deu erro: sendo que teste é string essa verificação faz o que: and ("." in value[0]["lexeme"] and variable_entry.tipo == "integer")
-                            if (variable_entry.tipo != "float" and variable_entry.tipo != "integer" and ("." in value[0]["lexeme"] and variable_entry.tipo == "integer")):
-                                self.throw_error(f"{value["category"]} não pode ser convertido em {variable_entry.tipo}.", value[0])
+                            if (variable_entry.tipo != "float" and variable_entry.tipo != "integer"):
+                                self.throw_error(f"{value[0]["category"]} não pode ser convertido em {variable_entry.tipo}.", value[0])
                                 return False
                         
                         case "STRING":
@@ -576,7 +575,7 @@ class SemanticAnalyzer:
                 case "LITERAL":
                     match value[0]["category"]:
                         case "NUMBER":
-                            if (variable_type["lexeme"] != "float" and variable_type["lexeme"] != "integer" and ("." in value[0]["lexeme"] and variable_type["lexeme"] == "integer")):
+                            if (variable_type["lexeme"] != "float" and variable_type["lexeme"] != "integer"):
                                 self.throw_error(f"{value[0]["category"]} não pode ser convertido em {variable_type["lexeme"]}.", value[0])
                                 return False
                         
