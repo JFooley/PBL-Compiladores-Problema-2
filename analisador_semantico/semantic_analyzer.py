@@ -774,7 +774,7 @@ class SemanticAnalyzer:
         value_list = []
         # Verificar se só tem apenas o return na lista
         if len(token_list) == 1:
-            if self.last_function_type != None self.last_function_type['lexeme'].lower() != "empty":
+            if self.last_function_type != None and self.last_function_type['lexeme'].lower() != "empty":
                 self.throw_error("O retorno da função está vazio", token_list[0])
                 return
             else:
