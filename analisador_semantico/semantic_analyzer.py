@@ -939,8 +939,9 @@ class SemanticAnalyzer:
                 self.remove_local_table()
             else:                
                 line.append(token)
-        if(on_return == False and self.last_function_type['lexeme'] != "empty"):
-            self.throw_error(f"A função exige um retorno",self.last_function_type)
+        if(self.last_function_type != None):
+            if(on_return == False and self.last_function_type['lexeme'] != "empty"):
+                self.throw_error(f"A função exige um retorno",self.last_function_type)
 
         print("\n--------------- tabelas locais e global---------------")
         print(self.pairs_table)
