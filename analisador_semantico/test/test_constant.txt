@@ -1,0 +1,44 @@
+register pessoa {
+  integer idade;
+}
+
+constants {
+  integer a = 100;
+}
+
+variables {
+  integer b = 50;
+}
+
+function integer val() {
+  variables {}
+  return 1;
+}
+
+main() {
+  variables {
+      integer c = 0;
+      pessoa p;
+  }
+
+  p.idade = 15;
+
+  b = b + a;            //Ele NAO pode alegar um erro aqui
+  write(a + 1);         //Ele NAO pode alegar um erro aqui
+
+  a = 0;                //Ele DEVE alegar um erro aqui
+  a = a;                //Ele DEVE alegar um erro aqui
+  a = 2*a;              //Ele DEVE alegar um erro aqui
+  a = a + 1;            //Ele DEVE alegar um erro aqui
+  a = c;                //Ele DEVE alegar um erro aqui
+  a = val(b);           //Ele DEVE alegar um erro aqui
+  a = p.idade;          //Ele DEVE alegar um erro aqui
+  a = 1 + 1;            //Ele DEVE alegar um erro aqui
+  a++;                  //Ele DEVE alegar um erro aqui
+  a--;                  //Ele DEVE alegar um erro aqui
+  a = (1);              //Ele DEVE alegar um erro aqui
+}
+  
+
+  
+  
