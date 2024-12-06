@@ -700,18 +700,29 @@ class SemanticAnalyzer:
             self.throw_error(f"{token_list[0]['lexeme']} não é uma função", token_list[0])
             return
         
+        other_func_call = [] # token_list para validar chamadas de função nos parametros
+        is_func = False
         # Retira da lista de tokens acumulados apenas os tokens referentes aos argumentos passados na chamda
         function_call_arguments = []
         i = 1
         while i < len(token_list):
-            if token_list[i]['lexeme'] == '(' or token_list[i]['lexeme'] == ',':
-                if token_list[i+2]['lexeme'] == '.': # caso seja um objeto o id depois do . importa
-                    function_call_arguments.append([])
-                else:
-                    function_call_arguments.append(token_list[i+1])
+            if is_func:
+                other_func_call.append(token_list[i])
+                if token_list[i]['lexeme'] == ')':
+                    self.validate_function_parameters(other_func_call)
+                    other_func_call = []
+                    is_func = False
+            else:
+                if token_list[i]['lexeme'] == '(' or token_list[i]['lexeme'] == ',':
+                    if token_list[i+2]['lexeme'] == '.': # caso seja um objeto o id depois do . importa
+                        function_call_arguments.append([])
+                    else:
+                        if token_list[i+2]['lexeme'] == '(':
+                            is_func = True
+                        function_call_arguments.append(token_list[i+1])
 
-            if type(function_call_arguments[-1]) == list and token_list[i]['category'] == 'IDENTIFIER':
-                function_call_arguments[-1].append(token_list[i])
+                if type(function_call_arguments[-1]) == list and token_list[i]['category'] == 'IDENTIFIER':
+                    function_call_arguments[-1].append(token_list[i])
 
             i += 1
 

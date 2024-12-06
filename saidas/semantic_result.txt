@@ -1,5 +1,7 @@
+{'position': 46, 'message': '1º parametro de sum é string, espera-se integer'}
 {'position': 49, 'message': '1º parametro de sum é None, espera-se integer'}
-{'position': 52, 'message': 'sum espera 2 parametro(s), mas recebeu 6'}
+{'position': 52, 'message': '1º parametro de sum1 é string, espera-se integer'}
+{'position': 52, 'message': '1º parametro de sum é string, espera-se integer'}
 {'position': 53, 'message': 'O n1.a não existe nesse escopo.'}
 {'position': 56, 'message': "A Variável não é do tipo inteiro. A variável 'v' é um vetor ou matriz"}
 {'position': 57, 'message': "A Variável não é do tipo inteiro. A variável 'm' é um vetor ou matriz"}
