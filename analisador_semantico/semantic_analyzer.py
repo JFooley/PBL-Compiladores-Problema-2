@@ -330,7 +330,7 @@ class SemanticAnalyzer:
                 
     ################################ Funções de erro ################################
 
-    def identify_expression_return(self, current_scope_index, tokens):
+    def identify_expression_return(self, current_scope_index, tokens: list):
         ## Identifica se a expressão aritimética passada é do tipo aritimética (retorna apenas number) ou do tipo logica/relacional (retorna boolean)
         ## A função da throw nos erros caso alguma das variáveis não existam ou sejam string e retorna None caso tenha falhado
         ## Caso não tenha falhado, ela vai retornar o tipo do retorno da expressão (number ou boolean)
@@ -341,15 +341,14 @@ class SemanticAnalyzer:
             if token["category"] == "OPERATOR" and token["lexeme"] != "." and token["lexeme"] in ["&&", "||", '>', '<', '!=', '>=', '<=', '==']:
                 type = ["boolean"]
                 break
-        
+
         # Valida os atributos (se existem, se foi inicializado e são diferentes de string)
         variable_tokens = []
         for token in tokens:
-            if token["category"] == "OPERATOR" and token["lexeme"] != ".":
-                variable = self.get_variable_type(variable_tokens)
+            if (token["category"] == "OPERATOR" and token["lexeme"] != ".") or token == tokens[-1]:
+                if (token == tokens[-1]): variable_tokens.append(token) # Caso do ultimo token
 
-                if variable == None: #PRECISA REMOVER DPS Q ACHAR O PROBLEMA
-                    return None
+                variable = self.get_variable_type(variable_tokens)
 
                 if variable["tipo"] == "IDENTIFIER" or variable["tipo"] == "REGISTER" or variable["tipo"] == "VECTOR":
                     variable_entry: EntryIdentificadores = self.find_table_entry(current_scope_index, variable["token"][0])
@@ -395,6 +394,11 @@ class SemanticAnalyzer:
                 
                     self.validate_function_parameters(variable_tokens)  #valida os parametros
                 
+                elif variable["tipo"] == "LITERAL":
+                    if variable["token"][0]["category"] == "STRING":
+                        self.throw_error("String não pode compor expressão.", variable["token"][0])
+                        return None
+
                 variable_tokens.clear()
 
             else:
