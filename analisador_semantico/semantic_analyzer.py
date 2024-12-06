@@ -653,6 +653,7 @@ class SemanticAnalyzer:
     def repeated_statement(self, current_table_index, new_variable):
         ## Verifica se a variável definida pelo token new_variable já foi declarada
         ## new_variable: token do objeto que vai ser declarado
+        # tst
 
         ## Verifica se a variável existe no escopo
         if (self.find_table_entry(current_table_index, new_variable, throw_erro= False) != None):
@@ -752,8 +753,7 @@ class SemanticAnalyzer:
                 return
             i += 1
             
-
-            
+         
             
   
                     
@@ -779,10 +779,8 @@ class SemanticAnalyzer:
         if len(token_list) == 1:
             if self.last_function_type['lexeme'].lower() != "empty":
                 self.throw_error("O retorno da função está vazio", token_list[0])
-                self.last_function_type = None
                 return
             else:
-                self.last_function_type = None
                 return
         else:
             for token in token_list[1:len(token_list)]:
@@ -797,7 +795,6 @@ class SemanticAnalyzer:
                 return_entry = self.wrong_type_assign(self.current_table_index,[{"lexeme":"valid", "category":"STRING", "line":value_list[0]["line"]}],value_list,self.last_function_type)
                 if return_entry == False:
                     return
-        self.last_function_type = None
         
     # Chamada dentro ou após a adição da função na tabela
     def validate_consistent_return(self, token_list):
@@ -917,7 +914,6 @@ class SemanticAnalyzer:
                     if self.is_increment(line):
                         self.validate_increment_decrement(line)
                     elif self.is_function(line):
-                        
                         self.validate_function_parameters(line)
                         on_return = False
                     else:
@@ -929,7 +925,6 @@ class SemanticAnalyzer:
                         # Usar [] em um identificador que não é vetor(em declaração (2 lados da igualdade), em expressoes aritméticas)
                         #Verificar se o identificador passado como index do vetor é inteiro (error_vector_size)
                 line = []
-                # on_return = False
             
             elif token['lexeme'] == '{':
                 self.create_local_table()
@@ -950,10 +945,10 @@ class SemanticAnalyzer:
             else:                
                 line.append(token)
         if(on_return == False):
-            self.throw_error(f"A função exige um retorno",{"line":123})
+            self.throw_error(f"A função exige um retorno",self.last_function_type)
             
-        print("\n--------------- tabelas locais e global---------------")
-        print(self.pairs_table)
+        # print("\n--------------- tabelas locais e global---------------")
+        # print(self.pairs_table)
         
  #----------------------- Valida o while e if ----------------------------
     def validate_conditional(self,token_list):

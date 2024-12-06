@@ -8,6 +8,8 @@ constants {
 }
 
 variables {
+  string a = 3;
+  integer d = 4;
   string z = "teste string";
   integer g = 1;
   integer v_g[1];
@@ -22,23 +24,15 @@ function integer sum(integer a, integer b) {
   return 1;
 }
 
-function integer sum1(integer a, integer b) {
+function string sum1(integer a, integer b) {
   variables { 
-  r r2;
+  
   }
   r2.a = 3;
   sum(1,2);
-  return;
+  return "a";
 }
 
-
-function integer sum12(integer a, integer b) {
-  variables { 
-  r r2;
-  }
-  r2.a = 3;
-  return 2;
-}
 
 
 
