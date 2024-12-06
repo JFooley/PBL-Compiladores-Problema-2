@@ -940,7 +940,7 @@ class SemanticAnalyzer:
             else:                
                 line.append(token)
         if(on_return == False and self.last_function_type['lexeme'] != "empty"):
-            self.throw_error(f"A função exige um retorno",token_list[0])
+            self.throw_error(f"A função exige um retorno",self.last_function_type)
 
         print("\n--------------- tabelas locais e global---------------")
         print(self.pairs_table)
