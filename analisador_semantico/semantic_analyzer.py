@@ -359,7 +359,6 @@ class SemanticAnalyzer:
                 if (token == tokens[-1]): variable_tokens.append(token) # Caso do ultimo token
 
                 variable = self.get_variable_type(variable_tokens)
-
                 if variable["tipo"] == "IDENTIFIER" or variable["tipo"] == "REGISTER" or variable["tipo"] == "VECTOR":
                     variable_entry: EntryIdentificadores = self.find_table_entry(current_scope_index, variable["token"][0])
 
@@ -1023,9 +1022,6 @@ class SemanticAnalyzer:
             brakets = any(token['lexeme']=='[' for token in name_list)
             if variable == None and brakets:
                 self.throw_error(f"{name_list[0]['lexeme']} não é um vetor e por isso não pode posições acessadas.", name_list[0])
-           
-            
-        
 
  #------------------------- Valida erro no for ------------------
     def validate_for(self,token_list):
