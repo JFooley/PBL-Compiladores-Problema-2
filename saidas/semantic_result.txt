@@ -1,3 +1,8 @@
+{'position': 46, 'message': '1º parametro de sum é string, espera-se integer'}
+{'position': 49, 'message': '1º parametro de sum é None, espera-se integer'}
+{'position': 52, 'message': '1º parametro de sum1 é string, espera-se integer'}
+{'position': 52, 'message': '1º parametro de sum é string, espera-se integer'}
+{'position': 53, 'message': 'O n1.a não existe nesse escopo.'}
 {'position': 56, 'message': "A Variável não é do tipo inteiro. A variável 'v' é um vetor ou matriz"}
 {'position': 57, 'message': "A Variável não é do tipo inteiro. A variável 'm' é um vetor ou matriz"}
 {'position': 58, 'message': 'O indíce do vetor deve ser inteiro'}
@@ -6,18 +11,25 @@
 {'position': 61, 'message': 'A variável teste não é do tipo inteiro'}
 {'position': 62, 'message': 'A variável n1 não foi inicializada'}
 {'position': 63, 'message': 'O x não existe nesse escopo.'}
-{'position': 63, 'message': 'O x não existe nesse escopo.'}
-{'position': 78, 'message': 'O num não existe nesse escopo.'}
-{'position': 78, 'message': 'O num não existe nesse escopo.'}
-{'position': 78, 'message': 'O num não existe nesse escopo.'}
 {'position': 78, 'message': 'O num não existe nesse escopo.'}
 {'position': 80, 'message': 'O num não existe nesse escopo.'}
-{'position': 80, 'message': 'O num não existe nesse escopo.'}
-{'position': 80, 'message': 'O num não existe nesse escopo.'}
-{'position': 80, 'message': 'O num não existe nesse escopo.'}
-{'position': 84, 'message': 'O num não existe nesse escopo.'}
-{'position': 84, 'message': 'O num não existe nesse escopo.'}
-{'position': 85, 'message': 'O num não existe nesse escopo.'}
-{'position': 85, 'message': 'O num não existe nesse escopo.'}
-{'position': 85, 'message': 'O r.a não existe nesse escopo.'}
-{'position': 85, 'message': 'O r.a não existe nesse escopo.'}
+{'position': 110, 'message': 'O duna não existe nesse escopo.'}
+{'position': 111, 'message': 'O lor não existe nesse escopo.'}
+{'position': 113, 'message': 'O arcane não existe nesse escopo.'}
+{'position': 117, 'message': 'O r1.hulk não existe nesse escopo.'}
+{'position': 118, 'message': 'O batman.a não existe nesse escopo.'}
+{'position': 119, 'message': 'O batman.a não existe nesse escopo.'}
+{'position': 120, 'message': 'O batman não existe nesse escopo.'}
+{'position': 121, 'message': '1º parametro de sum é string, espera-se integer'}
+{'position': 122, 'message': 'O hello_world não existe nesse escopo.'}
+{'position': 123, 'message': 'O tipo string não pode ser operado em uma expressão'}
+{'position': 124, 'message': 'O tipo string não pode ser operado em uma expressão'}
+{'position': 125, 'message': 'O tipo string não pode ser operado em uma expressão'}
+{'position': 128, 'message': 'O duna não existe nesse escopo.'}
+{'position': 129, 'message': 'O lor não existe nesse escopo.'}
+{'position': 131, 'message': 'O arcane não existe nesse escopo.'}
+{'position': 135, 'message': 'O r1.hulk não existe nesse escopo.'}
+{'position': 136, 'message': 'O batman.a não existe nesse escopo.'}
+{'position': 137, 'message': 'O batman.a não existe nesse escopo.'}
+{'position': 138, 'message': 'O batman não existe nesse escopo.'}
+{'position': 23, 'message': 'A função exige um retorno'}

@@ -107,22 +107,24 @@ class Parser():
             self.constants_declarations()
 
 #--------------------- Variaveis ---------------------
-    def variables(self, is_global = False):
+    def variables(self, is_global = False, parameters_list=[]):
         self.match_lexeme(['variables'])
         self.match_lexeme(['{'])
-        self.token_accumulator_list = []
-        size_error = len(self.error_list)
+        if len(parameters_list) > 0:
+            self.validator.add_variables_parameter_function(parameters_list,is_global)
         if self.lookahead()['category'] == 'IDENTIFIER' or self.lookahead()['lexeme'] in ['integer', 'float', 'boolean', 'string']:
-            self.expression_variables()
-        
-        if (len(self.error_list) == size_error):
-            self.validator.add_variables_to_table(is_global, self.token_accumulator_list)
+            self.expression_variables(is_global)
         self.match_lexeme(['}'])
 
-    def expression_variables(self):
-        # limpa lista
+    def expression_variables(self, is_global = False):
+        self.token_accumulator_list = []
+        size_error = len(self.error_list)
+        
         self.expression_declaration()
-        # chama função
+
+        if (len(self.error_list) == size_error):
+            self.validator.add_variables_to_table(is_global, self.token_accumulator_list)
+
         if self.lookahead()['category'] == 'IDENTIFIER' or self.lookahead()['lexeme'] in ['integer', 'float', 'boolean', 'string']:
             self.expression_variables()
 
@@ -142,9 +144,9 @@ class Parser():
         self.match_category(["IDENTIFIER"])
         self.parameters()
         if len(self.get_error_list()) == 0:
-            self.validator.add_function_to_table(self.token_accumulator_list) # adiciona na tabela de simbolos
+            parameters_list = self.validator.add_function_to_table(self.token_accumulator_list) # adiciona na tabela de simbolos
         self.match_lexeme(["{"])
-        self.statements()
+        self.statements(parameters_list)
         self.match_lexeme(["}"])
 
     def parameters(self):
@@ -401,9 +403,9 @@ class Parser():
             self.value()  
 
 #--------------------- statements ---------------------
-    def statements(self):
+    def statements(self, parameters_list=[]):
         self.validator.create_local_table() 
-        self.variables()
+        self.variables(False, parameters_list)
         self.token_accumulator_list = []
         size_error = len(self.error_list)
         self.body()
