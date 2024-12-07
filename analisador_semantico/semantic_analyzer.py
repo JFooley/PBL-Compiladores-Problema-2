@@ -265,52 +265,53 @@ class SemanticAnalyzer:
         vector_length = []
         value_list = []
         values = ""
+        consume_values = False
         for i in range(0, len(token_list)):
             token = token_list[i]
             
+            
             if token['category'] == 'KEYWORD':  #obs: o tipo pode ser tbm identifier, que é o caso de ser um register
-                variable_type = token
+                if(token['lexeme'] not in ['true', "false"]):
+                    variable_type = token
+                else:
+                    if(consume_values==True):
+                        value_list.append(token)
+                        values = values + token["lexeme"]
             
             elif token['category'] == 'IDENTIFIER': # Falta verificar os registers
                 if token_list[i + 1]['category'] == "IDENTIFIER":
                     variable_type = token
-                else:
-                    variable_name = token
-                    
+                elif token_list[i+1]['lexeme'] != ']':
+                    variable_name = token   
             
             elif token['category'] == 'OPERATOR' and token['lexeme'] == '=': # consumir tudo até o ;
-                aux_counter = i + 1
-                current_token = token_list[aux_counter]
-                while current_token['lexeme'] != ";":
-                    value_list.append(current_token)
-                    values = values + current_token["lexeme"]
-                    aux_counter += 1
-                    current_token = token_list[aux_counter]
-                i = aux_counter + 1
-                
+                consume_values = True
             
             elif token['category'] == 'DELIMITER' and token['lexeme'] == '[': # verificar se é um vector ou matriz
                 vector_length.append(token_list[i + 1])
-                
                     
             elif token['category'] == 'DELIMITER' and token['lexeme'] == ";":  # Encontrando o delimitador ';'
-                if self.repeated_statement(self.current_table_index,variable_name) == False: #Verifica se o identificador ja não existe como constante ou variaveis na tabela de simbolos
-                    return 
+                consume_values = False
+                error = len(self.error_list)
+                self.repeated_statement(self.current_table_index,variable_name)#Verifica se o identificador ja não existe como constante ou variaveis na tabela de simbolos
+                 
                 # Atribuição de valor
                 if not len(value_list) == 0:
-
-                    if self.wrong_type_assign(self.current_table_index,[variable_name],value_list,variable_type) == False:
-                        return
+                    self.wrong_type_assign(self.current_table_index,[variable_name],value_list,variable_type)
                     
                     #TODO Talvez nao é necessario pq o sintatico da erro
                     if (variable_type['category'] == "IDENTIFIER"):
-                        register = [variable_type, variable_name, {"lexeme":"=", "category":"DELIMITER", "line":variable_name["line"]}].extend(value_list).append({"lexeme":";", "category":"DELIMITER", "line":variable_name["line"]})
-                        self.add_register_instance_to_table(register)
+                        if error == len(self.error_list):
+                            register = [variable_type, variable_name, {"lexeme":"=", "category":"DELIMITER", "line":variable_name["line"]}].extend(value_list).append({"lexeme":";", "category":"DELIMITER", "line":variable_name["line"]})
+                            self.add_register_instance_to_table(register)
                     else:
-                        variables_entry = EntryIdentificadores(variable_name['lexeme'], variable_type['lexeme'], values , None, None, vector_length if vector_length != [] else 0)
-                        self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
+                        if error == len(self.error_list):
+                            variables_entry = EntryIdentificadores(variable_name['lexeme'], variable_type['lexeme'], values , None, None, vector_length if vector_length != [] else 0)
+                            self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
                     
                     value_list = []
+                    values = ""
+                    
                 # Declaração de variável
                 else:
                     error_size = len(self.error_list)
@@ -327,13 +328,17 @@ class SemanticAnalyzer:
                         self.add_register_instance_to_table([variable_type, variable_name])
                         variable_type = ""
                         
-                    if variable_type != "":
+                    if variable_type != "": # Verifica se não é um registrador, caso não seja adiciona na tabela de símbolos
                         variables_entry = EntryIdentificadores(variable_name['lexeme'], variable_type['lexeme'], None , None, None, vector_size if vector_size != [] else 0)
                         self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
                         variable_type, variable_name, variable_value = "", "", ""
                         vector_length = []
                         value_list = []
-                        
+                        values = ""
+            else: # Consome tudo o que não fizer parte de nome ou tipo da variável
+                if consume_values == True:
+                    value_list.append(token)
+                    values = values + token["lexeme"]
                 
                 
     ################################ Funções de erro ################################
