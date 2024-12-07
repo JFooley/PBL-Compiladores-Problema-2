@@ -30,7 +30,7 @@ def write_file(file_name, list, message):
 
 def main():
 
-	TEST_FILE = './analisador_semantico/test/test_function.txt' # Exemplo: ./test/function_sample.txt 
+	TEST_FILE = './analisador_semantico/test/teste_adicao_funcao_e_variaveis.txt' # Exemplo: ./test/function_sample.txt 
 
 	tokens = lexical_analise(TEST_FILE)
 	if tokens :
@@ -41,10 +41,10 @@ def main():
 
 		# for item in parser.validator.pairs_table.tabela[0]['tabela']:print(item.nome)
 
-		print("\n--------------- tabela de registro ---------------")
-		print(validator.registers_type_table)
-		print("\n--------------- tabela global ---------------")
-		print(validator.pairs_table)
+		#print("\n--------------- tabela de registro ---------------")
+		#print(validator.registers_type_table)
+		#print("\n--------------- tabela global ---------------")
+		#print(validator.pairs_table)
 
 		if parser.get_error_list(): 
 			print("Erros foram encontrados durante a análise sintática.")

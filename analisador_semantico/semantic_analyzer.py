@@ -255,7 +255,151 @@ class SemanticAnalyzer:
             constant_entry = EntryIdentificadores(name["lexeme"], type["lexeme"], value, None, None, 0, True)
             self.pairs_table.tabela[0]['tabela'].append(constant_entry)
 
-    
+    def add_variables_parameter_function(self, token_list){
+        
+    }
+    def add_variables_to_table_2(self, is_global, token_list):
+        variable_type = token_list[0]
+        variable_name = token_list[1]
+        vector_length = []
+        value_list = []
+        values = ""
+        if self.repeated_statement(self.current_table_index,variable_name) == False: #Verifica se o identificador ja não existe como constante ou variaveis na tabela de simbolos
+            return 
+        variable = self.get_variable_type(token_list)
+
+        for i in range(0, len(token_list)): #Salva os tamanhos do vetor
+            token = token_list[i]
+            if token['category'] == 'DELIMITER' and token['lexeme'] == '[': # verificar se é um vector ou matriz
+                vector_length.append(token_list[i + 1])
+            if token['lexeme'] == ";" or token['lexeme'] == "=":
+                break
+            
+        if any(token.get("lexeme") == "=" for token in token_list) : #é só declaração de variavel com valor
+            list_assignment = self.split_list_token(token_list[0: len(token_list)-1], "=")
+            if (len(list_assignment)<2 and list_assignment[1] == None):
+                return
+            value_list = list_assignment[1]
+            values = self.get_concatenated_lexemes(value_list)
+            if self.wrong_type_assign(self.current_table_index,[variable_name],value_list,variable_type) == False:
+                return   
+            #TODO Talvez nao é necessario pq o sintatico da erro
+            if (variable_type['category'] == "IDENTIFIER"):
+                register = [variable_type, variable_name, {"lexeme":"=", "category":"DELIMITER", "line":variable_name["line"]}].extend(value_list).append({"lexeme":";", "category":"DELIMITER", "line":variable_name["line"]})
+                self.add_register_instance_to_table(register)
+            else:
+                variables_entry = EntryIdentificadores(variable_name['lexeme'], variable_type['lexeme'], values , None, None, vector_length if vector_length != [] else 0)
+                self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
+                    
+        else:
+            error_size = len(self.error_list)
+            vector_size = []
+            if (vector_length != []): # No caso é um vetor 
+                for index in vector_length:
+                    self.error_vector_size(index) # Verifica se o indice do vetor é int ou identifier
+                if(error_size == len(self.error_list)):
+                    for item in vector_length:
+                        vector_size.append(item['lexeme'])
+                else: 
+                    return
+            elif (variable_name['category']== "IDENTIFIER" and variable_type['category'] == "IDENTIFIER"):
+                self.add_register_instance_to_table([variable_type, variable_name])
+                variable_type = ""
+                        
+            if variable_type != "":
+                variables_entry = EntryIdentificadores(variable_name['lexeme'], variable_type['lexeme'], None , None, None, vector_size if vector_size != [] else 0)
+                self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
+                variable_type, variable_name, variable_value = "", "", ""
+                vector_length = []
+
+        
+        ''' 
+        if "=" in token_list
+        print(token_list)
+         #Verifica se o vetor tem index correto
+        index_list = self.get_index_vector(token_list)
+        if index_list == None:
+            print("vazio")
+        else:
+            print("\n\n ----- vetor")
+            print(index_list)
+                        
+        for index in index_list:
+            if self.error_vector_size(index): print("erro")
+            '''       
+        '''
+        for i in range(0, len(token_list)):
+            token = token_list[i]
+            
+            if token['category'] == 'KEYWORD':  #obs: o tipo pode ser tbm identifier, que é o caso de ser um register
+                variable_type = token
+            
+            elif token['category'] == 'IDENTIFIER': # Falta verificar os registers
+                if token_list[i + 1]['category'] == "IDENTIFIER":
+                    variable_type = token
+                else:
+                    variable_name = token
+                    
+            
+            elif token['category'] == 'OPERATOR' and token['lexeme'] == '=': # consumir tudo até o ;
+                aux_counter = i + 1
+                current_token = token_list[aux_counter]
+                while current_token['lexeme'] != ";":
+                    value_list.append(current_token)
+                    values = values + current_token["lexeme"]
+                    aux_counter += 1
+                    current_token = token_list[aux_counter]
+                i = aux_counter + 1
+                
+            
+            elif token['category'] == 'DELIMITER' and token['lexeme'] == '[': # verificar se é um vector ou matriz
+                vector_length.append(token_list[i + 1])
+                
+                    
+            elif token['category'] == 'DELIMITER' and token['lexeme'] == ";":  # Encontrando o delimitador ';'
+                if self.repeated_statement(self.current_table_index,variable_name) == False: #Verifica se o identificador ja não existe como constante ou variaveis na tabela de simbolos
+                    return 
+                # Atribuição de valor
+                if not len(value_list) == 0:
+
+                    if self.wrong_type_assign(self.current_table_index,[variable_name],value_list,variable_type) == False:
+                        return
+                    
+                    #TODO Talvez nao é necessario pq o sintatico da erro
+                    if (variable_type['category'] == "IDENTIFIER"):
+                        register = [variable_type, variable_name, {"lexeme":"=", "category":"DELIMITER", "line":variable_name["line"]}].extend(value_list).append({"lexeme":";", "category":"DELIMITER", "line":variable_name["line"]})
+                        self.add_register_instance_to_table(register)
+                    else:
+                        variables_entry = EntryIdentificadores(variable_name['lexeme'], variable_type['lexeme'], values , None, None, vector_length if vector_length != [] else 0)
+                        self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
+                    
+                    value_list = []
+                # Declaração de variável
+                else:
+                    error_size = len(self.error_list)
+                    vector_size = []
+                    if (vector_length != []): # No caso é um vetor 
+                        for index in vector_length:
+                            self.error_vector_size(index) # Verifica se o indice do vetor é int ou identifier
+                        if(error_size == len(self.error_list)):
+                            for item in vector_length:
+                                vector_size.append(item['lexeme'])
+                        else: 
+                            return
+                    elif (variable_name['category']== "IDENTIFIER" and variable_type['category'] == "IDENTIFIER"):
+                        self.add_register_instance_to_table([variable_type, variable_name])
+                        variable_type = ""
+                        
+                    if variable_type != "":
+                        variables_entry = EntryIdentificadores(variable_name['lexeme'], variable_type['lexeme'], None , None, None, vector_size if vector_size != [] else 0)
+                        self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
+                        variable_type, variable_name, variable_value = "", "", ""
+                        vector_length = []
+                        value_list = []
+                        '''
+                
+                
+
     # Definir quando acaba o escopo da variável 
     # Definir quando acaba o escopo da variável 
     # Se for vetor, verificar se o tamanho é int(number ou identificador)
@@ -470,10 +614,11 @@ class SemanticAnalyzer:
         ## Atribuição de valor a variavel existente
         if variable_type == None: 
             variable_entry: EntryIdentificadores = self.find_table_entry(current_table_index, variable[0])
-
+            print("\n\n -----------------------------variable entry")
+            print(variable_entry)
             if variable_entry == None:
                 return False
-        
+            print("\n\n -----------------------------variable")
             if variable_entry.isConstant:
                 self.throw_error(f"{variable[0]["lexeme"]} é uma constante, não pode ter seu valor alterado.", variable[0])
                 return False
@@ -578,8 +723,11 @@ class SemanticAnalyzer:
                     if (value_entry == None):
                         return False
                     
+                    print("\n\n----------------------------------------")
+                    print(value_entry)
+                    print("\n\n----------------------------------------")
                     if (variable_type["lexeme"] != value_entry.tipo):
-                        self.throw_error(f"{value_entry.tipo} não pode ser convertido em {variable_entry.tipo}.", value[0])
+                        self.throw_error(f"{value_entry.tipo} não pode ser convertido em {variable_type["lexeme"]}.", value[0])
                         return False
 
                 case "LITERAL":
@@ -810,20 +958,6 @@ class SemanticAnalyzer:
                 if return_entry == False:
                     return
         
-    # Chamada dentro ou após a adição da função na tabela
-    def validate_consistent_return(self, token_list):
-        function_name = token_list[1]['lexeme']
-        
-        if any(token['lexeme'] == "return" for token in token_list) == True:
-            # valida o retorno da função
-            # self.validate_function_return(token_list)
-            print()
-        else:
-            self.throw_error(f"A função {function_name} não possui retorno", token_list[1])
-            
-                
-        
-
     #################### Função para validar o incremento ou decremento  ####################
      #AJUSTES NECESSÁRIO:
     #precisa verifica se variável não foi inicializada

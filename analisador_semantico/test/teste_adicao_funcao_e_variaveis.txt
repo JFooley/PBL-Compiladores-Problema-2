@@ -8,7 +8,7 @@ constants {
 }
 
 variables {
-  boolean an = true;
+  boolean an = false;
   float a = 5;
   string z = "teste string";
   integer g = 1;

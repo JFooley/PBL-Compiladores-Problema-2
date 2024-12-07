@@ -110,21 +110,28 @@ class Parser():
     def variables(self, is_global = False, parameters_list=[]):
         self.match_lexeme(['variables'])
         self.match_lexeme(['{'])
-        self.token_accumulator_list = []
+        #self.token_accumulator_list = []
         if len(parameters_list) > 0:
-            self.token_accumulator_list.extend(parameters_list)
-        size_error = len(self.error_list)
+            self.add_variables_parameter_function(parameters_list)
+            #self.token_accumulator_list.extend(parameters_list)
+        #size_error = len(self.error_list)
         if self.lookahead()['category'] == 'IDENTIFIER' or self.lookahead()['lexeme'] in ['integer', 'float', 'boolean', 'string']:
-            self.expression_variables()
+            self.expression_variables(is_global)
         
-        if (len(self.error_list) == size_error):
-            self.validator.add_variables_to_table(is_global, self.token_accumulator_list)
+        #if (len(self.error_list) == size_error):
+        #   self.validator.add_variables_to_table_2(is_global, self.token_accumulator_list)
         self.match_lexeme(['}'])
 
-    def expression_variables(self):
+    def expression_variables(self, is_global = False):
         # limpa lista
+        self.token_accumulator_list = []
+        size_error = len(self.error_list)
+
         self.expression_declaration()
-        # chama função
+
+        if (len(self.error_list) == size_error):
+            self.validator.add_variables_to_table_2(is_global, self.token_accumulator_list)
+        
         if self.lookahead()['category'] == 'IDENTIFIER' or self.lookahead()['lexeme'] in ['integer', 'float', 'boolean', 'string']:
             self.expression_variables()
 
