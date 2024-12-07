@@ -453,7 +453,7 @@ class SemanticAnalyzer:
             ## Vector
             elif tokens[1]["lexeme"] == "[":
                 value_entry: EntryIdentificadores = self.find_table_entry(self.current_table_index, tokens[0])
-                if (value_entry.tamanho == 0):
+                if (value_entry != None and value_entry.tamanho == 0):
                     return None
                 return {"tipo":"VECTOR", "token": tokens}
 
