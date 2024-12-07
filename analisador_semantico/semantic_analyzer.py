@@ -452,6 +452,9 @@ class SemanticAnalyzer:
 
             ## Vector
             elif tokens[1]["lexeme"] == "[":
+                value_entry: EntryIdentificadores = self.find_table_entry(self.current_table_index, tokens[0])
+                if (value_entry.tamanho == 0):
+                    return None
                 return {"tipo":"VECTOR", "token": tokens}
 
     def wrong_type_assign(self, current_table_index, variable, value, variable_type = None): 
@@ -1002,6 +1005,11 @@ class SemanticAnalyzer:
             variable = self.get_variable_type(name_list)
             if (variable != None and variable["tipo"] != "VECTOR"):
                 self.pairs_table.alterar_caracteristica_identificador(self.current_table_index,variable["token"][0]["lexeme"],"valor",value)
+        else: # Erro no tipo, não é vetor 
+            variable = self.get_variable_type(name_list)
+            brakets = any(token['lexeme']=='[' for token in name_list)
+            if variable == None and brakets:
+                self.throw_error(f"{name_list[0]['lexeme']} não é um vetor e por isso não pode posições acessadas.", name_list[0])
 
  #------------------------- Valida erro no for ------------------
     def validate_for(self,token_list):
