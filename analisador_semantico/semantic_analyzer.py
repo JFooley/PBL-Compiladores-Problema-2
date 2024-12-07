@@ -340,7 +340,6 @@ class SemanticAnalyzer:
                     value_list.append(token)
                     values = values + token["lexeme"]
                 
-
                 
     ################################ Funções de erro ################################
 
@@ -493,14 +492,14 @@ class SemanticAnalyzer:
                     if (value_entry == None):
                         return False
                     
-                    if (variable_entry.tipo != value_entry.tipo):
+                    if ((variable_entry.tipo == "float" or variable_entry.tipo == "integer") and value_entry.tipo == "string") or (variable_entry.tipo == "string" and value_entry.tipo != "string"):
                         self.throw_error(f"{value_entry.tipo} não pode ser convertido em {variable_entry.tipo}.", value[0])
                         return False
 
                 case "LITERAL": 
                     match value[0]["category"]:
                         case "NUMBER":
-                            if (variable_entry.tipo != "float" and variable_entry.tipo != "integer"):
+                            if (variable_entry.tipo == "string" or variable_entry.tipo == "character"):
                                 self.throw_error(f"{value[0]["category"]} não pode ser convertido em {variable_entry.tipo}.", value[0])
                                 return False
                         
@@ -515,7 +514,7 @@ class SemanticAnalyzer:
                                 return False
 
                         case "BOOLEAN":
-                            if (variable_entry.tipo != "boolean"):
+                            if (variable_entry.tipo == "string" or variable_entry.tipo == "character"):
                                 self.throw_error(f"{value[0]["category"]} não pode ser convertido em {variable_entry.tipo}.", value[0])    
                                 return False
 
@@ -587,15 +586,15 @@ class SemanticAnalyzer:
 
                     if (value_entry == None):
                         return False
-                    
-                    if (variable_type["lexeme"] != value_entry.tipo):
-                        self.throw_error(f"{value_entry.tipo} não pode ser convertido em {variable_entry.tipo}.", value[0])
+                        
+                    if ((variable_type["lexeme"] == "float" or variable_type["lexeme"] == "integer") and value_entry.tipo == "string") or (variable_type["lexeme"] == "string" and value_entry.tipo != "string"):
+                        self.throw_error(f"{value_entry.tipo} não pode ser convertido em {variable_type["lexeme"]}.", value[0])
                         return False
 
                 case "LITERAL":
                     match value[0]["category"]:
                         case "NUMBER":
-                            if (variable_type["lexeme"] != "float" and variable_type["lexeme"] != "integer"):
+                            if (variable_type["lexeme"] == "string" or variable_type["lexeme"] == "character"):
                                 self.throw_error(f"{value[0]["category"]} não pode ser convertido em {variable_type["lexeme"]}.", value[0])
                                 return False
                         
@@ -610,8 +609,8 @@ class SemanticAnalyzer:
                                 return False
 
                         case "BOOLEAN":
-                            if (variable_type["lexeme"] != "boolean"):
-                                self.throw_error(f"{value[0]['category']} não pode ser convertido em {variable_type['lexeme']}.", value[0])    
+                            if (variable_type["lexeme"] == "string" or variable_type["lexeme"] == "character"):
+                                self.throw_error(f"{value[0]["category"]} não pode ser convertido em {variable_type["lexeme"]}.", value[0])    
                                 return False
 
                 case "REGISTER":
@@ -1025,7 +1024,7 @@ class SemanticAnalyzer:
             variable = self.get_variable_type(name_list)
             brakets = any(token['lexeme']=='[' for token in name_list)
             if variable == None and brakets:
-                self.throw_error(f"{name_list[0]['lexeme']} não é um vetor e por isso não pode posições acessadas.", name_list[0])
+                self.throw_error(f"{name_list[0]['lexeme']} não é um vetor e por isso não pode ter posições acessadas.", name_list[0])
 
  #------------------------- Valida erro no for ------------------
     def validate_for(self,token_list):
