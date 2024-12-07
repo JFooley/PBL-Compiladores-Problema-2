@@ -1,0 +1,46 @@
+register documento {
+    integer idade;
+}
+
+constants {
+    float g = 9.8;
+}
+
+variables {
+}
+
+main() {
+    variables {
+        integer n1 = 5;
+        integer n2 = 1;
+        string s = "teste";
+        boolean b = true;
+        integer v[2];
+        integer m[1][2];
+        integer result;
+        documento fulano;
+    }
+    
+    n1 = 1;
+    n1 = "joao";
+
+    n1 = n2;
+    n1 = s;
+
+    s = 1;
+    s = n1;
+    n1 = b;
+    b = s;
+
+    fulano.idade = 10;
+    fulano.idade = n1;
+    fulano.idade = s;
+    fulano.idade = "string literal";
+
+    s = 1 + n1;
+    b = b && n1;
+}
+  
+
+  
+  

@@ -30,7 +30,7 @@ def write_file(file_name, list, message):
 
 def main():
 
-	TEST_FILE = './analisador_semantico/test/test_function.txt' # Exemplo: ./test/function_sample.txt 
+	TEST_FILE = './analisador_semantico/test/test_assigment.txt' # Exemplo: ./test/function_sample.txt 
 
 	tokens = lexical_analise(TEST_FILE)
 	if tokens :
