@@ -93,7 +93,7 @@ main() {
   write(1);
   write(a+1);
   write(a==1);
-  //write(a==1 && b==1); dando erro em variable
+  write(a==1 && b==1);
   write(a, v[0], m[0][0], r1.a, sum(a, b), 1, a+1);
 
   // Testes read
