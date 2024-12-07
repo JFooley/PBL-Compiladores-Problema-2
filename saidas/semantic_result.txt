@@ -1,37 +1,26 @@
-{'position': 31, 'message': 'O r2.a não existe nesse escopo.'}
-{'position': 42, 'message': 'a já existe neste escopo.'}
-{'position': 53, 'message': 'O v não existe nesse escopo.'}
-{'position': 54, 'message': 'O v não existe nesse escopo.'}
-{'position': 55, 'message': 'O m não existe nesse escopo.'}
-{'position': 56, 'message': 'O m não existe nesse escopo.'}
-{'position': 57, 'message': 'O result não existe nesse escopo.'}
-{'position': 58, 'message': 'O result não existe nesse escopo.'}
-{'position': 59, 'message': 'O result não existe nesse escopo.'}
-{'position': 60, 'message': 'O result não existe nesse escopo.'}
-{'position': 62, 'message': 'O result não existe nesse escopo.'}
-{'position': 63, 'message': 'O result não existe nesse escopo.'}
-{'position': 64, 'message': 'O n1.a não existe nesse escopo.'}
-{'position': 67, 'message': 'O v não existe nesse escopo.'}
-{'position': 68, 'message': 'O m não existe nesse escopo.'}
-{'position': 69, 'message': 'O v não existe nesse escopo.'}
-{'position': 70, 'message': 'O m não existe nesse escopo.'}
-{'position': 71, 'message': 'A variável c é uma constante. Não é possível alterar o valor de constantes.'}
-{'position': 72, 'message': 'A variável teste não é do tipo inteiro'}
-{'position': 73, 'message': 'O n1 não existe nesse escopo.'}
-{'position': 74, 'message': 'O x não existe nesse escopo.'}
-{'position': 77, 'message': "['float', 'integer'] não pode ser convertido em string."}
-{'position': 83, 'message': 'A váriavel a não é do tipo integer.'}
-{'position': 84, 'message': 'O b não existe nesse escopo.'}
-{'position': 87, 'message': 'O tipo string não pode ser operado em uma expressão'}
-{'position': 89, 'message': 'O num não existe nesse escopo.'}
-{'position': 91, 'message': 'O num não existe nesse escopo.'}
-{'position': 95, 'message': 'O num não existe nesse escopo.'}
-{'position': 95, 'message': 'O v não existe nesse escopo.'}
-{'position': 95, 'message': 'O m não existe nesse escopo.'}
-{'position': 95, 'message': 'O tipo string não pode ser operado em uma expressão'}
-{'position': 95, 'message': 'O tipo string não pode ser operado em uma expressão'}
-{'position': 96, 'message': 'O num não existe nesse escopo.'}
-{'position': 96, 'message': 'O v não existe nesse escopo.'}
-{'position': 96, 'message': 'O m não existe nesse escopo.'}
-{'position': 96, 'message': 'O r.a não existe nesse escopo.'}
-{'position': 27, 'message': 'A função exige um retorno'}
+{'position': 13, 'message': 'c já existe neste escopo.'}
+{'position': 27, 'message': 'teste_string não é um vetor e por isso não pode posições acessadas.'}
+{'position': 28, 'message': 'g não é um vetor e por isso não pode posições acessadas.'}
+{'position': 42, 'message': 'O r2.a não existe nesse escopo.'}
+{'position': 68, 'message': '1º parametro de sum é string, espera-se integer'}
+{'position': 71, 'message': '1º parametro de sum é None, espera-se integer'}
+{'position': 73, 'message': 'O g não existe nesse escopo.'}
+{'position': 74, 'message': '1º parametro de sum1 é string, espera-se integer'}
+{'position': 74, 'message': '1º parametro de sum é string, espera-se integer'}
+{'position': 75, 'message': 'O n1.a não existe nesse escopo.'}
+{'position': 78, 'message': "A Variável não é do tipo inteiro. A variável 'v' é um vetor ou matriz"}
+{'position': 79, 'message': "A Variável não é do tipo inteiro. A variável 'm' é um vetor ou matriz"}
+{'position': 80, 'message': 'O indíce do vetor deve ser inteiro'}
+{'position': 81, 'message': 'O indíce do vetor deve ser inteiro'}
+{'position': 82, 'message': "A Variável não é do tipo inteiro. A variável 'c' é um vetor ou matriz"}
+{'position': 83, 'message': 'A variável teste não é do tipo inteiro'}
+{'position': 84, 'message': 'A variável n1 não foi inicializada'}
+{'position': 85, 'message': 'O x não existe nesse escopo.'}
+{'position': 98, 'message': 'A variável c não foi inicializada'}
+{'position': 99, 'message': 'A variável c não foi inicializada'}
+{'position': 100, 'message': 'O num não existe nesse escopo.'}
+{'position': 102, 'message': 'O num não existe nesse escopo.'}
+{'position': 106, 'message': 'O num não existe nesse escopo.'}
+{'position': 107, 'message': 'O num não existe nesse escopo.'}
+{'position': 107, 'message': 'O r.a não existe nesse escopo.'}
+{'position': 38, 'message': 'A função exige um retorno'}

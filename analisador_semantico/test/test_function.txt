@@ -8,11 +8,9 @@ constants {
 }
 
 variables {
-  string a = 3;
   integer d = 4;
   string z = "teste string";
-  integer g = 1;
-  integer v_g[1];
+  integer v_g[c];
   integer m_g[1][2];
 
 
@@ -20,7 +18,20 @@ variables {
 
 function integer sum(integer a, integer b) {
   variables {  
+  integer g = 1;
+  string teste_string = "A";
+  integer vector_test[4];
   }
+  
+  /* Teste acessar variável que não é vetor */
+  teste_string[3] = "a";
+  g[1] = 2;
+
+  /* Teste acessar vetor com index não inteiro */
+  vector_test[4] = 3;
+  vector_test[teste_string] = 2;
+
+  return vector_test[4];
   return 1;
 }
 

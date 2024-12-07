@@ -265,6 +265,7 @@ class SemanticAnalyzer:
         vector_length = []
         value_list = []
         values = ""
+        counter = 0
         for i in range(0, len(token_list)):
             token = token_list[i]
             
@@ -294,21 +295,22 @@ class SemanticAnalyzer:
                 
                     
             elif token['category'] == 'DELIMITER' and token['lexeme'] == ";":  # Encontrando o delimitador ';'
-                if self.repeated_statement(self.current_table_index,variable_name) == False: #Verifica se o identificador ja não existe como constante ou variaveis na tabela de simbolos
-                    return 
+                error = len(self.error_list)
+                self.repeated_statement(self.current_table_index,variable_name)#Verifica se o identificador ja não existe como constante ou variaveis na tabela de simbolos
+                 
                 # Atribuição de valor
                 if not len(value_list) == 0:
-
-                    if self.wrong_type_assign(self.current_table_index,[variable_name],value_list,variable_type) == False:
-                        return
+                    self.wrong_type_assign(self.current_table_index,[variable_name],value_list,variable_type)
                     
                     #TODO Talvez nao é necessario pq o sintatico da erro
                     if (variable_type['category'] == "IDENTIFIER"):
-                        register = [variable_type, variable_name, {"lexeme":"=", "category":"DELIMITER", "line":variable_name["line"]}].extend(value_list).append({"lexeme":";", "category":"DELIMITER", "line":variable_name["line"]})
-                        self.add_register_instance_to_table(register)
+                        if error == len(self.error_list):
+                            register = [variable_type, variable_name, {"lexeme":"=", "category":"DELIMITER", "line":variable_name["line"]}].extend(value_list).append({"lexeme":";", "category":"DELIMITER", "line":variable_name["line"]})
+                            self.add_register_instance_to_table(register)
                     else:
-                        variables_entry = EntryIdentificadores(variable_name['lexeme'], variable_type['lexeme'], values , None, None, vector_length if vector_length != [] else 0)
-                        self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
+                        if error == len(self.error_list):
+                            variables_entry = EntryIdentificadores(variable_name['lexeme'], variable_type['lexeme'], values , None, None, vector_length if vector_length != [] else 0)
+                            self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
                     
                     value_list = []
                 # Declaração de variável
@@ -452,6 +454,9 @@ class SemanticAnalyzer:
 
             ## Vector
             elif tokens[1]["lexeme"] == "[":
+                value_entry: EntryIdentificadores = self.find_table_entry(self.current_table_index, tokens[0])
+                if (value_entry.tamanho == 0):
+                    return None
                 return {"tipo":"VECTOR", "token": tokens}
 
     def wrong_type_assign(self, current_table_index, variable, value, variable_type = None): 
@@ -532,11 +537,13 @@ class SemanticAnalyzer:
                             return None
                     
                     value_entry: EntryIdentificadores = self.find_table_entry(current_table_index, value[0])
+                    
 
                     if (value_entry == None):
                         return False
                     
                     if (value_entry.tamanho == 0):
+                       
                         self.throw_error(f"{value[0]['lexeme']} não é um vator e por isso não pode posições acessadas.", value[0])
                         return False
 
@@ -969,8 +976,8 @@ class SemanticAnalyzer:
             if(on_return == False and self.last_function_type['lexeme'] != "empty"):
                 self.throw_error(f"A função exige um retorno",self.last_function_type)
 
-        print("\n--------------- tabelas locais e global---------------")
-        print(self.pairs_table)
+        # print("\n--------------- tabelas locais e global---------------")
+        # print(self.pairs_table)
         
  #----------------------- Valida o while e if ----------------------------
     def validate_conditional(self,token_list):
@@ -1001,12 +1008,24 @@ class SemanticAnalyzer:
         if assignment_list == None : return 
         name_list = assignment_list[0]
         value_list = assignment_list[1]
+        
         if self.wrong_type_assign(self.current_table_index,name_list,value_list) == True: #Verificar se o tipo primitivo é do mesmo valor adicionado
             value = self.get_concatenated_lexemes(value_list)
 
             variable = self.get_variable_type(name_list)
+           
+            
+            
             if (variable != None and variable["tipo"] != "VECTOR"):
                 self.pairs_table.alterar_caracteristica_identificador(self.current_table_index,variable["token"][0]["lexeme"],"valor",value)
+        else: # Erro no tipo, não é vetor 
+            variable = self.get_variable_type(name_list)
+            brakets = any(token['lexeme']=='[' for token in name_list)
+            if variable == None and brakets:
+                self.throw_error(f"{name_list[0]['lexeme']} não é um vetor e por isso não pode posições acessadas.", name_list[0])
+           
+            
+        
 
  #------------------------- Valida erro no for ------------------
     def validate_for(self,token_list):
