@@ -1,1 +1,5 @@
-A análise sintática foi realizada com sucesso.
+{'position': 34, 'expected': ['NUMBER'], 'received': ['true', ']', '=', '3']}
+{'position': 34, 'expected': [']'], 'received': []}
+{'position': 34, 'expected': ['++', '--'], 'received': []}
+{'position': 35, 'expected': [']'], 'received': ['!=', '2', ']', '=', '4']}
+{'position': 35, 'expected': ['++', '--'], 'received': []}

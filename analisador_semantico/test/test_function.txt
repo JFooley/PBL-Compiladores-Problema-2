@@ -4,15 +4,15 @@ register r {
 }
 
 constants {
-  integer c = 1;
+  integer c =1;
 }
 
 variables {
   integer d = 4;
   string z = "teste string";
+  boolean b = true;
   integer v_g[c];
   integer m_g[1][2];
-
 
 }
 
@@ -22,20 +22,22 @@ function integer sum(integer a, integer b) {
   string teste_string = "A";
   integer vector_test[4];
   }
-  
-  /* Teste acessar variável que não é vetor */
+
+ /* Teste acessar variável que não é vetor */
   teste_string[3] = "a";
   g[1] = 2;
 
   /* Teste acessar vetor com index não inteiro */
-  vector_test[4] = 3;
+  vector_test[5] = 3;
   vector_test[teste_string] = 2;
+  vector_test[(1-2)+3] = 2;
+  vector_test[true] = 3;
+  vector_test[1 != 2] = 4;
 
   return vector_test[4];
-  return 1;
 }
 
-function string sum1(integer a, integer b) {
+function empty sum1(integer a, integer b) {
   variables { 
   
   }
