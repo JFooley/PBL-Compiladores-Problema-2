@@ -333,9 +333,10 @@ class SemanticAnalyzer:
 
         # Valida os atributos (se existem, se foi inicializado e são diferentes de string)
         variable_tokens = []
-        for token in tokens:
-            if (token["category"] == "OPERATOR" and token["lexeme"] != ".") or token == tokens[-1]:
-                if (token == tokens[-1]): variable_tokens.append(token) # Caso do ultimo token
+        for i in range(0, len(tokens)):
+            token = tokens[i]
+            if (token["category"] == "OPERATOR" and token["lexeme"] != ".") or i == len(tokens) - 1:
+                if (i == len(tokens) - 1): variable_tokens.append(token) # Caso do ultimo token
 
                 variable = self.get_variable_type(variable_tokens)
                 if variable["tipo"] == "IDENTIFIER" or variable["tipo"] == "REGISTER" or variable["tipo"] == "VECTOR":
