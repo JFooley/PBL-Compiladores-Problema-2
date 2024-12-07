@@ -538,7 +538,7 @@ class SemanticAnalyzer:
 
                 case "FUNCTION CALL":
                     self.validate_function_parameters(value)
-                    value_entry: EntryIdentificadores = self.find_table_entry(current_table_index, value[0])
+                    value_entry: EntryIdentificadores = self.find_table_entry(current_table_index, value[0], False) #Passando false pq a funcao de cima ja registra o erro
 
                     if (value_entry == None):
                         return False
@@ -632,7 +632,7 @@ class SemanticAnalyzer:
 
                 case "FUNCTION CALL":
                     self.validate_function_parameters(value)
-                    value_entry: EntryIdentificadores = self.find_table_entry(current_table_index, value[0])
+                    value_entry: EntryIdentificadores = self.find_table_entry(current_table_index, value[0], False) #Passando false pq a funcao de cima ja registra o erro
 
                     if (value_entry == None):
                         return False
@@ -686,11 +686,11 @@ class SemanticAnalyzer:
         function_entry = self.find_table_entry(0, token_list[0])
 
         if function_entry == None:
-            return
+            return False
         
         if function_entry.tipo != 'function':
             self.throw_error(f"{token_list[0]['lexeme']} não é uma função", token_list[0])
-            return
+            return True 
         
         other_func_call = [] # token_list para validar chamadas de função nos parametros
         is_func = False
