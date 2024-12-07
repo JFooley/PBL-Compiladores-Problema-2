@@ -357,7 +357,6 @@ class SemanticAnalyzer:
                 if (token == tokens[-1]): variable_tokens.append(token) # Caso do ultimo token
 
                 variable = self.get_variable_type(variable_tokens)
-
                 if variable["tipo"] == "IDENTIFIER" or variable["tipo"] == "REGISTER" or variable["tipo"] == "VECTOR":
                     variable_entry: EntryIdentificadores = self.find_table_entry(current_scope_index, variable["token"][0])
 
