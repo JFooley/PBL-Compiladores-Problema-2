@@ -1008,6 +1008,9 @@ class SemanticAnalyzer:
             value = self.get_concatenated_lexemes(value_list)
 
             variable = self.get_variable_type(name_list)
+             if(variable["tipo"] == "VECTOR"): # Verfica se é vetor e se o index é um número ou identifier númerico
+                self.error_vector_size(variable['token'][2])
+            
             if (variable != None and variable["tipo"] != "VECTOR"):
                 self.pairs_table.alterar_caracteristica_identificador(self.current_table_index,variable["token"][0]["lexeme"],"valor",value)
         else: # Erro no tipo, não é vetor 
