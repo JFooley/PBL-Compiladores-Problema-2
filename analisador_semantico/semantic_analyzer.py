@@ -152,13 +152,21 @@ class SemanticAnalyzer:
         return_type = token_list[0]['lexeme']
         self.last_function_type = token_list[0]
         function_name = token_list[1]['lexeme']
+        parameters_list = []
         parameters_type_list = []
         i = 3
         while i < len(token_list):
+            parameters_list.append(token_list[i])
+            parameters_list.append(token_list[i+1])
+            parameters_list.append({ "lexeme": "=","category": "OPERATOR","line": token_list[i]["line"]})
+            parameters_list.append({ "lexeme": "None","category": "KEY-WORD","line": token_list[i]["line"]})
+            parameters_list.append({ "lexeme": ";","category": "DELIMITER","line": token_list[i]["line"]})
             parameters_type_list.append(token_list[i]['lexeme'])
             i += 3
         function_entry = EntryIdentificadores(function_name, 'function', None, return_type, parameters_type_list, 0)
         self.pairs_table.tabela[0]['tabela'].append(function_entry)
+
+        return parameters_list
 
     def add_registers_to_table(self,token_list):
         size_error = len(self.error_list)
@@ -349,7 +357,6 @@ class SemanticAnalyzer:
                 if (token == tokens[-1]): variable_tokens.append(token) # Caso do ultimo token
 
                 variable = self.get_variable_type(variable_tokens)
-
                 if variable["tipo"] == "IDENTIFIER" or variable["tipo"] == "REGISTER" or variable["tipo"] == "VECTOR":
                     variable_entry: EntryIdentificadores = self.find_table_entry(current_scope_index, variable["token"][0])
 
@@ -692,18 +699,29 @@ class SemanticAnalyzer:
             self.throw_error(f"{token_list[0]['lexeme']} não é uma função", token_list[0])
             return
         
+        other_func_call = [] # token_list para validar chamadas de função nos parametros
+        is_func = False
         # Retira da lista de tokens acumulados apenas os tokens referentes aos argumentos passados na chamda
         function_call_arguments = []
         i = 1
         while i < len(token_list):
-            if token_list[i]['lexeme'] == '(' or token_list[i]['lexeme'] == ',':
-                if token_list[i+2]['lexeme'] == '.': # caso seja um objeto o id depois do . importa
-                    function_call_arguments.append([])
-                else:
-                    function_call_arguments.append(token_list[i+1])
+            if is_func:
+                other_func_call.append(token_list[i])
+                if token_list[i]['lexeme'] == ')':
+                    self.validate_function_parameters(other_func_call)
+                    other_func_call = []
+                    is_func = False
+            else:
+                if token_list[i]['lexeme'] == '(' or token_list[i]['lexeme'] == ',':
+                    if token_list[i+2]['lexeme'] == '.': # caso seja um objeto o id depois do . importa
+                        function_call_arguments.append([])
+                    else:
+                        if token_list[i+2]['lexeme'] == '(':
+                            is_func = True
+                        function_call_arguments.append(token_list[i+1])
 
-            if type(function_call_arguments[-1]) == list and token_list[i]['category'] == 'IDENTIFIER':
-                function_call_arguments[-1].append(token_list[i])
+                if type(function_call_arguments[-1]) == list and token_list[i]['category'] == 'IDENTIFIER':
+                    function_call_arguments[-1].append(token_list[i])
 
             i += 1
 
