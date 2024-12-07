@@ -582,7 +582,7 @@ class SemanticAnalyzer:
                         return False
                     
                     if (variable_type["lexeme"] != value_entry.tipo):
-                        self.throw_error(f"{value_entry.tipo} não pode ser convertido em {variable_entry.tipo}.", value[0])
+                        self.throw_error(f"{value_entry.tipo} não pode ser convertido em {variable_type["lexeme"]}.", value[0])
                         return False
 
                 case "LITERAL":
