@@ -40,7 +40,7 @@ class SemanticAnalyzer:
             selected_entry = self.find_table_entry(self.pairs_table.tabela[target_table_index]["pai"], token, False)
         
         # Causa erro se necessário
-        if (throw_erro and selected_entry == None): self.throw_error(f"O {token['lexeme']} não existe nesse escopo.", token)
+        if (throw_erro and selected_entry == None): self.throw_error(f"O identificador '{token['lexeme']}' não existe nesse escopo.", token)
 
         return selected_entry
 
@@ -147,7 +147,7 @@ class SemanticAnalyzer:
     def add_function_to_table(self, token_list):
         if self.find_table_entry(0, token_list[1], False) != None:
             self.throw_error(f"{token_list[1]['lexeme']} já foi declarada", token_list[1])
-            return
+            return []
 
         return_type = token_list[0]['lexeme']
         self.last_function_type = token_list[0]
@@ -256,91 +256,67 @@ class SemanticAnalyzer:
             self.pairs_table.tabela[0]['tabela'].append(constant_entry)
 
     
+    def add_variables_parameter_function(self, token_list, is_global):
+       tokens_line = self.split_list_token(token_list, ";") 
+       for tokens in tokens_line:
+        tokens.append({"lexeme": ";","category": "DELIMITER","line": tokens[0]["line"]})
+        self.add_variables_to_table(is_global,tokens)
+    
     # Definir quando acaba o escopo da variável 
     # Definir quando acaba o escopo da variável 
     # Se for vetor, verificar se o tamanho é int(number ou identificador)
     def add_variables_to_table(self, is_global, token_list):
-        variable_type = ""
-        variable_name = ""
+        variable_type = token_list[0]
+        variable_name = token_list[1]
         vector_length = []
         value_list = []
         values = ""
-        consume_values = False
-        for i in range(0, len(token_list)):
+        if self.repeated_statement(self.current_table_index,variable_name) == False: #Verifica se o identificador ja não existe como constante ou variaveis na tabela de simbolos
+            return 
+        for i in range(0, len(token_list)): #Salva os tamanhos do vetor
             token = token_list[i]
-            
-            
-            if token['category'] == 'KEYWORD':  #obs: o tipo pode ser tbm identifier, que é o caso de ser um register
-                if(token['lexeme'] not in ['true', "false"]):
-                    variable_type = token
-                else:
-                    if(consume_values==True):
-                        value_list.append(token)
-                        values = values + token["lexeme"]
-            
-            elif token['category'] == 'IDENTIFIER': # Falta verificar os registers
-                if token_list[i + 1]['category'] == "IDENTIFIER":
-                    variable_type = token
-                elif token_list[i+1]['lexeme'] != ']':
-                    variable_name = token   
-            
-            elif token['category'] == 'OPERATOR' and token['lexeme'] == '=': # consumir tudo até o ;
-                consume_values = True
-            
-            elif token['category'] == 'DELIMITER' and token['lexeme'] == '[': # verificar se é um vector ou matriz
+            if token['category'] == 'DELIMITER' and token['lexeme'] == '[': # verificar se é um vector ou matriz
                 vector_length.append(token_list[i + 1])
+            if token['lexeme'] == ";" or token['lexeme'] == "=":
+                break
+            
+        if any(token.get("lexeme") == "=" for token in token_list) : #é só declaração de variavel com valor
+            list_assignment = self.split_list_token(token_list[0: len(token_list)-1], "=")
+            if (len(list_assignment)<2 and list_assignment[1] == None):
+                return
+            value_list = list_assignment[1]
+            values = self.get_concatenated_lexemes(value_list)
+            if self.wrong_type_assign(self.current_table_index,[variable_name],value_list,variable_type) == False:
+                return   
+            #TODO Talvez nao é necessario pq o sintatico da erro
+            if (variable_type['category'] == "IDENTIFIER"):
+                register = [variable_type, variable_name, {"lexeme":"=", "category":"DELIMITER", "line":variable_name["line"]}].extend(value_list).append({"lexeme":";", "category":"DELIMITER", "line":variable_name["line"]})
+                self.add_register_instance_to_table(register)
+            else:
+                variables_entry = EntryIdentificadores(variable_name['lexeme'], variable_type['lexeme'], values , None, None, vector_length if vector_length != [] else 0)
+                self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
                     
-            elif token['category'] == 'DELIMITER' and token['lexeme'] == ";":  # Encontrando o delimitador ';'
-                consume_values = False
-                error = len(self.error_list)
-                self.repeated_statement(self.current_table_index,variable_name)#Verifica se o identificador ja não existe como constante ou variaveis na tabela de simbolos
-                 
-                # Atribuição de valor
-                if not len(value_list) == 0:
-                    self.wrong_type_assign(self.current_table_index,[variable_name],value_list,variable_type)
-                    
-                    #TODO Talvez nao é necessario pq o sintatico da erro
-                    if (variable_type['category'] == "IDENTIFIER"):
-                        if error == len(self.error_list):
-                            register = [variable_type, variable_name, {"lexeme":"=", "category":"DELIMITER", "line":variable_name["line"]}].extend(value_list).append({"lexeme":";", "category":"DELIMITER", "line":variable_name["line"]})
-                            self.add_register_instance_to_table(register)
-                    else:
-                        if error == len(self.error_list):
-                            variables_entry = EntryIdentificadores(variable_name['lexeme'], variable_type['lexeme'], values , None, None, vector_length if vector_length != [] else 0)
-                            self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
-                    
-                    value_list = []
-                    values = ""
-                    
-                # Declaração de variável
-                else:
-                    error_size = len(self.error_list)
-                    vector_size = []
-                    if (vector_length != []): # No caso é um vetor 
-                        for index in vector_length:
-                            self.error_vector_size(index) # Verifica se o indice do vetor é int ou identifier
-                        if(error_size == len(self.error_list)):
-                            for item in vector_length:
-                                vector_size.append(item['lexeme'])
-                        else: 
-                            return
-                    elif (variable_name['category']== "IDENTIFIER" and variable_type['category'] == "IDENTIFIER"):
-                        self.add_register_instance_to_table([variable_type, variable_name])
-                        variable_type = ""
+        else:
+            error_size = len(self.error_list)
+            vector_size = []
+            if (vector_length != []): # No caso é um vetor 
+                for index in vector_length:
+                    self.error_vector_size(index) # Verifica se o indice do vetor é int ou identifier
+                if(error_size == len(self.error_list)):
+                    for item in vector_length:
+                        vector_size.append(item['lexeme'])
+                else: 
+                    return
+            elif (variable_name['category']== "IDENTIFIER" and variable_type['category'] == "IDENTIFIER"):
+                self.add_register_instance_to_table([variable_type, variable_name])
+                variable_type = ""
                         
-                    if variable_type != "": # Verifica se não é um registrador, caso não seja adiciona na tabela de símbolos
-                        variables_entry = EntryIdentificadores(variable_name['lexeme'], variable_type['lexeme'], None , None, None, vector_size if vector_size != [] else 0)
-                        self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
-                        variable_type, variable_name, variable_value = "", "", ""
-                        vector_length = []
-                        value_list = []
-                        values = ""
-            else: # Consome tudo o que não fizer parte de nome ou tipo da variável
-                if consume_values == True:
-                    value_list.append(token)
-                    values = values + token["lexeme"]
-                
-                
+            if variable_type != "":
+                variables_entry = EntryIdentificadores(variable_name['lexeme'], variable_type['lexeme'], None , None, None, vector_size if vector_size != [] else 0)
+                self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
+                variable_type, variable_name, variable_value = "", "", ""
+                vector_length = []
+        
     ################################ Funções de erro ################################
 
     def identify_expression_return(self, current_scope_index, tokens: list):
@@ -383,11 +359,11 @@ class SemanticAnalyzer:
                                 return None
                     
                     if variable_entry.tipo not in ["integer", "float", "boolean"]:
-                        self.throw_error(f"O tipo {variable_entry.tipo} não pode ser operado em uma expressão", variable["token"][0])
+                        self.throw_error(f"O tipo '{variable_entry.tipo}' não pode ser operado em uma expressão", variable["token"][0])
                         return None
                     
                     if variable["tipo"] != "VECTOR" and variable_entry.valor == None: #Valida se foi inicializada
-                        self.throw_error(f"A variável {variable_entry.nome} não foi inicializada", token)
+                        self.throw_error(f"A variável '{variable_entry.nome}' não foi inicializada", token)
                         return None
                     
                 elif variable["tipo"] == "FUNCTION CALL":
@@ -494,29 +470,33 @@ class SemanticAnalyzer:
                         return False
                     
                     if ((variable_entry.tipo == "float" or variable_entry.tipo == "integer") and value_entry.tipo == "string") or (variable_entry.tipo == "string" and value_entry.tipo != "string"):
-                        self.throw_error(f"{value_entry.tipo} não pode ser convertido em {variable_entry.tipo}.", value[0])
+                        self.throw_error(f"O tipo '{value_entry.tipo}' não pode ser convertido em {variable_entry.tipo}.", value[0])
                         return False
-
+                    
+                    if value_entry.valor == None: #Valida se foi inicializada
+                        self.throw_error(f"A variável '{value_entry.nome}' não foi inicializada", value[0])
+                        return None
+                    
                 case "LITERAL": 
                     match value[0]["category"]:
                         case "NUMBER":
                             if (variable_entry.tipo == "string" or variable_entry.tipo == "character"):
-                                self.throw_error(f"{value[0]["category"]} não pode ser convertido em {variable_entry.tipo}.", value[0])
+                                self.throw_error(f"O tipo '{value[0]["category"]}' não pode ser convertido em {variable_entry.tipo}.", value[0])
                                 return False
                         
                         case "STRING":
                             if (variable_entry.tipo != "string"):
-                                self.throw_error(f"{value[0]["category"]} não pode ser convertido em {variable_entry.tipo}.", value[0])
+                                self.throw_error(f"O tipo '{value[0]["category"]}' não pode ser convertido em {variable_entry.tipo}.", value[0])
                                 return False
 
                         case "CHARACTER":
                             if (variable_entry.tipo != "character"):
-                                self.throw_error(f"{value[0]["category"]} não pode ser convertido em {variable_entry.tipo}.", value[0])
+                                self.throw_error(f"O tipo '{value[0]["category"]}' não pode ser convertido em {variable_entry.tipo}.", value[0])
                                 return False
 
                         case "BOOLEAN":
                             if (variable_entry.tipo == "string" or variable_entry.tipo == "character"):
-                                self.throw_error(f"{value[0]["category"]} não pode ser convertido em {variable_entry.tipo}.", value[0])    
+                                self.throw_error(f"O tipo'{value[0]["category"]}' não pode ser convertido em {variable_entry.tipo}.", value[0])    
                                 return False
 
                 case "REGISTER":
@@ -526,7 +506,7 @@ class SemanticAnalyzer:
                         return False
 
                     if (variable_entry.tipo != value_entry.tipo):
-                        self.throw_error(f"{value_entry.tipo} não pode ser convertido em {variable_entry.tipo}.", value[0])
+                        self.throw_error(f"O tipo '{value_entry.tipo}' não pode ser convertido em {variable_entry.tipo}.", value[0])
                         return False
 
                 case "VECTOR":         
@@ -545,7 +525,7 @@ class SemanticAnalyzer:
                         return False
                     
                     if (value_entry.tamanho == 0):
-                        self.throw_error(f"{value[0]["lexeme"]} não é um vator e por isso não pode posições acessadas.", value[0])
+                        self.throw_error(f"O identificador '{value[0]["lexeme"]}' não é um vator e por isso não pode ter posições acessadas.", value[0])
                         return False
 
                     if (variable_entry.tamanho == 0):
@@ -553,7 +533,7 @@ class SemanticAnalyzer:
                         return False
 
                     if (variable_entry.tipo != value_entry.tipo):
-                        self.throw_error(f"{value_entry.tipo} não pode ser convertido em {variable_entry.tipo}.", value[0])
+                        self.throw_error(f"O tipo '{value_entry.tipo}' não pode ser convertido em {variable_entry.tipo}.", value[0])
                         return False
 
                 case "FUNCTION CALL":
@@ -564,7 +544,7 @@ class SemanticAnalyzer:
                         return False
 
                     if (variable_entry.tipo != value_entry.tipoRetorno or variable_entry.tamanho != value_entry.tamanho):                        
-                        self.throw_error(f"{value_entry.tipoRetorno} não pode ser convertido em {variable_entry.tipo}.", value[0])
+                        self.throw_error(f"O tipo '{value_entry.tipoRetorno}' não pode ser convertido em {variable_entry.tipo}.", value[0])
                         return False
 
                 case "EXPRESSION":
@@ -574,7 +554,7 @@ class SemanticAnalyzer:
                         return False
 
                     if variable_entry.tipo not in value_type:
-                        self.throw_error(f"{value_type} não pode ser convertido em {variable_entry.tipo}.", value[0])
+                        self.throw_error(f"O tipo '{value_type}' não pode ser convertido em {variable_entry.tipo}.", value[0])
                         return False
         
         ## É declaração
@@ -587,29 +567,34 @@ class SemanticAnalyzer:
                         return False
                         
                     if ((variable_type["lexeme"] == "float" or variable_type["lexeme"] == "integer") and value_entry.tipo == "string") or (variable_type["lexeme"] == "string" and value_entry.tipo != "string"):
-                        self.throw_error(f"{value_entry.tipo} não pode ser convertido em {variable_type["lexeme"]}.", value[0])
+                        self.throw_error(f"O tipo '{value_entry.tipo}' não pode ser convertido em {variable_type["lexeme"]}.", value[0])
                         return False
+                    
+                    if value_entry.valor == None: #Valida se foi inicializada
+                        self.throw_error(f"A variável '{value_entry.nome}' não foi inicializada", value[0])
+                        return None
+                    
 
                 case "LITERAL":
                     match value[0]["category"]:
                         case "NUMBER":
                             if (variable_type["lexeme"] == "string" or variable_type["lexeme"] == "character"):
-                                self.throw_error(f"{value[0]["category"]} não pode ser convertido em {variable_type["lexeme"]}.", value[0])
+                                self.throw_error(f"O tipo '{value[0]["category"]}' não pode ser convertido em {variable_type["lexeme"]}.", value[0])
                                 return False
                         
                         case "STRING":
                             if (variable_type["lexeme"] != "string"):
-                                self.throw_error(f"{value[0]["category"]} não pode ser convertido em {variable_type["lexeme"]}.", value[0])
+                                self.throw_error(f"O tipo '{value[0]["category"]}' não pode ser convertido em {variable_type["lexeme"]}.", value[0])
                                 return False
 
                         case "CHARACTER":
                             if (variable_type["lexeme"] != "character"):
-                                self.throw_error(f"{value[0]["category"]} não pode ser convertido em {variable_type["lexeme"]}.", value[0])
+                                self.throw_error(f"O tipo '{value[0]["category"]}' não pode ser convertido em {variable_type["lexeme"]}.", value[0])
                                 return False
 
                         case "BOOLEAN":
                             if (variable_type["lexeme"] == "string" or variable_type["lexeme"] == "character"):
-                                self.throw_error(f"{value[0]["category"]} não pode ser convertido em {variable_type["lexeme"]}.", value[0])    
+                                self.throw_error(f"O tipo '{value[0]["category"]}' não pode ser convertido em {variable_type["lexeme"]}.", value[0])    
                                 return False
 
                 case "REGISTER":
@@ -619,7 +604,7 @@ class SemanticAnalyzer:
                         return False
 
                     if (variable_type["lexeme"] != value_entry.tipo):
-                        self.throw_error(f"{value_entry.tipo} não pode ser convertido em {variable_type["lexeme"]}.", value)
+                        self.throw_error(f"O tipo '{value_entry.tipo}' não pode ser convertido em {variable_type["lexeme"]}.", value)
                         return False
 
                 case "VECTOR":
@@ -642,7 +627,7 @@ class SemanticAnalyzer:
                         return False
                     
                     if (variable_type["lexeme"] != value_entry.tipo):
-                        self.throw_error(f"{value_entry.tipo} não pode ser convertido em {variable_type["lexeme"]}.", value[0])
+                        self.throw_error(f"O tipo '{value_entry.tipo}' não pode ser convertido em {variable_type["lexeme"]}.", value[0])
                         return False
 
                 case "FUNCTION CALL":
@@ -653,7 +638,7 @@ class SemanticAnalyzer:
                         return False
 
                     if (variable_type["lexeme"] != value_entry.tipoRetorno):
-                        self.throw_error(f"{value_entry.tipoRetorno} não pode ser convertido em {variable_type["lexeme"]}.", value[0])
+                        self.throw_error(f"O tipo '{value_entry.tipoRetorno}' não pode ser convertido em {variable_type["lexeme"]}.", value[0])
                         return False
 
                 case "EXPRESSION":
@@ -663,7 +648,7 @@ class SemanticAnalyzer:
                         return False
 
                     if variable_type["lexeme"] not in value_type:
-                        self.throw_error(f"{value_type} não pode ser convertido em {variable_type["lexeme"]}.", value[0])
+                        self.throw_error(f"O tipo '{value_type}' não pode ser convertido em {variable_type["lexeme"]}.", value[0])
                         return False
 
         return True
@@ -674,18 +659,18 @@ class SemanticAnalyzer:
 
         ## Verifica se a variável existe no escopo
         if (self.find_table_entry(current_table_index, new_variable, throw_erro= False) != None):
-            self.throw_error(f"{new_variable["lexeme"]} já existe neste escopo.", new_variable)
+            self.throw_error(f"O identificador '{new_variable["lexeme"]}' já existe neste escopo.", new_variable)
             return False
 
         ## Verifica se ele não possui um nome igual a de um tipo primitivo
         if (new_variable["lexeme"] in ["float", "integer", "string", "character", "boolean"]):
-            self.throw_error(f"{new_variable["lexeme"]} não pode ter o nome de um tipo primitivo.", new_variable)
+            self.throw_error(f"O identificador '{new_variable["lexeme"]}' não pode ter o nome de um tipo primitivo.", new_variable)
             return False
 
         ## Verifica se ele não possui um nome igual a de um tipo register
         for key in self.registers_type_table.keys():
             if key == new_variable["lexeme"]:
-                self.throw_error(f"{new_variable["lexeme"]} não pode ter o nome de um tipo de registro.", new_variable)
+                self.throw_error(f"O identificador '{new_variable["lexeme"]}' não pode ter o nome de um tipo de registro.", new_variable)
                 return False
         
         return True
@@ -818,20 +803,6 @@ class SemanticAnalyzer:
                 if return_entry == False:
                     return
         
-    # Chamada dentro ou após a adição da função na tabela
-    def validate_consistent_return(self, token_list):
-        function_name = token_list[1]['lexeme']
-        
-        if any(token['lexeme'] == "return" for token in token_list) == True:
-            # valida o retorno da função
-            # self.validate_function_return(token_list)
-            print()
-        else:
-            self.throw_error(f"A função {function_name} não possui retorno", token_list[1])
-            
-                
-        
-
     #################### Função para validar o incremento ou decremento  ####################
      #AJUSTES NECESSÁRIO:
     #precisa verifica se variável não foi inicializada
@@ -847,7 +818,7 @@ class SemanticAnalyzer:
             if token_entry == None:
                 return
             if token_entry.valor == None and (token_entry.tamanho == [] or token_entry.tamanho == 0): #variavel não inicializada
-                self.throw_error(f"A variável {token_entry.nome} não foi inicializada", token)
+                self.throw_error(f"A variável '{token_entry.nome}' não foi inicializada", token)
                 return
             if token_entry.tipo != "integer": # Para variável, register e vetor, deve ser do tipo inteiro
                 self.throw_error(f"A variável {token_entry.nome} não é do tipo inteiro", token)
@@ -874,7 +845,7 @@ class SemanticAnalyzer:
             
             if variable["tipo"] == "VECTOR":
                 if (token_entry.tamanho == [] or token_entry.tamanho == 0): # Usar [] em um identificador que não é vetor
-                    self.throw_error(f"A variável {token_entry.nome} não é um vetor",variable["token"][0])
+                    self.throw_error(f"A variável '{token_entry.nome}' não é um vetor",variable["token"][0])
                     return      
                 #Verifica se o vetor tem index correto
                 index_list = self.get_index_vector(identifier)
@@ -885,10 +856,10 @@ class SemanticAnalyzer:
                         return 
             elif variable["tipo"] == "IDENTIFIER" or variable["tipo"] == "REGISTER":
                 if token_entry.valor == None: #variavel não inicializada
-                    self.throw_error(f"A variável {token_entry.nome} não foi inicializada", variable["token"][0])
+                    self.throw_error(f"A variável '{token_entry.nome}' não foi inicializada", variable["token"][0])
                     return
                 if token_entry.tipo != "integer": # Para variável, register e vetor, deve ser do tipo inteiro
-                    self.throw_error(f"A variável {token_entry.nome} não é do tipo inteiro", variable["token"][0])
+                    self.throw_error(f"A variável '{token_entry.nome}' não é do tipo inteiro", variable["token"][0])
                     return
             
         
@@ -911,10 +882,9 @@ class SemanticAnalyzer:
     def error_has_value(self,token):
         object = self.find_table_entry(self.current_table_index,token)
         if(object != None and object.valor == None):
-            self.throw_error(f"A variável {object.nome} não foi inicializada", token)
+            self.throw_error(f"A variável '{object.nome}' não foi inicializada", token)
             True
         False
-
 
     def validate_body(self, token_list): 
         line = []
@@ -1008,7 +978,7 @@ class SemanticAnalyzer:
             value = self.get_concatenated_lexemes(value_list)
 
             variable = self.get_variable_type(name_list)
-             if(variable["tipo"] == "VECTOR"): # Verfica se é vetor e se o index é um número ou identifier númerico
+            if(variable["tipo"] == "VECTOR"): # Verfica se é vetor e se o index é um número ou identifier númerico
                 self.error_vector_size(variable['token'][2])
             
             if (variable != None and variable["tipo"] != "VECTOR"):
@@ -1017,7 +987,7 @@ class SemanticAnalyzer:
             variable = self.get_variable_type(name_list)
             brakets = any(token['lexeme']=='[' for token in name_list)
             if variable == None and brakets:
-                self.throw_error(f"{name_list[0]['lexeme']} não é um vetor e por isso não pode ter posições acessadas.", name_list[0])
+                self.throw_error(f"O identificador '{name_list[0]['lexeme']}' não é um vetor e por isso não pode ter posições acessadas.", name_list[0])
 
  #------------------------- Valida erro no for ------------------
     def validate_for(self,token_list):
@@ -1057,7 +1027,7 @@ class SemanticAnalyzer:
     def validade_third_part(self,token):
         entry = self.find_table_entry(self.current_table_index,token)
         if entry != None and entry.tipo != "integer":
-            self.throw_error(f"A váriavel {token["lexeme"]} não é do tipo integer.",token)
+            self.throw_error(f"A váriavel '{token["lexeme"]}' não é do tipo integer.",token)
     
     #Verifica se a variavel existe, se é inteira e se o valor depois da igualdade é inteiro
     def error_conditional_for(self,name_token,token_list,index):
@@ -1067,7 +1037,7 @@ class SemanticAnalyzer:
             if entry == None:
                 return True
             if entry.tipo != "integer":
-                self.throw_error(f"A váriavel {name_token["lexeme"]} não é do tipo integer.",name_token)
+                self.throw_error(f"A váriavel '{name_token["lexeme"]}' não é do tipo integer.",name_token)
                 return True
             for token in token_list[index:len(token_list)]:
                 value_list.append(token)
@@ -1087,7 +1057,7 @@ class SemanticAnalyzer:
                 entry = self.find_table_entry(self.current_table_index,token["token"][0])
                 if (token["tipo"] == "VECTOR" and entry != None):
                     if (entry.tamanho == [] or entry.tamanho == 0):
-                        self.throw_error(f"A variável {entry.nome} não é um vetor",token["token"][0])
+                        self.throw_error(f"A variável '{entry.nome}' não é um vetor",token["token"][0])
     
     #----------------------- Valida Write ----------------------------
     def validate_write(self,token_list):
@@ -1103,4 +1073,4 @@ class SemanticAnalyzer:
                     entry = self.find_table_entry(self.current_table_index,token["token"][0])
                     if (token["tipo"] == "VECTOR" and entry != None):
                         if (entry.tamanho == [] or entry.tamanho == 0):
-                            self.throw_error(f"A variável {entry.nome} não é um vetor",token["token"][0])
+                            self.throw_error(f"A variável '{entry.nome}' não é um vetor",token["token"][0])
