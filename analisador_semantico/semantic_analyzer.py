@@ -1009,7 +1009,7 @@ class SemanticAnalyzer:
             variable = self.get_variable_type(name_list)
             brakets = any(token['lexeme']=='[' for token in name_list)
             if variable == None and brakets:
-                self.throw_error(f"{name_list[0]['lexeme']} não é um vetor e por isso não pode posições acessadas.", name_list[0])
+                self.throw_error(f"{name_list[0]['lexeme']} não é um vetor e por isso não pode ter posições acessadas.", name_list[0])
 
  #------------------------- Valida erro no for ------------------
     def validate_for(self,token_list):
