@@ -396,7 +396,7 @@ class SemanticAnalyzer:
         return type
         
     def remove_parentheses(self, tokens: list):
-        pile = ["$"]
+        pile = []
         ## Gera a pilha de marcação de remoção
         for i in range(0, len(tokens)):
             if tokens[i]["lexeme"] == "(":
