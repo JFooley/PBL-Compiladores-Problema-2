@@ -12,33 +12,53 @@ variables {
 function integer function_1(integer a, integer b) { 
   variables {  
   }
-  return a + b; // Correto - Retorna integer 
+  return a + b; // Correto - Retorno tipo certo pelo parametro
 }
 
-function integer function_2(string b) { 
+function boolean function_2() { 
+  variables { 
+    boolean b = true;
+  }
+  return b; // Correto - Retorno tipo certo pelo parametro
+}
+
+function integer function_3(string batata) { 
   variables {  
   }
-  return b; // Errado - Retorna string com a função pedindo integer 
+  return batata; // Errado - Retorno tipo ERRADO pelo parametro
 }
 
-function void function_3() { 
-  variables {
-    string bola = "Oi";
+function string function_4() { 
+  variables {  
+    boolean vivo = true;
   }
-  return bola; // Errado - Retorna string com a função do tipo void
+  return vivo; // Errado - Retorno tipo ERRADO pelo variable
 }
 
-function void function_3() { 
+function void function_5() { 
   variables {
     string barriga = "Oi";
   }
-  barriga = "ola"; // Correto, sem retorno
+  barriga = "ola"; // Correto - sem retorno
 }
 
-function void function_3() { 
+function void function_6() { 
   variables {
-    string boia = "Oi";
+    string bola = "Oi";
   }
+  return bola; // Errado - Retorna string com a função do tipo void pelo variable
+}
+
+function void function_7(string bola) { 
+  variables {
+  }
+  return bola; // Errado - Retorna string com a função do tipo void pelo parametro
+}
+
+function void function_8() { 
+  variables {
+  }
+
   return // Errado, com retorno em função do tipo void
 }
 
