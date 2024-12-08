@@ -20,6 +20,11 @@ variables {
   
 }
 
+function integer val() {
+  variables {}
+  return 1;
+}
+
 function integer teste_function(integer abc, float abd, string abe, string a, boolean b) {
   variables {
   }
