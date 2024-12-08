@@ -470,10 +470,14 @@ class SemanticAnalyzer:
                     if (value_entry == None):
                         return False
                     
-                    if ((variable_entry.tipo == "float" or variable_entry.tipo == "integer") and value_entry.tipo == "string") or (variable_entry.tipo == "string" and value_entry.tipo != "string"):
+                    if (variable_entry.tipo in ["boolean", "integer", "float"]):
+                        if (value_entry.tipo not in ["boolean", "integer", "float"]):                        
+                            self.throw_error(f"O tipo '{value_entry.tipo}' não pode ser convertido em {variable_entry.tipo}.", value[0])
+                            return False
+                    elif (variable_entry.tipo != value_entry.tipo):
                         self.throw_error(f"O tipo '{value_entry.tipo}' não pode ser convertido em {variable_entry.tipo}.", value[0])
                         return False
-                    
+                                   
                     if value_entry.valor == None: #Valida se foi inicializada
                         self.throw_error(f"A variável '{value_entry.nome}' não foi inicializada", value[0])
                         return None
@@ -506,7 +510,11 @@ class SemanticAnalyzer:
                     if (value_entry == None):
                         return False
 
-                    if (variable_entry.tipo != value_entry.tipo):
+                    if (variable_entry.tipo in ["boolean", "integer", "float"]):
+                        if (value_entry.tipo not in ["boolean", "integer", "float"]):
+                            self.throw_error(f"O tipo '{value_entry.tipo}' não pode ser convertido em {variable_entry.tipo}.", value[0])
+                            return False
+                    elif (variable_entry.tipo != value_entry.tipo):
                         self.throw_error(f"O tipo '{value_entry.tipo}' não pode ser convertido em {variable_entry.tipo}.", value[0])
                         return False
 
@@ -533,7 +541,11 @@ class SemanticAnalyzer:
                         self.throw_error(f"{variable[0]["lexeme"]} ", value[0])
                         return False
 
-                    if (variable_entry.tipo != value_entry.tipo):
+                    if (variable_entry.tipo in ["boolean", "integer", "float"]):
+                        if (value_entry.tipo not in ["boolean", "integer", "float"]):
+                            self.throw_error(f"O tipo '{value_entry.tipo}' não pode ser convertido em {variable_entry.tipo}.", value[0])
+                            return False
+                    elif (variable_entry.tipo != value_entry.tipo):
                         self.throw_error(f"O tipo '{value_entry.tipo}' não pode ser convertido em {variable_entry.tipo}.", value[0])
                         return False
 
@@ -544,7 +556,11 @@ class SemanticAnalyzer:
                     if (value_entry == None):
                         return False
 
-                    if (variable_entry.tipo != value_entry.tipoRetorno or variable_entry.tamanho != value_entry.tamanho):                        
+                    if (variable_entry.tipo in ["boolean", "integer", "float"]):
+                        if (value_entry.tipoRetorno not in ["boolean", "integer", "float"] or variable_entry.tamanho != value_entry.tamanho):
+                            self.throw_error(f"O tipo '{value_entry.tipoRetorno}' não pode ser convertido em {variable_entry.tipo}.", value[0])
+                            return False
+                    elif (variable_entry.tipo != value_entry.tipoRetorno or variable_entry.tamanho != value_entry.tamanho):                        
                         self.throw_error(f"O tipo '{value_entry.tipoRetorno}' não pode ser convertido em {variable_entry.tipo}.", value[0])
                         return False
 
@@ -554,7 +570,7 @@ class SemanticAnalyzer:
                     if value_type == None:
                         return False
 
-                    if variable_entry.tipo not in value_type:
+                    if variable_entry.tipo not in ["boolean", "integer", "float"]:
                         self.throw_error(f"O tipo '{value_type}' não pode ser convertido em {variable_entry.tipo}.", value[0])
                         return False
         
@@ -567,7 +583,11 @@ class SemanticAnalyzer:
                     if (value_entry == None):
                         return False
                         
-                    if ((variable_type["lexeme"] == "float" or variable_type["lexeme"] == "integer") and value_entry.tipo == "string") or (variable_type["lexeme"] == "string" and value_entry.tipo != "string"):
+                    if (variable_type["lexeme"] in ["boolean", "integer", "float"]):
+                        if (value_entry.tipo not in ["boolean", "integer", "float"]):                        
+                            self.throw_error(f"O tipo '{value_entry.tipo}' não pode ser convertido em {variable_type["lexeme"]}.", value[0])
+                            return False
+                    elif (variable_type["lexeme"] != value_entry.tipo):
                         self.throw_error(f"O tipo '{value_entry.tipo}' não pode ser convertido em {variable_type["lexeme"]}.", value[0])
                         return False
                     
@@ -575,7 +595,6 @@ class SemanticAnalyzer:
                         self.throw_error(f"A variável '{value_entry.nome}' não foi inicializada", value[0])
                         return None
                     
-
                 case "LITERAL":
                     match value[0]["category"]:
                         case "NUMBER":
@@ -604,7 +623,11 @@ class SemanticAnalyzer:
                     if (value_entry == None):
                         return False
 
-                    if (variable_type["lexeme"] != value_entry.tipo):
+                    if (variable_type["lexeme"] in ["boolean", "integer", "float"]):
+                        if (value_entry.tipo not in ["boolean", "integer", "float"]):
+                            self.throw_error(f"O tipo '{value_entry.tipo}' não pode ser convertido em {variable_type["lexeme"]}.", value[0])
+                            return False
+                    elif (variable_type["lexeme"] != value_entry.tipo):
                         self.throw_error(f"O tipo '{value_entry.tipo}' não pode ser convertido em {variable_type["lexeme"]}.", value)
                         return False
 
@@ -627,7 +650,11 @@ class SemanticAnalyzer:
                         self.throw_error(f"{value[0]["lexeme"]} não é um vator e por isso não pode posições acessadas.", value[0])
                         return False
                     
-                    if (variable_type["lexeme"] != value_entry.tipo):
+                    if (variable_type["lexeme"] in ["boolean", "integer", "float"]):
+                        if (value_entry.tipo not in ["boolean", "integer", "float"]):
+                            self.throw_error(f"O tipo '{value_entry.tipo}' não pode ser convertido em {variable_type["lexeme"]}.", value[0])
+                            return False
+                    elif (variable_type["lexeme"] != value_entry.tipo):
                         self.throw_error(f"O tipo '{value_entry.tipo}' não pode ser convertido em {variable_type["lexeme"]}.", value[0])
                         return False
 
@@ -637,8 +664,12 @@ class SemanticAnalyzer:
 
                     if (value_entry == None):
                         return False
-
-                    if (variable_type["lexeme"] != value_entry.tipoRetorno):
+                    
+                    if (variable_type["lexeme"] in ["boolean", "integer", "float"]):
+                        if (value_entry.tipoRetorno not in ["boolean", "integer", "float"]):
+                            self.throw_error(f"O tipo '{value_entry.tipoRetorno}' não pode ser convertido em {variable_entry.tipo}.", value[0])
+                            return False
+                    elif (variable_type["lexeme"] != value_entry.tipoRetorno):
                         self.throw_error(f"O tipo '{value_entry.tipoRetorno}' não pode ser convertido em {variable_type["lexeme"]}.", value[0])
                         return False
 
@@ -648,7 +679,7 @@ class SemanticAnalyzer:
                     if value_type == None:
                         return False
 
-                    if variable_type["lexeme"] not in value_type:
+                    if variable_type["lexeme"] not in ["boolean", "integer", "float"]:
                         self.throw_error(f"O tipo '{value_type}' não pode ser convertido em {variable_type["lexeme"]}.", value[0])
                         return False
 
