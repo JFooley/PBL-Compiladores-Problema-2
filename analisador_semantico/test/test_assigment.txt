@@ -41,6 +41,8 @@ main() {
     s = 1;          // Errado - string recebe number literal
     s = n1;         // Errado - string recebe variavel number
     b = s;          // Errado - boolean recebe string
+    n1[1] = n2;      // Errado - acessando posicao em objeto que nao é vetor
+
 
     s = 1 + n1 / (3 - n2 + n1); // Errado - string recebe resultado de expressao aritimetica
     s = (1 > n1 + 1) && b;      // Errado - string recebe resultado de expressao relacional/logica
