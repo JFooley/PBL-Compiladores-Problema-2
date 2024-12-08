@@ -494,7 +494,7 @@ class SemanticAnalyzer:
 
             if variable_entry == None:
                 return False
-            
+
             if variable_dict['tipo'] == "VECTOR":
                 if (variable_entry.tamanho == 0):
                     self.throw_error(f"{variable[0]['lexeme']} não é um vetor, e por isso não pode posições acessadas.", variable[0])
@@ -820,7 +820,7 @@ class SemanticAnalyzer:
                 if entry == None:
                     return
                 else:
-                    arguments_types.append(entry.tipoRetorno)
+                    arguments_types.append(entry.tipo)
             elif function_call_arguments[i]['category'] == 'NUMBER':
                 if '.' in function_call_arguments[i]['lexeme']: #TODO Já existe a função is_int
                     arguments_types.append('float')
