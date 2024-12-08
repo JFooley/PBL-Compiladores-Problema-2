@@ -27,8 +27,9 @@ main() {
     b = false;      // Correto - boolean recebe boolean literal
     b = n2;         // Correto - boolean recebe variavel float/integer
     b = 1;          // Correto - boolean recebe number literal
-    v[1] = n1;      // Correto - posicao do vetor recebe variable number
+    v[1] = n1;      // Correto - posicao do vetor recebe variavel number
     v[1][1] = 123;  // Correto - posicao de vetor recebe number literal
+    n1[1] = v;      // Correto - variavel number recebe posicao de vetor number
 
     n1 = 1 + n1 / (g - n2 + n1); // Correto - number recebe resultado de expressao aritimetica
     n2 = (1 > n1 + 1) && b;      // Correto - number recebe resultado de expressao logica/relacional
@@ -43,7 +44,6 @@ main() {
     b = s;          // Errado - boolean recebe string
     n1[1] = n2;      // Errado - acessando posicao em objeto que nao é vetor
 
-
     s = 1 + n1 / (3 - n2 + n1); // Errado - string recebe resultado de expressao aritimetica
     s = (1 > n1 + 1) && b;      // Errado - string recebe resultado de expressao relacional/logica
 
@@ -52,3 +52,7 @@ main() {
 
     g = 3;          // Errado - constante não pode ser modificada
 }
+  
+
+  
+  
