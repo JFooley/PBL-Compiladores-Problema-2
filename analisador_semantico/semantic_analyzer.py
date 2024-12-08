@@ -805,7 +805,7 @@ class SemanticAnalyzer:
                 if entry == None:
                     return
                 else:
-                    arguments_types.append(entry.tipoRetorno)
+                    arguments_types.append(entry.tipo)
             elif function_call_arguments[i]['category'] == 'NUMBER':
                 if '.' in function_call_arguments[i]['lexeme']: #TODO Já existe a função is_int
                     arguments_types.append('float')

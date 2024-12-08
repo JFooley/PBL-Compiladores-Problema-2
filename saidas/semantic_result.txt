@@ -1,18 +1,14 @@
-{'position': 84, 'message': "O identificador 'teste1' já existe neste escopo."}
-{'position': 88, 'message': "O termo deve ser uma expressão relacional, mas foi recebido: 'teste1'"}
-{'position': 88, 'message': "O identificador 'ff' não existe nesse escopo."}
-{'position': 92, 'message': "O termo deve ser uma expressão relacional, mas foi recebido: '3'"}
-{'position': 92, 'message': 'A variável c é uma constante. Não é possível alterar o valor de constantes.'}
-{'position': 102, 'message': "O termo deve ser uma expressão relacional, mas foi recebido: 'teste1+teste2'"}
-{'position': 106, 'message': "O termo deve ser uma expressão relacional, mas foi recebido: '(true&&true)'"}
-{'position': 110, 'message': "O termo deve ser uma expressão relacional, mas foi recebido: '(teste1&&3)>=(teste1||4)'"}
-{'position': 133, 'message': "O identificador 'sum' não existe nesse escopo."}
-{'position': 134, 'message': "O identificador 'sum' não existe nesse escopo."}
-{'position': 135, 'message': "O identificador 'sum' não existe nesse escopo."}
-{'position': 136, 'message': "O identificador 'sum' não existe nesse escopo."}
-{'position': 137, 'message': "O identificador 'sum' não existe nesse escopo."}
-{'position': 138, 'message': "O identificador 'sum' não existe nesse escopo."}
-{'position': 139, 'message': "O identificador 'sum' não existe nesse escopo."}
-{'position': 140, 'message': "O identificador 'n1.a' não existe nesse escopo."}
-{'position': 152, 'message': "O identificador 'num' não existe nesse escopo."}
-{'position': 154, 'message': "O identificador 'num' não existe nesse escopo."}
+{'position': 46, 'message': '1º parametro de sum é string, espera-se integer'}
+{'position': 52, 'message': '1º parametro de sum1 é string, espera-se integer'}
+{'position': 52, 'message': '1º parametro de sum é string, espera-se integer'}
+{'position': 53, 'message': "O identificador 'n1.a' não existe nesse escopo."}
+{'position': 56, 'message': "A Variável não é do tipo inteiro. A variável 'v' é um vetor ou matriz"}
+{'position': 57, 'message': "A Variável não é do tipo inteiro. A variável 'm' é um vetor ou matriz"}
+{'position': 58, 'message': 'O indíce do vetor deve ser inteiro'}
+{'position': 59, 'message': 'O indíce do vetor deve ser inteiro'}
+{'position': 60, 'message': 'A variável c é uma constante. Não é possível alterar o valor de constantes.'}
+{'position': 61, 'message': 'A variável teste não é do tipo inteiro'}
+{'position': 62, 'message': "A variável 'n1' não foi inicializada"}
+{'position': 63, 'message': "O identificador 'x' não existe nesse escopo."}
+{'position': 78, 'message': "O identificador 'num' não existe nesse escopo."}
+{'position': 80, 'message': "O identificador 'num' não existe nesse escopo."}

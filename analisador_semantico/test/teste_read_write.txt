@@ -1,0 +1,101 @@
+register r {
+  integer a; 
+  integer b;
+}
+
+constants {
+  integer c = 1;
+}
+
+variables {
+  string z = "teste string";
+  integer g = 1;
+  integer v_g[2];
+  integer m_g[1][2];
+}
+
+function integer sum(integer a, integer b) {
+  variables {  
+  }
+  return a + b;
+}
+
+main() {
+  variables {
+    string teste = "aaa";
+    integer a = 5;
+    integer b = 1;
+    integer v[2];
+    integer m[1][2];
+    integer result;
+    integer n1;
+    integer n2;
+    r r1;
+  }
+
+  v[0] = 1;
+  v[1] = 1;
+  m[0][0] = 1;
+  m[0][1] = 1;
+
+  // Testes de acerto
+
+  // Testes write
+  write(a);
+  write(v[0]);
+  write(m[0][0]);
+  write(r1.a);
+  write(r1);
+  write(sum(a, b));
+  write(1);
+  write(a+1);
+  write(a==1);
+  //write(a==1 && b==1); dando erro em variable
+  write(a, v[0], m[0][0], r1.a, sum(a, b), 1, a+1);
+
+  // Testes read
+  read(a);
+  read(v[0]);
+  read(m[0][0]);
+  read(r1.a);
+  read(r1);
+  read(a, v[0], m[0][0], r1.a);
+
+  // Testes de erro
+
+  // Testes write
+  write(duna);
+  write(lor[0]);
+  write(v[99]); // tempo de execução
+  write(arcane[0][0]);
+  write(m[0][99]); // tempo de execução
+  write(m[99][0]); // tempo de execução
+  write(m[99][99]); //  tempo de execução
+  write(r1.hulk);
+  write(batman.a);
+  write(batman.a);
+  write(batman);
+  write(sum("coqueiro", b));
+  write(hello_world(a));
+  write(teste == a);
+  write(teste && true);
+  write(teste + a);
+
+  // Testes read
+  read(duna);
+  read(lor[0]);
+  read(v[99]);
+  read(arcane[0][0]);
+  read(m[0][99]); //  tempo de execução
+  read(m[99][0]); //  tempo de execução
+  read(m[99][99]); //  tempo de execução
+  read(r1.hulk);
+  read(batman.a);
+  read(batman.a);
+  read(batman);
+
+}
+  
+
+  
+  
