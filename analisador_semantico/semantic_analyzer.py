@@ -708,7 +708,7 @@ class SemanticAnalyzer:
                     
                     if (variable_type["lexeme"] in ["boolean", "integer", "float"]):
                         if (value_entry.tipoRetorno not in ["boolean", "integer", "float"]):
-                            self.throw_error(f"O tipo '{value_entry.tipoRetorno}' não pode ser convertido em {variable_entry.tipo}.", value[0])
+                            self.throw_error(f"O tipo '{value_entry.tipoRetorno}' não pode ser convertido em {variable_type["lexeme"]}.", value[0])
                             return False
                     elif (variable_type["lexeme"] != value_entry.tipoRetorno):
                         self.throw_error(f"O tipo '{value_entry.tipoRetorno}' não pode ser convertido em {variable_type["lexeme"]}.", value[0])
