@@ -43,8 +43,15 @@ main() {
     integer n1;
     integer n2;
     r r1;
+    boolean if1 = true;
+    boolean bol;
   }
 
+  a = teste + 5; //deve dar erro
+  a = 5+1+a[0]; //deve dar erro
+  a = 5 +2 + teste; //deve dar erro
+  v[0] = a[0] + v[0];
+  a[0] = 5;
   v[0] = 1;
   v[1] = 1;
   m[0][0] = 1;
@@ -56,7 +63,7 @@ main() {
   sum(1, 2);
   result = sum(c, g);
   result = sum(sum1(teste, n2), sum(a, b));
-  //sum_obj(r1);
+  sum_obj(r1);
   n1.a = 0;
   
   /* Teste do incremento e decremento */
@@ -85,6 +92,50 @@ main() {
       num++;
     } else {
       num--;
+    }
+
+    if (if1) then{
+      a++;
+    }
+
+    if (a > b) then{
+      a++;
+    }
+
+    if (3) then{
+      a++;
+    }
+
+    if (true) then{
+      a++;
+    }
+
+    if (a) then{
+      a++;
+    }
+    
+    if (n1) then {  //erro de nao inicializada
+      a++;
+    }
+
+    if (bol) then {  //erro de nao inicializada
+      a++;
+    }
+ 
+    if (r1) then {   //erro de register
+      a++;
+    }
+    r1.a = 2;
+    if (r1.a) then {
+      a++;
+    }
+
+    if (v) then {  //erro de vetor
+      a++;
+    }
+
+    if (teste) then {  //erro de string
+      a++;
     }
   }
   

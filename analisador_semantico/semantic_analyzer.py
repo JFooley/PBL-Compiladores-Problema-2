@@ -362,7 +362,7 @@ class SemanticAnalyzer:
         for i in range(0, len(tokens)):
             token = tokens[i]
             if (token["category"] == "OPERATOR" and token["lexeme"] != ".") or i == len(tokens) - 1:
-                if len(variable_tokens) == 0: # Caso em que a expressão começa com -
+                if len(variable_tokens) == 0 and i == 0: # Caso em que a expressão começa com -
                     continue
 
                 if (i == len(tokens) - 1): variable_tokens.append(token) # Caso do ultimo token
@@ -969,6 +969,9 @@ class SemanticAnalyzer:
                         self.throw_error(f"A variável '{token_list[0]["lexeme"]}' é um vetor. Não pode ser operada diretamente em uma expressão",token_list[0])
                     elif ((entry.tipo not in ["integer", "boolean", "float"])):
                         self.throw_error(f"O tipo '{entry.tipo}' não pode ser operado em uma expressão",token_list[0])
+                    elif entry.tamanho == [] or entry.tamanho == 0 and entry.valor == None: #Valida se foi inicializada
+                        self.throw_error(f"A variável '{token_list[0]["lexeme"]}' não foi inicializada.", token_list[0])
+                        return None
             elif ((token_list[0]["lexeme"] not in ["true", "false"]) and (token_list[0]["category"] != "NUMBER")):  # Se não for true ou false e não for número
                 self.throw_error(f"'{token_list[0]["lexeme"]}' não pode ser operado em uma expressão",token_list[0])
         else:
