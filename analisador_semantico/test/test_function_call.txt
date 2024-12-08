@@ -1,0 +1,22 @@
+constants { }
+
+variables { }
+
+function integer sum(integer a, integer b) {
+  variables { }
+  return a + b;
+}
+
+main() {
+  variables { }
+
+  sum(1, 2); // É esperado funcionar OK
+
+  essa_func_nao_existe(); // É esperado detectar erro
+
+  write("Fim de teste");
+}
+  
+
+  
+  
