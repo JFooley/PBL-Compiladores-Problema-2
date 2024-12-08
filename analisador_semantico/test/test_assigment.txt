@@ -1,0 +1,54 @@
+register documento {
+    integer idade;
+}
+
+constants {
+    float g = 9.8;
+}
+
+variables {
+}
+
+main() {
+    variables {
+        integer n1 = 5;
+        float n2 = 1;
+        string s = "teste";
+        boolean b = true;
+        integer v[2];
+        integer m[1][2];
+        integer result;
+        documento fulano;
+    }
+    
+    n1 = 1;         // Correto - number recebe number literal
+    n1 = n2;        // Correto - number recebe variavel number (truncamento float para integer)
+    n1 = b;         // Correto - number recebe variavel boolean (casting de boolean para float/integer)
+    b = false;      // Correto - boolean recebe boolean literal
+    b = n2;         // Correto - boolean recebe variavel float/integer
+    b = 1;          // Correto - boolean recebe number literal
+    v[1] = n1;      // Correto - posicao do vetor recebe variavel number
+    v[1][1] = 123;  // Correto - posicao de vetor recebe number literal
+
+    n1 = 1 + n1 / (g - n2 + n1); // Correto - number recebe resultado de expressao aritimetica
+    n2 = (1 > n1 + 1) && b;      // Correto - number recebe resultado de expressao logica/relacional
+
+    fulano.idade = 10;          // Correto - atributo number recebe literal number
+    fulano.idade = n1;          // Correto - atributo number recebe variavel number
+
+    n1 = "joao";    // Errado - number recebe string literal
+    n1 = s;         // Errado - number recebe variavel string
+    s = 1;          // Errado - string recebe number literal
+    s = n1;         // Errado - string recebe variavel number
+    b = s;          // Errado - boolean recebe string
+    n1[1] = n2;     // Errado - acessando posicao em objeto que nao é vetor
+    n1 = v;         // Errado - variavel number recebe uma variavel vetor
+
+    s = 1 + n1 / (3 - n2 + n1); // Errado - string recebe resultado de expressao aritimetica
+    s = (1 > n1 + 1) && b;      // Errado - string recebe resultado de expressao relacional/logica
+
+    fulano.idade = s;           // Errado - atributo number recebe variavel string
+    fulano.idade = "string";    // Errado - atributo number recebe string literal
+
+    g = 3;          // Errado - constante não pode ser modificada
+}
