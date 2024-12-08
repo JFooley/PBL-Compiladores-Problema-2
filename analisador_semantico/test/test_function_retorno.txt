@@ -1,0 +1,51 @@
+register documento {
+    integer idade;
+}
+
+constants {
+    float garfo = 9.8;
+}
+
+variables {
+}
+
+function integer function_1(integer a, integer b) { 
+  variables {  
+  }
+  return a + b; // Correto - Retorna integer 
+}
+
+function integer function_2(string b) { 
+  variables {  
+  }
+  return b; // Errado - Retorna string com a função pedindo integer 
+}
+
+function void function_3() { 
+  variables {
+    string bola = "Oi";
+  }
+  return bola; // Errado - Retorna string com a função do tipo void
+}
+
+function void function_3() { 
+  variables {
+    string barriga = "Oi";
+  }
+  barriga = "ola"; // Correto, sem retorno
+}
+
+function void function_3() { 
+  variables {
+    string boia = "Oi";
+  }
+  return // Errado, com retorno em função do tipo void
+}
+
+main() {
+    variables {
+        integer n1 = 5;
+    }
+    
+    n1 = 1;         // Correto - Apenas para ter um body
+}
