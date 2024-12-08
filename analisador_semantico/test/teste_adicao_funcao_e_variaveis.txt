@@ -14,15 +14,16 @@ variables {
   integer g = 1;
   integer v_g[2];
   integer m_g[1][2];
-  float z;
-  register3 teste_register;
+  float z; //Deve apontar erro
+  register3 teste_register; //Deve apontar erro
+  integer xs = teste_abc();
   
 }
 
 function integer teste_function(integer abc, float abd, string abe, string a, boolean b) {
   variables {
   }
-  return 3;
+  return abc+abd;
 }
 
 function float teste_function2(integer abc, float abc, float abd, string abe, integer g) {
@@ -54,30 +55,33 @@ function string sum1(integer a, integer b) {
 main() {
   variables {
     string teste = "aaa";
-    integer a = 5;
+    integer a = 5; //Deve apontar erro
     integer b = 1;
     integer v[2];
     integer m[1][2];
     integer result;
     integer n1;
     integer n2;
-    boolean x  = True;
+    boolean x  = True; //Deve apontar erro
+    boolean an2 = true;
     r r1;
-    float a;
-    string c;
-    string r;
-    float teste_function;
+    float a; //Deve apontar erro
+    string c; //Deve apontar erro
+    string r; //Deve apontar erro
+    float teste_function; //Deve apontar erro
     float ad = 3;
-    float ba = "string";
-    float bd = True;
+    float ba = "string"; //Deve apontar erro
+    float bd = True; //Deve apontar erro
     float bc = a;
-    float be = teste;
-    float bf = x;
-    integer bw = n1;
-    string vt[3.5];
-    float br[ad];
+    float be = teste; //Deve apontar erro
+    float bf = x; //Deve apontar erro pq x n foi add n tabela pq deu erro
+    integer bw = n1; //Deve apontar erro de nao inicializada
+    string vt[3.5]; //Deve apontar erro
+    float br[ad];//Deve apontar erro
+    float at = sum(1,3);
   }
 
+  a = n1; //deve da erro de inicializacao em n1
   c = 0;
   v[0] = 1;
   v[1] = 1;
