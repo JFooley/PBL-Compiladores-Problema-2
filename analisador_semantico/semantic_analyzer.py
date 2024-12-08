@@ -394,15 +394,49 @@ class SemanticAnalyzer:
                 variable_tokens.append(token)
         return type
         
+    def remove_parentheses(self, tokens: list):
+        pile = ["$"]
+        ## Gera a pilha de marcação de remoção
+        for i in range(0, len(tokens)):
+            if tokens[i]["lexeme"] == "(":
+                if i > 0 and tokens[i-1]["category"] == "IDENTIFIER":
+                    pile.append("F")
+                else:
+                    pile.append("(")
+        
+        ## Itera sob a pilha e remove os tokens corretos:
+        new_tokens = []
+        for j in range(0, len(tokens)):
+            token = tokens[j]
+            if token["lexeme"] == "(":
+                if len(pile) == 0:
+                    continue
+
+                elif pile[0] == "F":
+                    new_tokens.append(token)
+
+                elif pile[0] == "(":
+                    pile.pop(0)
+
+            elif token["lexeme"] == ")":
+                if len(pile) == 0:
+                    continue
+
+                elif pile[0] == "F":
+                    pile.pop(0)
+                    new_tokens.append(token)
+
+            else:
+                new_tokens.append(token)
+
+        return new_tokens
+    
     def get_variable_type(self, tokens: list): ## identifica qual tipo é a variável ou value passado e devolve o tipo e o token necessário
         if tokens == None or tokens == []:
             return None
+        
         # Trata os parenteses
-        if tokens[0]["lexeme"] == "(": 
-            tokens.pop(0) ## Remove os parenteses do início
-
-        if tokens[-1]["lexeme"] == ")" and tokens[1]["lexeme"] != "(":
-            tokens.pop(-1) ## Remove os parenteses inúteis do final (que não são os da cahamada de função)
+        tokens = self.remove_parentheses(tokens)
         
         if len(tokens) == 1:
             ## Identifier
