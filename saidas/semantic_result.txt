@@ -1,18 +1,3 @@
-{'position': 84, 'message': "O identificador 'teste1' já existe neste escopo."}
-{'position': 88, 'message': "O termo deve ser uma expressão relacional, mas foi recebido: 'teste1'"}
-{'position': 88, 'message': "O identificador 'ff' não existe nesse escopo."}
-{'position': 92, 'message': "O termo deve ser uma expressão relacional, mas foi recebido: '3'"}
-{'position': 92, 'message': 'A variável c é uma constante. Não é possível alterar o valor de constantes.'}
-{'position': 102, 'message': "O termo deve ser uma expressão relacional, mas foi recebido: 'teste1+teste2'"}
-{'position': 106, 'message': "O termo deve ser uma expressão relacional, mas foi recebido: '(true&&true)'"}
-{'position': 110, 'message': "O termo deve ser uma expressão relacional, mas foi recebido: '(teste1&&3)>=(teste1||4)'"}
-{'position': 133, 'message': "O identificador 'sum' não existe nesse escopo."}
-{'position': 134, 'message': "O identificador 'sum' não existe nesse escopo."}
-{'position': 135, 'message': "O identificador 'sum' não existe nesse escopo."}
-{'position': 136, 'message': "O identificador 'sum' não existe nesse escopo."}
-{'position': 137, 'message': "O identificador 'sum' não existe nesse escopo."}
-{'position': 138, 'message': "O identificador 'sum' não existe nesse escopo."}
-{'position': 139, 'message': "O identificador 'sum' não existe nesse escopo."}
-{'position': 140, 'message': "O identificador 'n1.a' não existe nesse escopo."}
-{'position': 152, 'message': "O identificador 'num' não existe nesse escopo."}
-{'position': 154, 'message': "O identificador 'num' não existe nesse escopo."}
+{'position': 40, 'message': 'index não é um vetor, e por isso não pode posições acessadas.'}
+{'position': 41, 'message': 'g não é um vetor, e por isso não pode posições acessadas.'}
+{'position': 45, 'message': 'O indíce do vetor deve ser inteiro'}

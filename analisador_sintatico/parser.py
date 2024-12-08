@@ -110,8 +110,8 @@ class Parser():
     def variables(self, is_global = False):
         self.match_lexeme(['variables'])
         self.match_lexeme(['{'])
-        if len(parameters_list) > 0:
-            self.validator.add_variables_parameter_function(parameters_list,is_global)
+        # if len(parameters_list) > 0:
+            # self.validator.add_variables_parameter_function(parameters_list,is_global)
         if self.lookahead()['category'] == 'IDENTIFIER' or self.lookahead()['lexeme'] in ['integer', 'float', 'boolean', 'string']:
             self.expression_variables(is_global)
         self.match_lexeme(['}'])

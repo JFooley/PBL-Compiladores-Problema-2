@@ -16,7 +16,7 @@ class SemanticAnalyzer:
         # Cria tabela global
         self.create_global_table()
 
-        self.last_function_type = ""
+        self.last_function_type = None
 
     ################################ Funções auxiliares ################################
     def get_error_list(self):
@@ -494,6 +494,11 @@ class SemanticAnalyzer:
 
             if variable_entry == None:
                 return False
+            
+            if variable_dict['tipo'] == "VECTOR":
+                if (variable_entry.tamanho == 0):
+                    self.throw_error(f"{variable[0]['lexeme']} não é um vetor, e por isso não pode posições acessadas.", variable[0])
+                    return False
         
             if variable_entry.isConstant:
                 self.throw_error(f"{variable[0]["lexeme"]} é uma constante, não pode ter seu valor alterado.", variable[0])
@@ -505,7 +510,6 @@ class SemanticAnalyzer:
                     if (value_entry == None):
                         return False
                     
-                    print(value_entry.tamanho)
                     if (variable_entry.tamanho == 0 and variable_entry.tamanho != value_entry.tamanho):
                         self.throw_error(f"O {variable_entry.nome} não é um vetor e por isso não pode ser atribuir {value_entry.nome}.", value[0])
                         return False
@@ -522,7 +526,7 @@ class SemanticAnalyzer:
                         self.throw_error(f"A variável '{value_entry.nome}' não foi inicializada", value[0])
                         return None
                     
-                case "LITERAL": 
+                case "LITERAL":                         
                     match value[0]["category"]:
                         case "NUMBER":
                             if (variable_entry.tipo == "string" or variable_entry.tipo == "character"):
@@ -563,6 +567,7 @@ class SemanticAnalyzer:
                         return False
 
                 case "VECTOR":
+                    
                     index_list = self.get_index_vector(value)
 
                     if index_list == None:
@@ -573,15 +578,16 @@ class SemanticAnalyzer:
                             return None
                     
                     value_entry: EntryIdentificadores = self.find_table_entry(current_table_index, value[0])
-                    
+            
 
                     if (value_entry == None):
                         return False
                     
                     if (value_entry.tamanho == 0):
-                        self.throw_error(f"O identificador '{value[0]["lexeme"]}' não é um vator e por isso não pode ter posições acessadas.", value[0])
+                        self.throw_error(f"O identificador '{value[0]["lexeme"]}' não é um vetor e por isso não pode ter posições acessadas.", value[0])
                         return False
 
+                    
                     if (variable_entry.tipo in ["boolean", "integer", "float"]):
                         if (value_entry.tipo not in ["boolean", "integer", "float"]):
                             self.throw_error(f"O tipo '{value_entry.tipo}' não pode ser convertido em {variable_entry.tipo}.", value[0])
@@ -960,7 +966,7 @@ class SemanticAnalyzer:
                 return True
         return False
 
-
+ 
     def error_has_value(self,token):
         object = self.find_table_entry(self.current_table_index,token)
         if(object != None and object.valor == None):
@@ -1018,14 +1024,15 @@ class SemanticAnalyzer:
                 self.remove_local_table()
             else:                
                 line.append(token)
+        print(self.last_function_type != None)
         if(self.last_function_type != None):
             if(on_return == False and self.last_function_type['lexeme'] != "empty"):
                 self.throw_error(f"A função exige um retorno",self.last_function_type)
-        print(token_list)
+        # print(token_list)
 
         self.last_function_type = None
-        print("\n--------------- tabelas locais e global---------------")
-        print(self.pairs_table)
+        # print("\n--------------- tabelas locais e global---------------")
+        # print(self.pairs_table)
         
  #----------------------- Valida o while e if ----------------------------
     def validate_conditional(self,token_list):
@@ -1056,23 +1063,32 @@ class SemanticAnalyzer:
         if assignment_list == None : return 
         name_list = assignment_list[0]
         value_list = assignment_list[1]
+    
         
         
         if self.wrong_type_assign(self.current_table_index,name_list,value_list) == True: #Verificar se o tipo primitivo é do mesmo valor adicionado
             value = self.get_concatenated_lexemes(value_list)
 
             variable = self.get_variable_type(name_list)
+           
             if(variable["tipo"] == "VECTOR"): # Verfica se é vetor e se o index é um número ou identifier númerico
                 self.error_vector_size(variable['token'][2])
+                # brakets = any(token['lexeme']=='[' for token in variable['token'])
+                # print('btack')
+                # print(brakets)
+                # if brakets:
+                #     self.throw_error(f"O identificador '{name_list[0]['lexeme']}' não é um vetor e por isso não pode ter posições acessadas.", name_list[0])
+           
+           
             
             if (variable != None and variable["tipo"] != "VECTOR"):
                 self.pairs_table.alterar_caracteristica_identificador(self.current_table_index,variable["token"][0]["lexeme"],"valor",value)
-        else: # Erro no tipo, não é vetor 
-            variable = self.get_variable_type(name_list)
-            brakets = any(token['lexeme']=='[' for token in name_list)
-         
-            if variable == None and brakets:
-                self.throw_error(f"O identificador '{name_list[0]['lexeme']}' não é um vetor e por isso não pode ter posições acessadas.", name_list[0])
+        # else: # Erro no tipo, não é vetor 
+        #     variable = self.get_variable_type(name_list)
+        #     brakets = any(token['lexeme']=='[' for token in name_list)
+           
+        #     if variable == None and brakets:
+        #         self.throw_error(f"O identificador '{name_list[0]['lexeme']}' não é um vetor e por isso não pode ter posições acessadas.", name_list[0])
 
  #------------------------- Valida erro no for ------------------
     def validate_for(self,token_list):
