@@ -1085,7 +1085,6 @@ class SemanticAnalyzer:
 
         #Verifica segunda parte do for
         second_parte = list_for[1]
-        #if(size_error == len(self.error_list)):
         if (self.is_relation_expression_for(second_parte)): # Se for uma operação relacional
             self.identify_expression_return(self.current_table_index, second_parte)
         else:   # Se não for, identifica que a expressão não é relacional
@@ -1095,7 +1094,6 @@ class SemanticAnalyzer:
             self.throw_error(f"O termo deve ser uma expressão relacional, mas foi recebido: '{expression}'", second_parte[0])
 
         #Verifica terceira parte
-        #if(size_error == len(self.error_list)):
         self.validate_increment_decrement(list_for[2])  # Valida o incremento/decremento da terceira parte do for
     
     # Verifica a lista de tokens é uma expressão relacional (aceita aritméticos) sem operadores lógicos
