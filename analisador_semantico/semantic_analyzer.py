@@ -362,7 +362,7 @@ class SemanticAnalyzer:
         for i in range(0, len(tokens)):
             token = tokens[i]
             if (token["category"] == "OPERATOR" and token["lexeme"] != ".") or i == len(tokens) - 1:
-                if len(variable_tokens) == 0: # Caso em que a expressão começa com -
+                if len(variable_tokens) == 0 and i == 0: # Caso em que a expressão começa com -
                     continue
 
                 if (i == len(tokens) - 1): variable_tokens.append(token) # Caso do ultimo token
