@@ -154,15 +154,16 @@ class SemanticAnalyzer:
         function_name = token_list[1]['lexeme']
         parameters_list = []
         parameters_type_list = []
-        i = 3
-        while i < len(token_list):
-            parameters_list.append(token_list[i])
-            parameters_list.append(token_list[i+1])
-            parameters_list.append({ "lexeme": "=","category": "OPERATOR","line": token_list[i]["line"]})
-            parameters_list.append({ "lexeme": "None","category": "KEY-WORD","line": token_list[i]["line"]})
-            parameters_list.append({ "lexeme": ";","category": "DELIMITER","line": token_list[i]["line"]})
-            parameters_type_list.append(token_list[i]['lexeme'])
-            i += 3
+        if (token_list[3]['lexeme'] != ")"):
+            i = 3
+            while i < len(token_list):
+                parameters_list.append(token_list[i])
+                parameters_list.append(token_list[i+1])
+                parameters_list.append({ "lexeme": "=","category": "OPERATOR","line": token_list[i]["line"]})
+                parameters_list.append({ "lexeme": "None","category": "KEY-WORD","line": token_list[i]["line"]})
+                parameters_list.append({ "lexeme": ";","category": "DELIMITER","line": token_list[i]["line"]})
+                parameters_type_list.append(token_list[i]['lexeme'])
+                i += 3
         function_entry = EntryIdentificadores(function_name, 'function', None, return_type, parameters_type_list, 0)
         self.pairs_table.tabela[0]['tabela'].append(function_entry)
 
@@ -1006,6 +1007,7 @@ class SemanticAnalyzer:
             if(on_return == False and self.last_function_type['lexeme'] != "empty"):
                 self.throw_error(f"A função exige um retorno",self.last_function_type)
 
+        self.last_function_type = None
         print("\n--------------- tabelas locais e global---------------")
         print(self.pairs_table)
         
