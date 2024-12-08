@@ -504,6 +504,11 @@ class SemanticAnalyzer:
                     if (value_entry == None):
                         return False
                     
+                    print(value_entry.tamanho)
+                    if (variable_entry.tamanho == 0 and variable_entry.tamanho != value_entry.tamanho):
+                        self.throw_error(f"O {variable_entry.nome} não é um vetor e por isso não pode ser atribuir {value_entry.nome}.", value[0])
+                        return False
+                    
                     if (variable_entry.tipo in ["boolean", "integer", "float"]):
                         if (value_entry.tipo not in ["boolean", "integer", "float"]):                        
                             self.throw_error(f"O tipo '{value_entry.tipo}' não pode ser convertido em {variable_entry.tipo}.", value[0])
@@ -552,7 +557,7 @@ class SemanticAnalyzer:
                         self.throw_error(f"O tipo '{value_entry.tipo}' não pode ser convertido em {variable_entry.tipo}.", value[0])
                         return False
 
-                case "VECTOR":         
+                case "VECTOR":
                     index_list = self.get_index_vector(value)
 
                     if index_list == None:
@@ -569,10 +574,6 @@ class SemanticAnalyzer:
                     
                     if (value_entry.tamanho == 0):
                         self.throw_error(f"O identificador '{value[0]["lexeme"]}' não é um vator e por isso não pode ter posições acessadas.", value[0])
-                        return False
-
-                    if (variable_entry.tamanho == 0):
-                        self.throw_error(f"{variable[0]["lexeme"]} ", value[0])
                         return False
 
                     if (variable_entry.tipo in ["boolean", "integer", "float"]):
