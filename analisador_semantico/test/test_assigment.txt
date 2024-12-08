@@ -22,6 +22,7 @@ main() {
     }
     
     n1 = 1;         // Correto - number recebe number literal
+    n1 = -1;        // Correto - number recebe number literal negativo
     n1 = n2;        // Correto - number recebe variavel number (truncamento float para integer)
     n1 = b;         // Correto - number recebe variavel boolean (casting de boolean para float/integer)
     b = false;      // Correto - boolean recebe boolean literal
