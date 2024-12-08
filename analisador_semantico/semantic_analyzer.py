@@ -493,6 +493,11 @@ class SemanticAnalyzer:
 
             if variable_entry == None:
                 return False
+
+            if variable_dict['tipo'] == "VECTOR":
+                if (variable_entry.tamanho == 0):
+                    self.throw_error(f"{variable[0]['lexeme']} não é um vetor, e por isso não pode posições acessadas.", variable[0])
+                    return False
         
             if variable_entry.isConstant:
                 self.throw_error(f"{variable[0]["lexeme"]} é uma constante, não pode ter seu valor alterado.", variable[0])
