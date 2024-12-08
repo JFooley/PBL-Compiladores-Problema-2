@@ -1,0 +1,126 @@
+register r {
+  integer a; 
+  integer b;
+}
+
+constants {
+  integer c = 1;
+}
+
+variables {
+  string z = "teste string";
+  integer g = 32;
+  integer v_g[2];
+  integer m_g[1][2];
+  boolean controle = true;
+}
+
+
+function string sum1(integer a, integer b) {
+  variables {
+    integer teste1;
+    integer teste2;
+  }
+
+    /* ---- Teste cabeçalho FOR em função ---- */
+    
+    /* -- casos que não devem dar erros -- */
+    for (integer i = 0; i > 0; i++) {
+        teste1 = 3;
+        i = teste1;
+    }
+
+    for (teste1 = 3; teste1 < 0; g--) {
+        teste1 = 3;
+    }
+
+    for (integer i = m_g[0][1]; i >= 0; i++) { /* atribuição de posicao de matriz na variavel de 'controle' */
+        teste1 = 3;
+    }
+
+    for (teste1 = v_g[1]; i >= 0; i++) { /* atribuição de posicao de matriz na variavel de 'controle' */
+        teste1 = 3;
+    }
+
+    for (teste1 = 3; teste1 <= 0; teste1--) {
+        teste1 = 3;
+    }
+    
+    for (integer i = 0; i != 0; i++) {
+        teste1 = 3;
+    }
+
+    for (teste1 = 3; teste1 == 0; teste1--) {
+        teste1 = 3;
+    }
+
+    for (teste1 = 3; teste1; teste1--) {    /* esse caso não tem erro porque teste1 é um número que pode ser convertido para booleano. a parte condicional aceita apenas um booleano */
+        teste1 = 3;
+    }
+
+    for (teste1 = 3; 3; teste1--) {    /* esse caso tem erro - não pode haver apenas um numero/identificar/boolean, tem que ser uma operação logica ou relacional */
+        teste1 = 3;
+    }
+    /* testar operações mais complexas como condicao (segunda parte do for) */
+
+    for (teste1 = 3; teste1 < 0; teste1--) {    /* nesse caso, só será aceito uma expressão (< > <= >= != ==) acho que tambem deve aceitar && e ||*/
+        teste1 = 3;
+    }
+
+    for (teste1 = 3; teste1 + teste2; teste1--) {    /* nesse caso, só será aceito uma expressão seja relacional ou logica (< > <= >= != == && ||) */
+        teste1 = 3;
+    }
+
+    for (teste1 = 3; (true && true); teste1--) {    /* nesse caso, não ocorre no sintático passando para o semantico - deve ser aceito no semantico porque é uma operação logica */
+        teste1 = 3;
+    }
+
+    for (teste1 = 3; (teste1 && 3) >= (teste1 || 4); teste1--) {    
+        teste1 = 3;
+    }
+  return "a + b";
+}
+
+main() {
+  variables {
+    string teste = "aaa";
+    integer a = 5;
+    integer b = 1;
+    integer v[2];
+    integer m[1][2];
+    integer result;
+    integer n1;
+    integer n2;
+    r r1;
+  }
+    /* Erro: está considerando que aqui está dentro de uma função */
+    v[0] = 1;  
+    v[1] = 1;
+    m[0][0] = 1;
+    m[0][1] = 1;
+    result = sum(a, b);
+    result = sum(v[0], v[1]);
+    result = sum(m[0][0], m[0][1]);
+    result = sum(r1.a, r1.b);
+    sum(1, 2);
+    result = sum(c, g);
+    result = sum(sum1(n1, n2), sum(a, b));
+    n1.a = 0;
+
+    n1 = v[1];
+
+  /* a = (((42*(31-5)) + 3)-32); */
+
+  for (a = 0; a>5; a++){
+    b = v[0];
+  }
+
+  while ((a + 1 && b) || a != c){
+    if (c && b) then {
+      num++;
+    } else {
+      num--;
+    }
+  }
+
+}

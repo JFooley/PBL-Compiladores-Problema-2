@@ -858,7 +858,7 @@ class SemanticAnalyzer:
             if token_entry.isConstant:  # Não pode ser uma constante
                 self.throw_error(f"A variável {token_entry.nome} é uma constante. Não é possível alterar o valor de constantes.", token)
                 return
-            if ((token_entry.tamanho != [] and token_entry.tamanho != 0)): # incremento direto na matriz ou vetor
+            if ((token_entry.tamanho != [] and token_entry.tamanho != 0)): # Incremento direto na matriz ou vetor
                     self.throw_error(f"A Variável não é do tipo inteiro. A variável '{token_entry.nome}' é um vetor ou matriz", token)  # matriz ou vetor sem [] ou [][]
                     return
 
@@ -1049,17 +1049,30 @@ class SemanticAnalyzer:
         #Verifica segunda parte do for
         second_parte = list_for[1]
         if(size_error == len(self.error_list)):
-            name = second_parte[0]
-            self.error_conditional_for(name,second_parte,2)
-        
+            if (self.is_relation_expression_for(second_parte)): # Se for uma operação relacional
+                self.identify_expression_return(self.current_table_index, second_parte)
+            else:   # Se não for, identifica que a expressão não é relacional
+                expression = ''
+                for token in second_parte:
+                    expression += token["lexeme"] 
+                self.throw_error(f"O termo deve ser uma expressão relacional, mas foi recebido: '{expression}'", second_parte[0])
+
         #Verifica terceira parte
         if(size_error == len(self.error_list)):
-            self.validade_third_part(list_for[2][0])
+            self.validate_increment_decrement(list_for[2])  # Valida o incremento/decremento da terceira parte do for
+    
+    # Verifica a lista de tokens é uma expressão relacional (aceita aritméticos) sem operadores lógicos
+    def is_relation_expression_for(self, token_list):
+        is_relational = False
+        # verifica se não tem um operador lógico
+        for token in token_list:
+            if token["category"] == "OPERATOR" and token["lexeme"] in ["&&", "||"]:
+                return False # Encontrou um token de operação lógica
+            
+            if (token["category"] == "OPERATOR" and token["lexeme"] in ["==", "!=", ">", ">=", "<", "<="]):
+                is_relational = True
 
-    def validade_third_part(self,token):
-        entry = self.find_table_entry(self.current_table_index,token)
-        if entry != None and entry.tipo != "integer":
-            self.throw_error(f"A váriavel '{token["lexeme"]}' não é do tipo integer.",token)
+        return is_relational
     
     #Verifica se a variavel existe, se é inteira e se o valor depois da igualdade é inteiro
     def error_conditional_for(self,name_token,token_list,index):
