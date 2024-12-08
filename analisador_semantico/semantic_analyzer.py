@@ -960,10 +960,19 @@ class SemanticAnalyzer:
         
  #----------------------- Valida o while e if ----------------------------
     def validate_conditional(self,token_list):
-        type = self.identify_expression_return(self.current_table_index, token_list)
-
-        if type != None and "boolean" not in type:
-            self.throw_error(f"O resultado da expressão não é do tipo boolean.",token_list[0])        
+        # verifica se o tipo é válido
+        if len(token_list) == 1:    # Se não for uma expressão - apenas um token
+            if (token_list[0]["category"] == "IDENTIFIER"): # Se for um identificador sozinho
+                entry = self.find_table_entry(self.current_table_index, token_list[0])
+                if (entry != None): # Se achou o identificador
+                    if ((entry.tipo in ["integer", "boolean", "float"] and not (entry.tamanho == [] or entry.tamanho == 0))): # Vetor
+                        self.throw_error(f"A variável '{token_list[0]["lexeme"]}' é um vetor. Não pode ser operada diretamente em uma expressão",token_list[0])
+                    elif ((entry.tipo not in ["integer", "boolean", "float"])):
+                        self.throw_error(f"O tipo '{entry.tipo}' não pode ser operado em uma expressão",token_list[0])
+            elif ((token_list[0]["lexeme"] not in ["true", "false"]) and (token_list[0]["category"] != "NUMBER")):  # Se não for true ou false e não for número
+                self.throw_error(f"'{token_list[0]["lexeme"]}' não pode ser operado em uma expressão",token_list[0])
+        else:
+            self.identify_expression_return(self.current_table_index, token_list)      
         
  #---------------------- Valida assignment ------------------------------
     def validate_assignment(self,token_list):
