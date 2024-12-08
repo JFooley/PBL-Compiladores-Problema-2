@@ -817,18 +817,6 @@ class SemanticAnalyzer:
                 return
             i += 1
 
-    ################ Função para tratar o tipo do token ######################
-    def conversion(self, value):
-        # Tentar converter para int
-        if value == "NUMBER":
-            return "integer"
-        if value == "STRING":
-            return "string"
-        if value == "BOOLEAN" or value == "true" or value == "false":
-            return "boolean"
-        # Caso não seja nenhum dos anteriores, manter como string
-        return "string"
-    
     #################### Função para validar o return (inteiro / identificador) ##################
     def validate_function_return(self, token_list): 
         value = ""
