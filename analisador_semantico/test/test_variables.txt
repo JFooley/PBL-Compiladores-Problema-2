@@ -1,0 +1,19 @@
+constants {
+  
+}
+
+variables {
+  integer b = 1;
+}
+
+main() {
+  variables {
+    integer c = 1;
+  }
+  b = 7; // É esperado funcionar OK
+  c = 8; // É esperado funcionar OK
+
+  z = 9; // É esperado detectar erro
+
+  write("Fim de teste");
+}
