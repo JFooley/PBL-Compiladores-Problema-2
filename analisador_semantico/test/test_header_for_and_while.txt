@@ -59,7 +59,6 @@ main() {
 
     n1 = v[1];
 
-  a = 32 - z;
   // ---- Teste cabeçalho WHILE ----
 
   // --- Devem passar ---
