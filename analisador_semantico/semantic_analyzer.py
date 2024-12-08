@@ -308,7 +308,7 @@ class SemanticAnalyzer:
                         if error == len(self.error_list):
                             variables_entry = EntryIdentificadores(variable_name['lexeme'], variable_type['lexeme'], values , None, None, vector_length if vector_length != [] else 0)
                             self.pairs_table.tabela[0 if is_global == True else self.current_table_index]['tabela'].append(variables_entry)
-                    
+              
                     value_list = []
                     values = ""
                     
@@ -432,7 +432,7 @@ class SemanticAnalyzer:
             if tokens[0]["category"] == "IDENTIFIER":
                 return {"tipo":"IDENTIFIER", "token": tokens}
             ## Literal
-            else:
+            else:                    
                 return {"tipo":"LITERAL", "token": tokens}
             
         else:
@@ -458,7 +458,7 @@ class SemanticAnalyzer:
             elif tokens[1]["lexeme"] == "[":
                 value_entry: EntryIdentificadores = self.find_table_entry(self.current_table_index, tokens[0])
                 if (value_entry != None and value_entry.tamanho == 0):
-                    return None
+                    return None                
                 return {"tipo":"VECTOR", "token": tokens}
 
     def wrong_type_assign(self, current_table_index, variable, value, variable_type = None): 
@@ -474,9 +474,11 @@ class SemanticAnalyzer:
         variable = variable_dict["token"]
         value = value_dict["token"]
 
+        
         ## Atribuição de valor a variavel existente
         if variable_type == None: 
             variable_entry: EntryIdentificadores = self.find_table_entry(current_table_index, variable[0])
+            
 
             if variable_entry == None:
                 return False
@@ -484,7 +486,6 @@ class SemanticAnalyzer:
             if variable_entry.isConstant:
                 self.throw_error(f"{variable[0]["lexeme"]} é uma constante, não pode ter seu valor alterado.", variable[0])
                 return False
-
             match value_dict["tipo"]:
                 case "IDENTIFIER":
                     value_entry: EntryIdentificadores = self.find_table_entry(current_table_index, value[0])
@@ -517,6 +518,10 @@ class SemanticAnalyzer:
                             if (variable_entry.tipo == "string" or variable_entry.tipo == "character"):
                                 self.throw_error(f"{value[0]["category"]} não pode ser convertido em {variable_entry.tipo}.", value[0])    
                                 return False
+                        
+                        
+                       
+                            
 
                 case "REGISTER":
                     value_entry: EntryIdentificadores = self.find_table_entry(current_table_index, value[0])
@@ -612,6 +617,13 @@ class SemanticAnalyzer:
                             if (variable_type["lexeme"] == "string" or variable_type["lexeme"] == "character"):
                                 self.throw_error(f"{value[0]["category"]} não pode ser convertido em {variable_type["lexeme"]}.", value[0])    
                                 return False
+                            
+                        # Quando os valores forem true or false
+                        case "KEYWORD":
+                            if(value[0]['lexeme'] not in ['true', 'false']):
+                                self.throw_error(f"{value[0]["category"]} não pode ser convertido em {variable_type["lexeme"]}.", value[0])    
+                                return False
+                       
 
                 case "REGISTER":
                     value_entry: EntryIdentificadores = self.find_table_entry(current_table_index, value[0])
@@ -645,6 +657,8 @@ class SemanticAnalyzer:
                     if (variable_type["lexeme"] != value_entry.tipo):
                         self.throw_error(f"{value_entry.tipo} não pode ser convertido em {variable_type['lexeme']}.", value[0])
                         return False
+                    
+                    
 
                 case "FUNCTION CALL":
                     self.validate_function_parameters(value)
@@ -977,6 +991,7 @@ class SemanticAnalyzer:
         if(self.last_function_type != None):
             if(on_return == False and self.last_function_type['lexeme'] != "empty"):
                 self.throw_error(f"A função exige um retorno",self.last_function_type)
+        print(token_list)
 
         # print("\n--------------- tabelas locais e global---------------")
         # print(self.pairs_table)
@@ -1011,18 +1026,20 @@ class SemanticAnalyzer:
         name_list = assignment_list[0]
         value_list = assignment_list[1]
         
+        
         if self.wrong_type_assign(self.current_table_index,name_list,value_list) == True: #Verificar se o tipo primitivo é do mesmo valor adicionado
             value = self.get_concatenated_lexemes(value_list)
 
             variable = self.get_variable_type(name_list)
            
-            
+           
             
             if (variable != None and variable["tipo"] != "VECTOR"):
                 self.pairs_table.alterar_caracteristica_identificador(self.current_table_index,variable["token"][0]["lexeme"],"valor",value)
         else: # Erro no tipo, não é vetor 
             variable = self.get_variable_type(name_list)
             brakets = any(token['lexeme']=='[' for token in name_list)
+         
             if variable == None and brakets:
                 self.throw_error(f"{name_list[0]['lexeme']} não é um vetor e por isso não pode ter posições acessadas.", name_list[0])
 

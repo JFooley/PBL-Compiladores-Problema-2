@@ -1,5 +1,6 @@
-{'position': 34, 'expected': ['NUMBER'], 'received': ['true', ']', '=', '3']}
-{'position': 34, 'expected': [']'], 'received': []}
+{'position': 34, 'expected': [']'], 'received': ['!=', '3', ']', '=', '2']}
 {'position': 34, 'expected': ['++', '--'], 'received': []}
-{'position': 35, 'expected': [']'], 'received': ['!=', '2', ']', '=', '4']}
+{'position': 35, 'expected': [']'], 'received': ['>', '3', ']', '=', '2']}
 {'position': 35, 'expected': ['++', '--'], 'received': []}
+{'position': 36, 'expected': [']'], 'received': ['==', '3', ']', '=', '2']}
+{'position': 36, 'expected': ['++', '--'], 'received': []}
