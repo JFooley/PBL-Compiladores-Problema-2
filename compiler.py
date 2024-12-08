@@ -37,9 +37,6 @@ def main():
 		validator = SemanticAnalyzer()
 		parser = Parser(validator, tokens)
 		parser.run()  
-		
-
-		# for item in parser.validator.pairs_table.tabela[0]['tabela']:print(item.nome)
 
 		print("\n--------------- tabela de registro ---------------")
 		print(validator.registers_type_table)
