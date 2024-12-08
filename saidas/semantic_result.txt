@@ -4,8 +4,9 @@
 {'position': 42, 'message': "O tipo 'integer' não pode ser convertido em string."}
 {'position': 43, 'message': "O tipo 'string' não pode ser convertido em boolean."}
 {'position': 44, 'message': "O identificador 'n1' não é um vetor e por isso não pode ter posições acessadas."}
-{'position': 46, 'message': "O tipo '['float', 'integer']' não pode ser convertido em string."}
-{'position': 47, 'message': "O tipo '['boolean']' não pode ser convertido em string."}
-{'position': 49, 'message': "O tipo 'string' não pode ser convertido em integer."}
-{'position': 50, 'message': "O tipo 'STRING' não pode ser convertido em integer."}
-{'position': 52, 'message': 'g é uma constante, não pode ter seu valor alterado.'}
+{'position': 45, 'message': 'O n1 não é um vetor e por isso não pode ser atribuir v.'}
+{'position': 47, 'message': "O tipo '['float', 'integer']' não pode ser convertido em string."}
+{'position': 48, 'message': "O tipo '['boolean']' não pode ser convertido em string."}
+{'position': 50, 'message': "O tipo 'string' não pode ser convertido em integer."}
+{'position': 51, 'message': "O tipo 'STRING' não pode ser convertido em integer."}
+{'position': 53, 'message': 'g é uma constante, não pode ter seu valor alterado.'}
