@@ -110,19 +110,21 @@ class Parser():
     def variables(self, is_global = False):
         self.match_lexeme(['variables'])
         self.match_lexeme(['{'])
-        self.token_accumulator_list = []
-        size_error = len(self.error_list)
+        if len(parameters_list) > 0:
+            self.validator.add_variables_parameter_function(parameters_list,is_global)
         if self.lookahead()['category'] == 'IDENTIFIER' or self.lookahead()['lexeme'] in ['integer', 'float', 'boolean', 'string']:
-            self.expression_variables()
-        
-        if (len(self.error_list) == size_error):
-            self.validator.add_variables_to_table(is_global, self.token_accumulator_list)
+            self.expression_variables(is_global)
         self.match_lexeme(['}'])
 
-    def expression_variables(self):
-        # limpa lista
+    def expression_variables(self, is_global = False):
+        self.token_accumulator_list = []
+        size_error = len(self.error_list)
+        
         self.expression_declaration()
-        # chama função
+
+        if (len(self.error_list) == size_error):
+            self.validator.add_variables_to_table(is_global, self.token_accumulator_list)
+
         if self.lookahead()['category'] == 'IDENTIFIER' or self.lookahead()['lexeme'] in ['integer', 'float', 'boolean', 'string']:
             self.expression_variables()
 
