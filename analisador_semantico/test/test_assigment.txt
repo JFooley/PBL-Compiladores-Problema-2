@@ -27,6 +27,8 @@ main() {
     b = false;      // Correto - boolean recebe boolean literal
     b = n2;         // Correto - boolean recebe variavel float/integer
     b = 1;          // Correto - boolean recebe number literal
+    v[1] = n1;      // Correto - posicao do vetor recebe variable number
+    v[1][1] = 123;  // Correto - posicao de vetor recebe number literal
 
     n1 = 1 + n1 / (g - n2 + n1); // Correto - number recebe resultado de expressao aritimetica
     n2 = (1 > n1 + 1) && b;      // Correto - number recebe resultado de expressao logica/relacional
