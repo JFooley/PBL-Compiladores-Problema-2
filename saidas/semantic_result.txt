@@ -3,7 +3,6 @@
 {'position': 41, 'message': "O tipo 'NUMBER' não pode ser convertido em string."}
 {'position': 42, 'message': "O tipo 'integer' não pode ser convertido em string."}
 {'position': 43, 'message': "O tipo 'string' não pode ser convertido em boolean."}
-{'position': 44, 'message': "O identificador 'n1' não é um vetor e por isso não pode ter posições acessadas."}
 {'position': 45, 'message': 'O n1 não é um vetor e por isso não pode ser atribuir v.'}
 {'position': 47, 'message': "O tipo '['float', 'integer']' não pode ser convertido em string."}
 {'position': 48, 'message': "O tipo '['boolean']' não pode ser convertido em string."}

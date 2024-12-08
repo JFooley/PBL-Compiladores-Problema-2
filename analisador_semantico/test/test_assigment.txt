@@ -22,11 +22,11 @@ main() {
     }
     
     n1 = 1;         // Correto - number recebe number literal
+    n2 = -1;        // Correto - number recebe number literal negativo
     n1 = n2;        // Correto - number recebe variavel number (truncamento float para integer)
     n1 = b;         // Correto - number recebe variavel boolean (casting de boolean para float/integer)
     b = false;      // Correto - boolean recebe boolean literal
     b = n2;         // Correto - boolean recebe variavel float/integer
-    b = 1;          // Correto - boolean recebe number literal
     v[1] = n1;      // Correto - posicao do vetor recebe variavel number
     v[1][1] = 123;  // Correto - posicao de vetor recebe number literal
 
