@@ -1,0 +1,85 @@
+register r {
+  integer a; 
+  integer b;
+}
+
+constants {
+  integer c = 1;
+  string s = "constant string";
+}
+
+variables {
+  boolean flag = true;
+  float pi = 3.14;
+  string text = "hello";
+  integer counter = 10;
+  integer values[3];
+  integer matrix[2][2];
+  r record;
+}
+
+function integer sum(integer a, integer b) {
+  variables {
+  }
+  return a + b;
+}
+
+function boolean is_positive(integer a) {
+  variables {
+  }
+  return a > 0;
+}
+
+main() {
+  variables {
+    integer result;
+    integer n1 = 5;
+    integer n2 = 10;
+    boolean status;
+    float radius = 5.5;
+    float area;
+    string invalid_op;
+  }
+
+  // Expressões Aritméticas
+  result = n1 + n2;             // Soma de inteiros
+  result = n1 * (n2 - 3);       // Subtração e multiplicação
+  area = pi * (radius ^ 2);     // Potenciação com float
+  area = "text" + n1;           // Erro: Soma entre string e integer
+  result = n1 / 0;              // Erro: Divisão por zero
+
+  // Expressões Relacionais
+  status = n1 > n2;             // Comparação maior que
+  status = n1 >= counter;       // Comparação maior ou igual
+  status = pi == radius;        // Comparação de igualdade
+  status = n1 != "hello";       // Erro: Comparação entre integer e string
+
+  // Expressões Lógicas
+  status = flag && (n1 > n2);   // Operação lógica AND
+  status = !flag || (n1 == 5);  // Operação lógica OR e NOT
+  status = n1 && n2;            // Erro: Operação lógica com inteiros
+
+  // Vetores e Matrizes
+  result = values[0] + values[1];      // Soma de valores em vetor
+  result = matrix[0][0] + matrix[1][1]; // Soma de valores em matriz
+  result = values[3];                  // Erro: Índice fora dos limites do vetor
+  result = matrix[0][2];               // Erro: Índice fora dos limites da matriz
+  result = values["text"];             // Erro: Índice não é inteiro
+
+  // Registros
+  record.a = 10;                       // Atribuição em atributo de registro
+  record.b = record.a + n1;            // Uso de registro em expressão
+  result = record.c;                   // Erro: Atributo inexistente no registro
+
+  // Funções
+  result = sum(n1, n2);                // Chamada de função válida
+  result = sum(n1, "text");            // Erro: Parâmetro de tipo inválido
+  status = is_positive(n1);            // Chamada de função válida
+  status = is_positive(pi);            // Erro: Parâmetro de tipo inválido
+
+  // Mistura de Expressões
+  result = sum(values[0], matrix[0][1]) * n1;  // Expressão válida
+  result = sum("text", record.a) + pi;         // Erro: Parâmetro de tipo inválido na função
+  status = (n1 > n2) && is_positive(counter);  // Expressão lógica válida
+  status = (n1 && n2) || flag;                 // Erro: Operação lógica com inteiros
+}
