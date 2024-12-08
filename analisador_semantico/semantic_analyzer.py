@@ -1007,6 +1007,7 @@ class SemanticAnalyzer:
             if(on_return == False and self.last_function_type['lexeme'] != "empty"):
                 self.throw_error(f"A função exige um retorno",self.last_function_type)
 
+        self.last_function_type = None
         print("\n--------------- tabelas locais e global---------------")
         print(self.pairs_table)
         
