@@ -1,14 +1,14 @@
-{'position': 46, 'message': '1º parametro de sum é string, espera-se integer'}
-{'position': 52, 'message': '1º parametro de sum1 é string, espera-se integer'}
 {'position': 52, 'message': '1º parametro de sum é string, espera-se integer'}
-{'position': 53, 'message': "O identificador 'n1.a' não existe nesse escopo."}
-{'position': 56, 'message': "A Variável não é do tipo inteiro. A variável 'v' é um vetor ou matriz"}
-{'position': 57, 'message': "A Variável não é do tipo inteiro. A variável 'm' é um vetor ou matriz"}
-{'position': 58, 'message': 'O indíce do vetor deve ser inteiro'}
-{'position': 59, 'message': 'O indíce do vetor deve ser inteiro'}
-{'position': 60, 'message': 'A variável c é uma constante. Não é possível alterar o valor de constantes.'}
-{'position': 61, 'message': 'A variável teste não é do tipo inteiro'}
-{'position': 62, 'message': "A variável 'n1' não foi inicializada"}
-{'position': 63, 'message': "O identificador 'x' não existe nesse escopo."}
-{'position': 78, 'message': "O identificador 'num' não existe nesse escopo."}
-{'position': 80, 'message': "O identificador 'num' não existe nesse escopo."}
+{'position': 58, 'message': '1º parametro de sum1 é string, espera-se integer'}
+{'position': 58, 'message': '1º parametro de sum é string, espera-se integer'}
+{'position': 60, 'message': "O identificador 'n1.a' não existe nesse escopo."}
+{'position': 63, 'message': "A Variável não é do tipo inteiro. A variável 'v' é um vetor ou matriz"}
+{'position': 64, 'message': "A Variável não é do tipo inteiro. A variável 'm' é um vetor ou matriz"}
+{'position': 65, 'message': 'O indíce do vetor deve ser inteiro'}
+{'position': 66, 'message': 'O indíce do vetor deve ser inteiro'}
+{'position': 67, 'message': 'A variável c é uma constante. Não é possível alterar o valor de constantes.'}
+{'position': 68, 'message': 'A variável teste não é do tipo inteiro'}
+{'position': 69, 'message': "A variável 'n1' não foi inicializada"}
+{'position': 70, 'message': "O identificador 'x' não existe nesse escopo."}
+{'position': 85, 'message': "O identificador 'num' não existe nesse escopo."}
+{'position': 87, 'message': "O identificador 'num' não existe nesse escopo."}

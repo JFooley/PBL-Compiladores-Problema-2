@@ -14,6 +14,12 @@ variables {
   integer m_g[1][2];
 }
 
+function integer sum_obj(r p) {
+  variables {  
+  }
+  return p.a + p.b;
+}
+
 function integer sum(integer a, integer b) {
   variables {  
   }
@@ -50,6 +56,7 @@ main() {
   sum(1, 2);
   result = sum(c, g);
   result = sum(sum1(teste, n2), sum(a, b));
+  //sum_obj(r1);
   n1.a = 0;
   
   /* Teste do incremento e decremento */

@@ -205,7 +205,7 @@ class SemanticAnalyzer:
             return
         
         if (len(token_list) > 4):
-            if(token_list[2]["lexeme"] == "=" and (token_list[3]["category"] != "IDENTIFIER" or token_list[4]["lexeme"] != ";")):
+            if(token_list[2]["lexeme"] == "=" and ((token_list[3]["category"] != "IDENTIFIER" and  token_list[3]["lexeme"] != "None") or token_list[4]["lexeme"] != ";")):
                 self.throw_error("Associação inválida de register", token_list[3])
                 return
 
@@ -222,6 +222,9 @@ class SemanticAnalyzer:
        
         for register in registers:
             value = None
+            if len(token_list) > 4:
+                if token_list[3]['lexeme'] == "None":
+                    value = "None"
             attribute_name = instance_name["lexeme"]+"."+register["nome_atributo"]
             
             if (isIdentifier):
@@ -291,7 +294,9 @@ class SemanticAnalyzer:
                 return   
             #TODO Talvez nao é necessario pq o sintatico da erro
             if (variable_type['category'] == "IDENTIFIER"):
-                register = [variable_type, variable_name, {"lexeme":"=", "category":"DELIMITER", "line":variable_name["line"]}].extend(value_list).append({"lexeme":";", "category":"DELIMITER", "line":variable_name["line"]})
+                register = [variable_type, variable_name, {"lexeme":"=", "category":"DELIMITER", "line":variable_name["line"]}]
+                register.extend(value_list)
+                register.append({"lexeme":";", "category":"DELIMITER", "line":variable_name["line"]})
                 self.add_register_instance_to_table(register)
             else:
                 variables_entry = EntryIdentificadores(variable_name['lexeme'], variable_type['lexeme'], values , None, None, vector_length if vector_length != [] else 0)
