@@ -551,7 +551,7 @@ class SemanticAnalyzer:
                         return False
 
                 case "VECTOR":
-                    
+                   
                     index_list = self.get_index_vector(value)
 
                     if index_list == None:
@@ -663,6 +663,7 @@ class SemanticAnalyzer:
                         return False
 
                 case "VECTOR":
+                   
                     index_list = self.get_index_vector(value)
 
                     if index_list == None:

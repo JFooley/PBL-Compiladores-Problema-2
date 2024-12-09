@@ -1,0 +1,57 @@
+register r {
+  integer a; 
+  integer b;
+}
+
+constants {
+  integer c =1;
+}
+
+variables {
+
+}
+
+
+main() {
+  variables {
+    integer g = 1;
+    string index = "A";
+    integer vector_test[4];
+    integer v[2];
+    integer m[1][2];
+    integer result;
+    integer n1;
+    integer n2;
+    r r1;
+    
+  }
+
+  /* Testes Válidos para vetor */ 
+  n1 = 2;
+  v[0] = 1;
+  v[1] = 1;
+  m[0][0] = 1;
+  m[0][1] = 1;
+  m[1][1] = 2;
+  m[1][n1] = 3;  
+  n1 = v[1];
+
+
+  /* Teste acessar variável que não é vetor */
+  index[3] = "a";
+  g[1] = 2;
+
+  /* Teste acessar vetor com index não inteiro */
+  vector_test[5] = 3;
+  vector_test[index] = 2;
+  vector_test[1-3] = 2;
+  // vector_test[1!=3] = 2; /* Casos de erro sintático */ 
+  // vector_test[1>3] = 2;  /* Casos de erro sintático */ 
+  // vector_test[1==3] = 2  /* Casos de erro sintático */ 
+
+
+}
+  
+
+  
+  
