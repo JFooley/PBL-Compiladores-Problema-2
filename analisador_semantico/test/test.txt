@@ -4,23 +4,14 @@ register r {
 }
 
 constants {
-  integer c =1;
+  integer c = 1;
 }
 
 variables {
-  integer d = 4;
   string z = "teste string";
-  boolean b = true;
-  integer v_g[c];
+  integer g = 1;
+  integer v_g[2];
   integer m_g[1][2];
-
-}
-
-function integer qualquer(integer a, r d){
-variables { 
-    integer e = 1;
-  }
-  return 1;
 }
 
 function integer sum_obj(r p) {
@@ -30,25 +21,16 @@ function integer sum_obj(r p) {
 }
 
 function integer sum(integer a, integer b) {
-  variables{
-
+  variables {  
   }
-  
-
-  return a+b;
+  return a + b;
 }
 
-function empty sum1(integer a, integer b) {
-  variables { 
-  
+function string sum1(integer a, integer b) {
+  variables {  
   }
-  r2.a = 3;
-  sum(1,2);
-  return;
+  return "a + b";
 }
-
-
-
 
 main() {
   variables {
@@ -61,9 +43,15 @@ main() {
     integer n1;
     integer n2;
     r r1;
-    
+    boolean if1 = true;
+    boolean bol;
   }
 
+  a = teste + 5; //deve dar erro
+  a = 5+1+a[0]; //deve dar erro
+  a = 5 +2 + teste; //deve dar erro
+  v[0] = a[0] + v[0];
+  a[0] = 5;
   v[0] = 1;
   v[1] = 1;
   m[0][0] = 1;
@@ -75,7 +63,7 @@ main() {
   sum(1, 2);
   result = sum(c, g);
   result = sum(sum1(teste, n2), sum(a, b));
-  //sum_obj(r1);
+  sum_obj(r1);
   n1.a = 0;
   
   /* Teste do incremento e decremento */
@@ -105,64 +93,52 @@ main() {
     } else {
       num--;
     }
+
+    if (if1) then{
+      a++;
+    }
+
+    if (a > b) then{
+      a++;
+    }
+
+    if (3) then{
+      a++;
+    }
+
+    if (true) then{
+      a++;
+    }
+
+    if (a) then{
+      a++;
+    }
+    
+    if (n1) then {  //erro de nao inicializada
+      a++;
+    }
+
+    if (bol) then {  //erro de nao inicializada
+      a++;
+    }
+ 
+    if (r1) then {   //erro de register
+      a++;
+    }
+    r1.a = 2;
+    if (r1.a) then {
+      a++;
+    }
+
+    if (v) then {  //erro de vetor
+      a++;
+    }
+
+    if (teste) then {  //erro de string
+      a++;
+    }
   }
   
-  // Testes de acerto
-
-  // Testes write
-  write(a);
-  write(v[0]);
-  write(m[0][0]);
-  write(r1.a);
-  write(r1);
-  write(sum(a, b));
-  write(1);
-  write(a+1);
-  write(a==1);
-  //write(a==1 && b==1); dando erro em variable
-  write(a, v[0], m[0][0], r1.a, sum(a, b), 1, a+1);
-
-  // Testes read
-  read(a);
-  read(v[0]);
-  read(m[0][0]);
-  read(r1.a);
-  read(r1);
-  read(a, v[0], m[0][0], r1.a);
-
-  // Testes de erro
-
-  // Testes write
-  write(duna);
-  write(lor[0]);
-  write(v[99]); // tempo de execução
-  write(arcane[0][0]);
-  write(m[0][99]); // tempo de execução
-  write(m[99][0]); // tempo de execução
-  write(m[99][99]); //  tempo de execução
-  write(r1.hulk);
-  write(batman.a);
-  write(batman.a);
-  write(batman);
-  write(sum("coqueiro", b));
-  write(hello_world(a));
-  write(teste == a);
-  write(teste && true);
-  write(teste + a);
-
-  // Testes read
-  read(duna);
-  read(lor[0]);
-  read(v[99]);
-  read(arcane[0][0]);
-  read(m[0][99]); //  tempo de execução
-  read(m[99][0]); //  tempo de execução
-  read(m[99][99]); //  tempo de execução
-  read(r1.hulk);
-  read(batman.a);
-  read(batman.a);
-  read(batman);
-
 }
   
 

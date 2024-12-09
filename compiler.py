@@ -1,5 +1,5 @@
 '''
-Problema 3 - Análise Sintática
+Problema 4 - Análise Semântica
 
 EXA869 – MI Processadores de Linguagens de Programação
 
@@ -30,17 +30,14 @@ def write_file(file_name, list, message):
 
 def main():
 
-	TEST_FILE = './analisador_semantico/test/teste_vector.txt' # Exemplo: ./test/function_sample.txt 
+	TEST_FILE = './analisador_semantico/test/test.txt' # Exemplo: ./test/function_sample.txt 
 
 	tokens = lexical_analise(TEST_FILE)
 	if tokens :
 		validator = SemanticAnalyzer()
 		parser = Parser(validator, tokens)
 		parser.run()  
-		
-
-		# for item in parser.validator.pairs_table.tabela[0]['tabela']:print(item.nome)
-
+	
 		print("\n--------------- tabela de registro ---------------")
 		print(validator.registers_type_table)
 		print("\n--------------- tabela global ---------------")
@@ -61,7 +58,6 @@ def main():
 
 	else:
 		print("Erro durante a análise léxica.")
-		#write_file("./analisador_sintatico/saida/parser_result.txt", None, "Erro durante a análise léxica.")
 		
 if __name__ == "__main__":
     main()

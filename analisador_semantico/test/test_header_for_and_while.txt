@@ -1,0 +1,357 @@
+register r {
+  integer a; 
+  integer b;
+  string c;
+}
+
+constants {
+  integer c = 1;
+}
+
+variables {
+  string z = "teste string";
+  integer g = 32;
+  integer v_g[2];
+  integer m_g[1][2];
+  boolean controle = true;
+  integer teste4;
+}
+
+function integer sum2(integer d, integer b){
+  variables {
+
+  }
+
+  return c + b;
+}
+
+
+function string sum1(integer a, integer b) {
+  variables {
+  }
+
+  return "a + b";
+}
+
+main() {
+  variables {
+    string teste = "aaa";
+    integer a = sum2(1,2);
+    integer b = 1;
+    integer v[2];
+    integer m[1][2];
+    integer result;
+    integer n1;
+    integer n2;
+    r r1;
+    integer teste1;
+    integer teste2;
+    integer teste3;
+    boolean teste6;
+    boolean teste_bool_for = true;
+  }
+    v[0] = 1;  
+    v[1] = 1;
+    m[0][0] = 1;
+    m[0][1] = 1;
+    r1.a = 2;
+    r1.c = "teste";
+
+    n1 = v[1];
+
+  // ---- Teste cabeçalho WHILE ----
+
+  // --- Devem passar ---
+  // operação válida com aritméticos, lógicos e relacionais
+  while (((a + 1 - r1.a && b) || a != c) > 321*85/c){
+    if (c && b) then {
+      b++;
+    } else {
+      b--;
+    }
+  }
+
+  // apenas um terminal booleano (false)
+  while (false){
+    if (c && b) then {
+      b++;
+    } else {
+      b--;
+    }
+  }
+
+  // apenas um terminal booleano (true)
+  while (true){
+    if (c && b) then {
+      b++;
+    } else {
+      b--;
+    }
+  }
+
+  // terminal booleano (true) entre parênteses
+  while ((true)){
+    if (3 > 4) then {
+      b++;
+    } else {
+      b--;
+    }
+  }
+
+  // terminal booleano (false) entre parênteses
+  while ((false)){
+    if (3 > 4) then {
+      b++;
+    } else {
+      b--;
+    }
+  }
+
+  // apenas operação aritmética
+  while ((32*13-43/v[3]*r1.a)){
+    if (3 > 4) then {
+      b++;
+    } else {
+      b--;
+    }
+  }
+
+  // inteiro como parâmetro - casting
+  while (3333){
+    if (c && b) then {
+      b++;
+    } else {
+      b--;
+    }
+  }
+
+  // float como parâmetro - casting
+  while (2.1){
+    if (c && b) then {
+      b++;
+    } else {
+      b--;
+    }
+  }
+
+  // operações relacionais e aritméticas
+  while ((((21 > 32) < (v[2] != r1.a)) >= ((32 - a) <= (c + 1))) == 2){
+    if (3 > 4) then {
+      b++;
+    } else {
+      b--;
+    }
+  }
+
+  // operações relacionais, aritméticas e lógicas
+  while (1 || 2 > (3 + 3) && true){
+    if (c && b) then {
+      b++;
+    } else {
+      b--;
+    }
+  }
+
+  // --- Devem dar erro ---
+  // erro: variável do tipo string em operação
+  while ((1+3*5/z-5-4)){
+    if (c || b) then {
+      b++;
+    } else {
+      b--;
+    }
+  }
+
+  // erro: string
+  while (z){
+    if (c && b) then {
+      b++;
+    } else {
+      b--;
+    }
+  }
+
+  // erro: vetor diretamente
+  while (v){
+    if (c && b) then {
+      b++;
+    } else {
+      b--;
+    }
+  }
+
+  // erro: vetor diretamente em uma operação
+  while (v - 32 / 62){
+    if (c && b) then {
+      b++;
+    } else {
+      b--;
+    }
+  }
+
+  // erro: objeto registrador
+  while (r1){
+    if (c && b) then {
+      b = 23 - z;
+    } else {
+      b--;
+    }
+  }
+
+
+  // ---- Teste cabeçalho FOR ----
+    // -- Casos que não devem dar erros --
+    // definição da variável (i) de controle no for 
+    for (integer i = 12; i > 0; i++) {
+        teste1 = 3;
+        i = teste1;
+    }
+
+    // utilização de uma variável já existente (teste1) e atribuição de valor a mesma 
+    for (teste1 = 23; teste1 < 0; g--) {
+        teste1 = 3;
+    }
+
+    // definição da variável (i) de controle no for e atribuição de posição de matriz como valor
+    for (integer i = m_g[0][1]; i >= teste1; i++) { 
+        i = 3;
+    }
+
+    // utilização de uma variável já existente (teste1) e atribuição de posição de vetor como valor
+    for (teste1 = m_g[0]; teste1 <= 0; teste1++) { 
+        teste2 = 3;
+    }
+
+    // utilização de uma variável já existente (teste1) e atribuição de operação aritmética 
+    for (teste2 = 12+15-85*g; teste1 != c; teste1++) {
+        teste1 = 3;
+    }
+
+    // definição da variável (i) e atribuição de operação aritmética
+    for (integer i = 12+15-85*g; teste1 == 32+8; teste1++) { 
+        teste1 = 3;
+        i = c;
+    }
+
+    // utilização de uma variável já existente (teste3) sem ser inicializada e atribuindo um valor a mesma 
+    for (teste3 = 12+15-85*g; teste3 >= c; teste3++) {
+        teste3 = 3;
+    }
+
+    // incremento de outra variável do tipo inteiro que não a de controle (deve ser permitido)
+    for (teste4 = 14-teste3*78/12; teste1 <= 145-teste3; teste3--) {
+        teste1 = 3;
+    }
+    
+    // definição da variável (i) de controle e atribuição de chamada de função - tipo certo
+    for (integer i = sum2(1,2); i != 0; i++) {
+        teste1 = 3;
+    }
+
+    // utilização de uma variável já existente (teste3) e atribuição de chamada de função - tipo certo
+    for (teste3 = sum2(1,2); teste3 != 0; teste3++) {
+        teste1 = 3;
+    }
+
+    //utilização de uma variável já existente (teste3) e uma variável booleana (deve fazer casting)
+    for (teste4 = teste_bool_for; 2 > teste2; teste2++){
+      teste1 = 4;
+    }
+
+    // definição da variável (i) de controle e atribuição de uma variável booleana (deve fazer casting)
+    for (integer i = teste_bool_for; i != 0; i++) {
+        teste1 = 3;
+    }
+
+    // operação relacional com aritmética (permitido)
+    for (integer j = 3; ((((42*(31-5)) + 3)-32)) <= 3; j++){
+      j--;
+    }
+
+    // for aninhado - opção 1
+    for (integer j = 3; ((((42*(31-5)) + 3)-32)) <= 3; j++){
+      for (j = 3; ((((42*(31-5)) + 3)-32)) <= 3; j++){
+        j--;
+      }
+    }
+
+    // for aninhado - opção 2
+    for (integer i = 3; i <= 3; i++){
+      for (integer j = 3; ((((42*(31-5)) + 3)-32)) <= 3; j++){
+        j--;
+        i++;
+      }
+    }
+
+    // for aninhado - opção 2
+    for (integer i = 3; i <= 3; i++){
+      for (integer j = 3; ((((42*(i-5)) + 3)-32)) <= 3; i++){
+        for (integer k = 3; ((((42*(31-5)) + 3)-32)) <= 3; j++){
+          j--;
+          i++;
+        }
+      }
+    }
+
+    // for aninhado - opção 3
+    for (integer i = 3; i <= 3; i++){
+      for (integer j = 3; ((((j*(31-5)) + 3)-32)) <= 3; i++){
+        for (j = 3; ((((42*(i-5)) + 3)-32)) <= 3; i++){
+          j--;
+          i++;
+        }
+      }
+    }
+
+    // --- Devem dar erro ---
+    // erro: atribuição a uma variável existente do retorno de uma função com tipo incompatível 
+    for (teste3 = sum1(1,2); teste3 != 0; teste3++) {
+        teste1 = 3;
+    }
+
+    // erro: criação de variável com atribuição atribuição a uma variável existente de retorno de uma função com tipo incompatível
+    for (integer i = sum1(1,2); i == 0; teste3++) {
+        teste1 = 3;
+    }
+
+    // erro: atribuição a uma variável existente mas de tipo distinto de inteiro. apesar de permitir o casting, nesse caso, espera-se uma variável do tipo inteiro no primeiro termo do for (como definido na gramática)
+    for (teste6 = 32+8; teste6 == 0; teste6--) {
+        teste1 = 3;
+    }
+    
+    // erro: atribuição a uma variável existente mas de tipo distinto de inteiro. apesar de permitir o casting, nesse caso, espera-se uma variável do tipo inteiro no primeiro termo do for (como definido na gramática)
+    for (z = teste1*32; z == 0; z--) {
+        teste1 = 3;
+    }
+
+    // erro: o segundo termo do for não é uma operação relacional e ff não existe
+    for (teste1 = 3; teste1; ff--) {
+        teste1 = 3;
+    }
+
+    // erro: o segundo termo do for não é uma operação relacional e c é uma constante
+    for (teste1 = 3-5+39*teste1; 3; c--) {    /* esse caso tem erro - não pode haver apenas um numero/identificar/boolean, tem que ser uma operação relacional */
+        teste1 = 3;
+    }
+
+    // erro: o segundo termo do for não é uma operação relacional e a variável do incremento não existe
+    for (teste1 = 3; teste1 + teste2; nao_existe++) {
+        teste1 = 3;
+    }
+
+    // erro: o segundo termo do for deve ser uma operação relacional (pode está em conjunto com operações aritmética) e não pode haver lógicas (vide gramática)
+    for (teste1 = 3; (true && true); teste1--) {    /* nesse caso, não ocorre no sintático passando para o semantico - deve ser aceito no semantico porque é uma operação logica */
+        teste1 = 3;
+    }
+
+    // erro: o segundo termo do for é uma operação relacional, mas não é aceito operadores lógicos (vide gramática)
+    for (teste1 = 3; ((true && true) >= 3); teste1++) {    /* nesse caso, só será aceito uma expressão seja relacional ou logica (< > <= >= != == && ||) */
+        teste1 = 3;
+    }
+
+    // erro: o segundo termo do for é uma operação relacional, mas não é aceito operadores lógicos (vide gramática)
+    for (teste1 = 3; (teste1 && 3) >= (teste1 || 4); teste1--) {    
+        teste1 = 3;
+    }
+
+}

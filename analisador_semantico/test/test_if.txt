@@ -1,0 +1,94 @@
+constants {
+  integer c = 0;
+  integer const = 10;
+}
+
+variables {
+  integer var = true;
+}
+
+main() {
+  variables {
+    integer a = 0;
+    integer b = 0;
+    integer d = 0;
+    integer e = 0;
+    integer f;
+    boolean bool;
+    string str;
+  }
+
+  if(true) then {
+    a++;
+  }
+
+  if(4) then {
+    a++;
+  }
+
+  if(a) then {
+    a++;
+  }
+
+  if(3>a) then {
+    a++;
+  }
+
+  if(b>a) then {
+    a++;
+  }
+
+ if(a>b) then {
+    if(a+((b*(c)))>e-d) then {
+      a++;
+    } else {
+      a++;
+    }
+  }
+
+  if(true && (a > (b+15) || e < d)) then {
+    a++;
+  }
+
+   if(a>b) then {
+    if(a+((b*(c)))>e-d) then {
+      a++;
+    } else {
+      a++;
+    }
+  }
+
+  if(true && (a > (b+15) || e < d)) then {
+    a++;
+  }
+
+  //Casos de erro
+  if(f) then {
+    a++;
+  }
+
+  if(3>f) then {
+    a++;
+  }
+
+  if(f>a) then {
+    a++;
+  }
+
+  if(str) then {
+    a++;
+  }
+
+  if(true && (a > (b+15) || str < d)) then {
+    a++;
+  }
+
+  if(a>b) then {
+    if(a+((b*(f)))>e-d) then {
+      a++;
+    } else {
+      a++;
+    }
+  }  
+
+}

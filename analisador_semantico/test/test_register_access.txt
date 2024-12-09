@@ -20,7 +20,20 @@ function integer sum(integer a, integer b) {
 main() {
   variables {
     my_register register_instance;
+    my_register reg1;
+    my_register reg2;
+    my_register reg3;
   }
+
+  reg1.b = 3;
+  reg1.a = 0;
+  
+  reg2.b = reg1.a;
+
+  reg1.b = reg3.a + 2;
+
+  reg2.a = reg1.a + reg3.b;
+
   register_instanceZ.b = 7; // Erro 1: acesso de registro não declarado
 
   register_instance.z = 7; // Erro 2: acesso de atributo não declarado no registro
